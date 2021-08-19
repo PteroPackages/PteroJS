@@ -1,6 +1,7 @@
 const {
     NodeLocationManager,
     NodeManager,
+    RequestManager,
     UserManager
 } = require('./managers');
 
@@ -17,6 +18,7 @@ class PteroApp {
         this.domain = domain.endsWith('/') ? domain.slice(0, -1) : domain;
         this.auth = auth;
         this.options = options;
+        this.requests = new RequestManager(this);
 
         this.users = new UserManager(this);
         this.nodes = new NodeManager(this);
