@@ -41,6 +41,30 @@ class FileManager {
             });
         }
     }
+
+    async fetch(dir = '') {}
+
+    async getContents(file) {}
+
+    async getPath(file) {}
+
+    async download(file) {}
+
+    async rename(file, name) {}
+
+    async copy(location) {}
+
+    async write(file, contents) {}
+
+    async compress(file) {}
+
+    async decompress(file) {}
+
+    async delete(file) {}
+
+    async createFolder(path, name) {}
+
+    async getUploadURL() {}
 }
 
 module.exports = FileManager;
