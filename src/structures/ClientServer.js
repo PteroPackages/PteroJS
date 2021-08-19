@@ -76,6 +76,16 @@ class ClientServer {
 
         this.files = new FileManager(client, null);
     }
+
+    addWebsocket() {
+        this.client.addSocketServer(this.identifier);
+    }
+
+    get resources() {}
+
+    async sendCommand(command) {}
+
+    async setPowerState(state) {}
 }
 
 module.exports = ClientServer;
