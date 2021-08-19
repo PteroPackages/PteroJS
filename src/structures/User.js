@@ -88,7 +88,7 @@ class PteroUser extends BaseUser {
         /**
          * @type {?number}
          */
-        this.updatedTimestamp = this.updatedAt ? this.updatedAt.getTime() : null;
+        this.updatedTimestamp = this.updatedAt?.getTime() || null;
     }
 }
 
