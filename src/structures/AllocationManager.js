@@ -19,6 +19,16 @@ class AllocationManager {
             });
         }
     }
+
+    async fetch() {}
+
+    async assign() {}
+
+    async setNote(id, note) {}
+
+    async setPrimary(id) {}
+
+    async unassign(id) {}
 }
 
 module.exports = AllocationManager;
