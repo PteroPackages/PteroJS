@@ -4,6 +4,7 @@ const ClientServer = require('./ClientServer');
 const ClientUser = require('./ClientUser');
 const DatabaseManager = require('./DatabaseManager');
 const FileManager = require('./FileManager');
+const Node = require('./Node');
 const { Permissions, UserPermissions } = require('./Permissions');
 const Schedule = require('./Schedule');
 const { BaseUser, PteroUser, PteroSubUser } = require('./User');
@@ -15,6 +16,7 @@ module.exports = {
     ClientUser,
     DatabaseManager,
     FileManager,
+    Node,
     Permissions,
     UserPermissions,
     Schedule,
