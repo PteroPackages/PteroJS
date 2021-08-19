@@ -1,3 +1,4 @@
+const BackupManager = require('./BackupManager');
 const RequestManager = require('./RequestManager');
 const ServerManager = require('./ServerManager');
 const UserManager = require('./UserManager');
@@ -7,8 +8,9 @@ class RequestError extends Error {
 }
 
 module.exports = {
+    BackupManager,
+    RequestError,
     RequestManager,
     ServerManager,
-    UserManager,
-    RequestError
+    UserManager
 }
