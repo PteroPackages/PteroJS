@@ -11,6 +11,21 @@ class UserManager {
         this.cache = new Map();
     }
 
+    _patch(data) {
+        if (data.data) {
+            const s = new Map();
+            for (const o of data.data) {
+                const u = new PteroUser(this.client, o);
+                this.cache.set(u.id, u);
+                s.set(u.id, u);
+            }
+            return s;
+        }
+        const u = new PteroUser(this.client, data);
+        this.cache.set(u.id, u);
+        return u;
+    }
+
     /**
      * Fetches a user from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the user.
@@ -23,22 +38,11 @@ class UserManager {
                 const u = this.cache.get(id);
                 if (u) return Promise.resolve(u);
             }
-            let user = await this.client.requests.make(endpoints.users.get(id));
-            user = new PteroUser(this.client, user);
-            this.cache.set(user.id, user);
-            return user;
+            const data = await this.client.requests.make(endpoints.users.get(id));
+            return this._patch(data);
         }
-
         const data = await this.client.requests.make(endpoints.users.main);
-        if (!Array.isArray(data)) throw new Error('Invalid API Response.');
-
-        const res = new Map();
-        data.forEach(o => {
-            const u = new PteroUser(this.client, o);
-            this.cache.set(u.id, u);
-            res.set(u.id, u);
-        });
-        return res;
+        return this._patch(data);
     }
 
     /**
@@ -51,10 +55,8 @@ class UserManager {
      */
     async fetchExternal(id, options = {}) {
         if (options.force !== true) this.cache.forEach(u => { if (id === u.externalId) return u });
-        let user = await this.client.requests.make(endpoints.users.ext(id) + (options.withServers ? '?include=servers' : ''));
-        user = new PteroUser(this.client, user);
-        this.cache.set(user.id, user);
-        return user;
+        const data = await this.client.requests.make(endpoints.users.ext(id) + (options.withServers ? '?include=servers' : ''));
+        return this._patch(data);
     }
 
     /**
@@ -71,9 +73,7 @@ class UserManager {
             { email, username, first_name: firstname, last_name: lastname },
             'POST'
         );
-        const user = new PteroUser(this.client, data);
-        this.cache.set(user.id, user);
-        return user;
+        return this._patch(data);
     }
 
     /** @todo */
