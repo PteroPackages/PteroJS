@@ -1,7 +1,7 @@
 <h1 align="center">PteroJS</h1>
 <h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
 
-[![discord](https://img.shields.io/badge/discord-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/Qx2hyttRsU)
+[![discord](https://img.shields.io/badge/discord-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rmRw4W5XXz)
 ![version](https://img.shields.io/badge/version-1.0.0-3572A5?style=for-the-badge)
 [![issues](https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge)](https://github.com/devnote-dev/PteroJS/issues)
 
