@@ -17,10 +17,26 @@ class PteroApp {
      * @param {ApplicationOptions} [options] Additional application options.
      */
     constructor(domain, auth, options = {}) {
+        /**
+         * @type {string}
+         */
         this.domain = domain.endsWith('/') ? domain.slice(0, -1) : domain;
+
+        /**
+         * @type {string}
+         * @private
+         */
         this.auth = auth;
+
+        /**
+         * @type {ApplicationOptions}
+         */
         this.options = options;
         this.requests = new RequestManager(this);
+
+        /**
+         * @type {?Date}
+         */
         this.readyAt = null;
 
         this.users = new UserManager(this);
