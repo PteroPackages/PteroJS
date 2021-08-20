@@ -9,6 +9,7 @@
 PteroJS utilises the verbose classes structure seen in libraries like Discord.js to give developers the most amount of control over their code.
 
 ## Installing
+*This package is not currently available on NPM so you have to download a zip of the repository to use.*
 ```
 npm i pterojs
 ```
@@ -26,14 +27,14 @@ const client = new PteroClient('your.domain.here', 'pterodactyl_api_key', { ws: 
 // Adding servers to listen for
 client.addSocksetServer([ 'kgujg66h', 'avipgt6e' ]);
 
-// Connecting to Pterodactyl
-(async () => { await client.connect(); })();
-
 // Listening to events
 client.on('statusUpdate', (server, status) => {
     console.log(server);
     console.log(status);
 });
+
+// Connecting to Pterodactyl
+client.connect();
 ```
 
 ### Using the application API
@@ -43,11 +44,11 @@ const { PteroApp } = require('pterojs');
 // Initialising the application
 const client = new PteroApp('your.domain.here', 'pterodactyl_api_key', { startup:{ fetchServers: true }});
 
-// Connecting to Pterodactyl
-(async () => { await client.connect(); })();
-
 // Accessing information
 client.servers.fetch('evuk98yu').then(console.log);
+
+// Connecting to Pterodactyl
+client.connect();
 ```
 
 ## Contributing
