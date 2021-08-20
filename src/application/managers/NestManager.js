@@ -39,7 +39,7 @@ class NestManager {
 
     /**
      * Fetches a nest from the Pterodactyl API with an optional cache check.
-     * @param {number} id The ID of the nest.
+     * @param {number} [id] The ID of the nest.
      * @returns {Promise<Set<Nest>>}
      */
     async fetch(id) {

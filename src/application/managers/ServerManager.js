@@ -28,8 +28,8 @@ class ServerManager {
 
     /**
      * Fetches a server from the Pterodactyl API with an optional cache check.
-     * @param {number} id The ID of the server.
-     * @param {object} options Additional fetch options.
+     * @param {number} [id] The ID of the server.
+     * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {Array<string>} [options.include] Additional fetch parameters to include.
      * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>}
