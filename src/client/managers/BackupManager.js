@@ -1,6 +1,9 @@
+const endpoints = require('./Endpoints');
+
 class BackupManager {
-    constructor(client) {
+    constructor(client, server) {
         this.client = client;
+        this.server = server;
 
         /**
          * @type {Map<string, Backup>}
@@ -8,13 +11,97 @@ class BackupManager {
         this.cache = new Map();
     }
 
-    async fetch(id = '', force = false) {}
+    _patch(data) {
+        if (data.data) {
+            const s = new Map();
+            for (let o of data.data) {
+                o = o.attributes;
+                this.cache.set(o.uuid, {
+                    uuid: o.uuid,
+                    name: o.name,
+                    ignoredFiles: o.ignored_files,
+                    hash: o.hash,
+                    bytes: o.bytes,
+                    createdAt: new Date(o.created_at),
+                    completedAt: o.completed_at ? new Date(o.completed_at) : null
+                });
+                s.set(o.uuid, this.cache.get(o.uuid));
+            }
+            return s;
+        }
+        data = data.attributes;
+        this.cache.set(data.uuid, {
+            uuid: data.uuid,
+            name: data.name,
+            ignoredFiles: data.ignored_files,
+            hash: data.hash,
+            bytes: data.bytes,
+            createdAt: new Date(data.created_at),
+            completedAt: data.completed_at ? new Date(data.completed_at) : null
+        });
+        return this.cache.get(data.uuid);
+    }
 
-    async create() {}
+    /**
+     * Fetches a backup from the Pterodactyl API with an optional cache check.
+     * @param {string} id The UUID of the backup.
+     * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
+     * @returns {Promise<Backup|Map<string, Backup>>}
+     */
+    async fetch(id, force = false) {
+        if (id) {
+            if (!force) {
+                const b = this.cache.get(id);
+                if (b) return b;
+            }
+            const data = await this.client.requests.make(
+                endpoints.servers.backups.get(this.server.identifier, id)
+            );
+            return this._patch(data);
+        }
+        const data = await this.client.requests.make(
+            endpoints.servers.backups.list(this.server.identifier)
+        );
+        return this._patch(data);
+    }
 
-    async download(id) {}
+    /**
+     * Creates a new backup.
+     * @returns {Promise<Backup>}
+     */
+    async create() {
+        return this._patch(
+            await this.client.requests.make(
+                endpoints.servers.backups.list(this.server.identifier),
+                {}, 'POST'
+            )
+        );
+    }
 
-    async delete(id) {}
+    /**
+     * Returns a download link for the backup.
+     * @param {string} id The UUID of the backup.
+     * @returns {Promise<string>}
+     */
+    async download(id) {
+        const url = await this.client.requests.make(
+            endpoints.servers.backups.download(this.server.identifier, id)
+        );
+        return url.attributes.url;
+    }
+
+    /**
+     * Deletes a specified backup.
+     * @param {string} id The UUID of the backup.
+     * @returns {Promise<string>}
+     */
+    async delete(id) {
+        await this.client.requests.make(
+            endpoints.servers.backups.get(this.server.identifier, id), { method: 'DELETE' }
+        );
+        this.cache.delete(id);
+        return id;
+    }
 }
 
 module.exports = BackupManager;
