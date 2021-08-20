@@ -3,7 +3,7 @@ class ApplicationServer {
         this.client = client;
 
         /**
-         * @type {string}
+         * @type {number}
          */
         this.id = data.id;
 
