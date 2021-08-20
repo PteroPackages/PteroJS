@@ -12,7 +12,7 @@ class NodeManager {
     }
 
     _patch(data) {
-        if (data.data && Array.isArray(data)) {
+        if (data.data) {
             const s = new Map();
             for (const o of data.data) {
                 const n = new Node(this.client, o);

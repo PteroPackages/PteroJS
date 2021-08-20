@@ -11,7 +11,7 @@ class NodeLocationManager {
     }
 
     _patch(data) {
-        if (data.data && Array.isArray(data)) {
+        if (data.data) {
             const s = new Map();
             for (const o of data.data) {
                 this.cache.set(o.id, {

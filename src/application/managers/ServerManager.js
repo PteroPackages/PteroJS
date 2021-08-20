@@ -12,7 +12,7 @@ class ServerManager {
     }
 
     _patch(data) {
-        if (data.data && Array.isArray(data.data)) {
+        if (data.data) {
             const s = new Map();
             for (const o of data.data) {
                 const server = new ApplicationServer(this.client, o);
@@ -66,6 +66,7 @@ class ServerManager {
 module.exports = ServerManager;
 
 function joinParams(params) {
+    if (!params) return '';
     const res = [];
     params.forEach(p => res.push(['include', p]));
     return '?'+ new URLSearchParams(res).toString();

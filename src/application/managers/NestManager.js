@@ -11,7 +11,7 @@ class NestManager {
     }
 
     _patch(data) {
-        if (data.data && Array.isArray(data.data)) {
+        if (data.data) {
             for (const o of data.data) {
                 o = o.attributes;
                 this.cache.add({
@@ -43,9 +43,7 @@ class NestManager {
      * @returns {Promise<Set<Nest>>}
      */
     async fetch(id) {
-        if (id) {
-            return this._patch(await this.client.requests.make(endpoints.nests.get(id)));
-        }
+        if (id) return this._patch(await this.client.requests.make(endpoints.nests.get(id)));
         return this._patch(await this.client.requests.make(endpoints.nests.main));
     }
 
