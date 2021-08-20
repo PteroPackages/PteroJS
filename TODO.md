@@ -12,10 +12,11 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Setup `connect()` function ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L26))
 - [ ] Create and implement `WebsocketManager`
 - [ ] Rename endpoints in endpoints structure
-- [ ] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
+- [X] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
 - [ ] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
 - [ ] Implement helper functions for all the managers
 - [ ] Implement `ClientUser` required fetch on startup
+- [ ] Rewrite enpoints naming scheme
 
 ## Global Managers
 - [ ] Implement helper functions for all the managers
@@ -23,7 +24,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 
 ## Global Structures
 - [ ] Implement helper functions for all the structures
-- [ ] Figure out and implement a consistent management system for `Permissions` ([Permissions](https://github.com/devnote-dev/PteroJS/blob/main/src/structures/Permissions.js))
+- [ ] Figure out and implement a consistent management system for `Permissions` ([Permissions](https://github.com/devnote-dev/PteroJS/blob/main/src/structures/Permissions.js)) (priority)
 
 ## Misc.
 - [ ] Add proper notes and annotations to JSDocs (not priority)
