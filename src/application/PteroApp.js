@@ -2,6 +2,7 @@ const {
     NodeLocationManager,
     NodeManager,
     RequestManager,
+    ServerManager,
     UserManager
 } = require('./managers');
 
@@ -19,13 +20,22 @@ class PteroApp {
         this.auth = auth;
         this.options = options;
         this.requests = new RequestManager(this);
+        this.readyAt = null;
 
         this.users = new UserManager(this);
         this.nodes = new NodeManager(this);
+        this.servers = new ServerManager(this);
         this.locations = new NodeLocationManager(this);
     }
 
-    async connect() {}
+    async connect() {
+        if (this.options.fetchUsers) await this.users.fetch();
+        if (this.options.fetchNodes) await this.nodes.fetch();
+        if (this.options.fetchServers) await this.servers.fetch();
+        if (this.options.fetchLocations) await this.locations.fetch();
+        this.readyAt = Date.now();
+        return true;
+    }
 }
 
 module.exports = PteroApp;
