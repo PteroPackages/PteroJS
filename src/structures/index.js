@@ -2,7 +2,7 @@ const ApplicationServer = require('./ApplicationServer');
 const ClientServer = require('./ClientServer');
 const ClientUser = require('./ClientUser');
 const Node = require('./Node');
-const { Permissions, UserPermissions } = require('./Permissions');
+const Permissions = require('./Permissions');
 const Schedule = require('./Schedule');
 const { BaseUser, PteroUser, PteroSubUser } = require('./User');
 
@@ -17,7 +17,6 @@ module.exports = {
     Node,
     Permissions,
     RequestError,
-    UserPermissions,
     Schedule,
     BaseUser,
     PteroUser,
