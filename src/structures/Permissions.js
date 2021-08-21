@@ -50,7 +50,7 @@ const FLAGS = {
 }
 
 class Permissions {
-    FLAGS = FLAGS;
+    FLAGS = Object.freeze(FLAGS);
 
     DEFAULT = [1, 2];
 
@@ -90,9 +90,8 @@ class Permissions {
      * @see {@link PermissionResolvable}
      * @param {PermissionResolvable} perms The data to resolve the permissions from.
      * @returns {object}
-     * @static
      */
-    resolve(perms) {
+    static resolve(perms) {
         const res = {};
         if (typeof perms === 'object' && !Array.isArray(perms)) perms = Object.keys(perms);
         if (!perms.every(p => typeof p == 'string' || typeof p == 'number')) throw new Error('Invalid permissions type array (must be strings or numbers only).');
@@ -136,9 +135,8 @@ class Permissions {
      * Returns a permission object from the default string permissions.
      * @param {Array<string>} perms The array of default permissions.
      * @returns {object}
-     * @static
      */
-    fromStrings(perms) {
+    static fromStrings(perms) {
         return Object.keys(this.resolve(perms)).map(p => p.toUpperCase().replace('.', '_'));
     }
 }
@@ -150,5 +148,5 @@ module.exports = Permissions;
  * * An array of strings
  * * An array of numbers
  * * An object
- * @typedef {Array<string>|Array<number>|object|PermissionResolvable} PermissionResolvable
+ * @typedef {Array<string>|Array<number>|object} PermissionResolvable
  */
