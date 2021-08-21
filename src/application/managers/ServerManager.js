@@ -1,4 +1,4 @@
-const { ApplicationServer } = require('../../structures');
+const { ApplicationServer, PteroUser } = require('../../structures');
 const endpoints = require('./Endpoints');
 
 class ServerManager {
@@ -47,8 +47,21 @@ class ServerManager {
         return this._patch(data);
     }
 
-    /** @todo */
-    async create(options) {}
+    /**
+     * Creates a new Pterodactyl server for a specified user.
+     * @param {number|PteroUser} user The user to create the server for.
+     * @param {object} options Base server options.
+     * @returns {Promise<ApplicationServer>}
+     */
+    async create(user, options) {
+        if (user instanceof PteroUser) user = user.id;
+        if (
+            !options.name ||
+            !options.egg ||
+            !options.env
+        ) throw new Error('Missing required server option.');
+        // WIP
+    }
 
     /**
      * Deletes a specified server.
