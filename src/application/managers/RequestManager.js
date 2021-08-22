@@ -8,7 +8,7 @@ class RequestManager {
         this.headers['Authorization'] = `Bearer ${client.auth}`;
     }
 
-    reset = 0;
+    suspended = false;
     headers = {
         'User-Agent': `Application PteroJS v${version}`,
         'Content-Type': 'application/json',
@@ -19,25 +19,27 @@ class RequestManager {
      * @param {string} url
      * @param {object} [params]
      * @param {string} [method]
-     * @returns {Promise<object>}
+     * @returns {Promise<object|boolean>}
      */
     async make(url, params = {}, method = 'GET') {
-        if (this.reset > Date.now()) throw new RequestError('Application is ratelimited.');
+        if (this.suspended) throw new RequestError('Application is ratelimited.');
+        const body = params.raw ?? JSON.stringify(params);
         const data = await fetch(this.client.domain + url, {
             method,
-            body: JSON.stringify(params),
+            body,
             headers: this.headers
         });
 
         if ([401, 403, 429].includes(data.status)) {
             if (data.status === 401) throw new RequestError();
             if (data.status === 403) throw new RequestError('403: Path forbidden.');
-            
+
             this.suspended = true;
-            this.timeout = setTimeout(() => this.suspended = false, 600000);
-            throw new RequestError('Ratelimited, resolving in 10 minutes.');
+            setTimeout(() => this.suspended = false, 600000);
+            throw new RequestError('Application is ratelimited, restarting in 10 minutes.');
         }
 
+        if ([201, 204].includes(data.status)) return true;
         if (data.ok) return await data.json();
         return null;
     }
