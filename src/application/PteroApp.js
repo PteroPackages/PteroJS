@@ -22,7 +22,6 @@ class PteroApp {
 
         /**
          * @type {string}
-         * @private
          */
         this.auth = auth;
 
@@ -37,6 +36,11 @@ class PteroApp {
          */
         this.readyAt = null;
 
+        /**
+         * @type {?number}
+         */
+        this.ping = null;
+
         this.users = new UserManager(this);
         this.nodes = new NodeManager(this);
         this.nests = new NestManager(this);
@@ -45,11 +49,14 @@ class PteroApp {
     }
 
     async connect() {
+        const start = Date.now();
+        await this.requests.make('/');
         if (this.options.fetchUsers) await this.users.fetch();
         if (this.options.fetchNodes) await this.nodes.fetch();
         if (this.options.fetchNests) await this.nests.fetch();
         if (this.options.fetchServers) await this.servers.fetch();
         if (this.options.fetchLocations) await this.locations.fetch();
+        this.ping = start - Date.now();
         this.readyAt = Date.now();
         return true;
     }
