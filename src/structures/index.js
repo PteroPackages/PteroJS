@@ -1,10 +1,9 @@
 const ApplicationServer = require('./ApplicationServer');
 const ClientServer = require('./ClientServer');
-const ClientUser = require('./ClientUser');
 const Node = require('./Node');
 const Permissions = require('./Permissions');
 const Schedule = require('./Schedule');
-const { BaseUser, PteroUser, PteroSubUser } = require('./User');
+const { BaseUser, PteroUser, PteroSubUser, ClientUser } = require('./User');
 
 class RequestError extends Error {
     constructor(message = 'Invalid request to API.') { super(message) }
