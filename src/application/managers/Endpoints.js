@@ -18,8 +18,7 @@ module.exports = {
         startup: s => `/api/application/servers/${s}/startup`,
         suspend: s => `/api/application/servers/${s}/suspend`,
         unsuspend: s => `/api/application/servers/${s}/unsuspend`,
-        reinstall: s => `/api/application/servers/${s}/reinstall`,
-        force: s => `/api/application/servers/${s}/force`
+        reinstall: s => `/api/application/servers/${s}/reinstall`
     },
     locations:{
         main: '/api/application/locations',
@@ -29,7 +28,7 @@ module.exports = {
         main: '/api/application/nests',
         get: n => `/api/application/nests/${n}`,
         eggs:{
-            main: e => `/api/application/nests/${e}/eggs`,
+            main: n => `/api/application/nests/${n}/eggs`,
             get: (n, e) => `/api/application/nests/${n}/eggs/${e}`
         }
     }
