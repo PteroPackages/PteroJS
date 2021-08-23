@@ -58,16 +58,14 @@ class Permissions {
     /**
      * Default Pterodactyl user permissions.
      */
-    DEFAULT = {
+    DEFAULT = Object.freeze({
         CONTROL_CONSOLE: 1,
         CONTROL_START: 2,
         CONTROL_STOP: 3,
         CONTROL_RESTART: 4
-    };
+    });
 
-    constructor(client, data) {
-        this.client = client;
-
+    constructor(data) {
         /**
          * The raw permissions object.
          * @type {object}
@@ -84,7 +82,7 @@ class Permissions {
         if (typeof perms === 'string' || typeof perms === 'number') perms = [perms];
         perms = Object.keys(this.resolve(perms));
 
-        for (const perm of perms) if (!this.raw[perm]) return false;
+        for (const p of perms) if (!this.raw[p]) return false;
         return true;
     }
 
@@ -106,11 +104,14 @@ class Permissions {
         const res = {};
         if (typeof perms === 'object' && !Array.isArray(perms)) perms = Object.keys(perms);
         if (!perms.every(p => typeof p == 'string' || typeof p == 'number')) throw new Error('Invalid permissions type array (must be strings or numbers only).');
+        if (diff(perms)) throw new Error('Permissions must be all strings or all numbers.');
 
-        const values = Object.values(this.FLAGS);
-        for (const perm of perms) {
-            if (!this.FLAGS[perm] && !values.includes(perm)) throw new Error(`Unknown permission '${perm}'.`);
-            res[perm] = this.FLAGS[perm];
+        if (perms.some(p => typeof p === 'string')) perms = this.resolve(this.fromStrings(perms));
+        const entries = Object.entries(this.FLAGS);
+        for (const p of perms) {
+            if (!this.FLAGS[p] && !entries.find(e => e[1] === p)) throw new Error(`Unknown permission '${p}.`);
+            const e = entries.find(e => e.includes(p));
+            res[e[0]] = e[1];
         }
         return res;
     }
@@ -153,6 +154,10 @@ class Permissions {
 }
 
 module.exports = Permissions;
+
+function diff(perms) {
+    return perms.some(p => typeof p === 'string') && perms.some(p => typeof p === 'number');
+}
 
 /**
  * Data that can be resolved into a Permissions object. Valid types are:
