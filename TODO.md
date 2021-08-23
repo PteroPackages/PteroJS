@@ -8,7 +8,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Create and implement `NestEggsManager`
 
 ## Client
-- [ ] Use typed `ClientOptions` for startup ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L13))
+- [X] Use typed `ClientOptions` for startup ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L13))
 - [ ] Setup `connect()` function ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L26))
 - [ ] Create and implement `WebsocketManager`
 - [ ] Rename endpoints in endpoints structure
