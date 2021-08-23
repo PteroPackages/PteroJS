@@ -1,12 +1,13 @@
 module.exports = {
     account:{
-        get: '/api/client/account',
+        main: '/api/client/account',
         tfa: '/api/client/two-factor',
         email: '/api/client/email',
         password: '/api/client/password',
-        apiKeys: '/api/client/api-keys'
+        apikeys: '/api/client/api-keys'
     },
     servers:{
+        main: '/api/client/servers',
         get: s => `/api/client/servers/${s}`,
         databases:{
             get: s => `/api/client/servers/${s}/databases`,
@@ -27,9 +28,12 @@ module.exports = {
             upload: s => `/api/client/servers/${s}/files/upload`
         },
         schedules:{
-            list: s => `/api/client/servers/${s}/schedules`,
+            main: s => `/api/client/servers/${s}/schedules`,
             get: (s, id) => `/api/client/servers/${s}/schedules/${id}`,
-            task: (s, id, t) => `/api/client/servers/${s}/schedules/${id}/tasks/${t}`
+            tasks:{
+                main: (s, id) => `/api/client/servers/${s}/schedules/${id}/tasks`,
+                get: (s, id, t) => `/api/client/servers/${s}/schedules/${id}/tasks/${t}`
+            }
         },
         network:{
             alloc: s => `/api/client/servers/${s}/network/allocations`,
@@ -37,11 +41,11 @@ module.exports = {
             primary: (s, id) => `/api/client/servers/${s}/network/allocations/${id}/primary`
         },
         users:{
-            list: s => `/api/client/servers/${s}/users`,
+            main: s => `/api/client/servers/${s}/users`,
             get: (s, id) => `/api/client/servers/${s}/users/${id}`
         },
         backups:{
-            list: s => `/api/client/servers/${s}/backups`,
+            main: s => `/api/client/servers/${s}/backups`,
             get: (s, id) => `/api/client/servers/${s}/backups/${id}`,
             download: (s, id) => `/api/client/servers/${s}/backups/${id}/download`
         },
@@ -58,6 +62,6 @@ module.exports = {
         command: s => `/api/client/servers/${s}/command`,
         power: s => `/api/client/servers/${s}/power`
     },
-    get: '/api/client',
+    main: '/api/client',
     permissions: '/api/client/permissions'
 }

@@ -60,7 +60,7 @@ class BackupManager {
             return this._patch(data);
         }
         const data = await this.client.requests.make(
-            endpoints.servers.backups.list(this.server.identifier)
+            endpoints.servers.backups.main(this.server.identifier)
         );
         return this._patch(data);
     }
@@ -72,7 +72,7 @@ class BackupManager {
     async create() {
         return this._patch(
             await this.client.requests.make(
-                endpoints.servers.backups.list(this.server.identifier),
+                endpoints.servers.backups.main(this.server.identifier),
                 {}, 'POST'
             )
         );

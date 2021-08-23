@@ -43,7 +43,7 @@ class ServerManager {
             const data = await this.client.requests.make(endpoints.servers.get(id) + joinParams(options.include));
             return this._patch(data);
         }
-        const data = await this.client.requests.make(endpoints.get + joinParams(options.include));
+        const data = await this.client.requests.make(endpoints.main + joinParams(options.include));
         return this._patch(data);
     }
 }

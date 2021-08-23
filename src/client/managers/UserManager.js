@@ -46,7 +46,7 @@ class UserManager {
             return this._patch(data);
         }
         const data = await this.client.requests.make(
-            endpoints.servers.users.list(this.server.identifier)
+            endpoints.servers.users.main(this.server.identifier)
         );
         return this._patch(data);
     }
