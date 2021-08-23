@@ -1,4 +1,4 @@
-const { Node } = require('../../structures');
+const Node = require('../../structures/Node');
 const endpoints = require('./Endpoints');
 
 class NodeManager {

@@ -1,4 +1,4 @@
-const { ClientServer } = require('../../structures');
+const ClientServer = require('../../structures/ClientServer');
 const endpoints = require('./Endpoints');
 
 class ServerManager {

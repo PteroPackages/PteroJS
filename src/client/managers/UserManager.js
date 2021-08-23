@@ -1,4 +1,5 @@
-const { PteroSubUser, Permissions } = require('../../structures');
+const { PteroSubUser } = require('../../structures/User');
+const Permissions = require('../../structures/Permissions');
 const endpoints = require('./Endpoints');
 
 class UserManager {

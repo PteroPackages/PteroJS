@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { RequestError } = require('../../structures');
+const { RequestError } = require('../../structures/Errors');
 const { version } = require('../../../package.json');
 
 class ClientRequestManager {

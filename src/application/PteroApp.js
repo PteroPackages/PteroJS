@@ -1,11 +1,9 @@
-const {
-    ApplicationRequestManager,
-    NestManager,
-    NodeLocationManager,
-    NodeManager,
-    ServerManager,
-    UserManager
-} = require('./managers');
+const ApplicationRequestManager = require('./managers/ApplicationRequestManager');
+const NestManager = require('./managers/NestManager');
+const NodeLocationManager = require('./managers/NodeLocationManager');
+const NodeManager = require('./managers/NodeManager');
+const ServerManager = require('./managers/ServerManager');
+const UserManager = require('./managers/UserManager');
 
 /**
  * The base class for the Pterodactyl application API.

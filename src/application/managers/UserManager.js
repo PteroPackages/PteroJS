@@ -1,4 +1,4 @@
-const { PteroUser } = require('../../structures');
+const { PteroUser } = require('../../structures/User');
 const endpoints = require('./Endpoints');
 
 class UserManager {

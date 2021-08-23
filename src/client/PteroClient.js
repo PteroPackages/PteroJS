@@ -1,6 +1,8 @@
 const { EventEmitter } = require('events');
-const { ClientRequestManager, WebSocketManager, ServerManager } = require('./managers');
-const { ClientUser } = require('../structures');
+const ClientRequestManager = require('./managers/ClientRequestManager');
+const { ClientUser } = require('../structures/User');
+const ServerManager = require('./managers/ServerManager');
+const WebSocketManager = require('./managers/WebSocketManager');
 
 /**
  * The base class for the Pterodactyl client API.

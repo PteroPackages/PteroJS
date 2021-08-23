@@ -1,9 +1,7 @@
-const {
-    AllocationManager,
-    DatabaseManager,
-    FileManager,
-    Permissions
-} = require('.');
+const AllocationManager = require('../managers/AllocationManager');
+const DatabaseManager = require('../managers/DatabaseManager');
+const FileManager = require('../managers/FileManager');
+const Permissions = require('./Permissions');
 
 class ClientServer {
     constructor(client, data) {
