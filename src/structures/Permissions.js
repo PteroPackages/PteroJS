@@ -50,9 +50,20 @@ const FLAGS = {
 }
 
 class Permissions {
+    /**
+     * An object containing all Pterodactyl permissions.
+     */
     FLAGS = Object.freeze(FLAGS);
 
-    DEFAULT = [1, 2];
+    /**
+     * Default Pterodactyl user permissions.
+     */
+    DEFAULT = {
+        CONTROL_CONSOLE: 1,
+        CONTROL_START: 2,
+        CONTROL_STOP: 3,
+        CONTROL_RESTART: 4
+    };
 
     constructor(client, data) {
         this.client = client;
