@@ -15,31 +15,32 @@ class ApplicationRequestManager {
         'Accept': 'application/json'
     }
 
-    /**
-     * @param {string} url
-     * @param {object} [params]
-     * @param {string} [method]
-     * @returns {Promise<object|boolean>}
+    /** Sends a request to the Pterodactyl API. Returns a json object or `null` if
+     * an unknown response code is received.
+     * @param {string} path The path to request.
+     * @param {object} [params] Optional payload data (POST, PUT and PATCH).
+     * @param {string} [method] The method or HTTP verb to use.
+     * @returns {Promise<object|null|void>}
      */
-    async make(url, params, method = 'GET') {
+    async make(path, params, method = 'GET') {
         if (this.suspended) throw new RequestError('Application is ratelimited.');
         const body = params?.raw ?? (params ? JSON.stringify(params) : null);
-        const data = await fetch(this.client.domain + url, {
+        const data = await fetch(this.client.domain + path, {
             method,
             body,
             headers: this.headers
         });
 
         if ([401, 403, 429].includes(data.status)) {
-            if (data.status === 401) throw new RequestError();
-            if (data.status === 403) throw new RequestError('403: Path forbidden.');
+            if (data.status === 401) throw new RequestError('401: Unauthorized API request.');
+            if (data.status === 403) throw new RequestError('403: API Path forbidden.');
 
             this.suspended = true;
             setTimeout(() => this.suspended = false, 600000);
-            throw new RequestError('Application is ratelimited, restarting in 10 minutes.');
+            throw new RequestError('429: Application is ratelimited, restarting in 10 minutes.');
         }
 
-        if ([201, 204].includes(data.status)) return true;
+        if ([201, 204].includes(data.status)) return;
         if (data.ok) return await data.json();
         return null;
     }
