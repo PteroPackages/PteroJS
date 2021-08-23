@@ -1,8 +1,8 @@
 const {
+    ApplicationRequestManager,
     NestManager,
     NodeLocationManager,
     NodeManager,
-    RequestManager,
     ServerManager,
     UserManager
 } = require('./managers');
@@ -32,7 +32,7 @@ class PteroApp {
          * @type {ApplicationOptions}
          */
         this.options = options;
-        this.requests = new RequestManager(this);
+        this.requests = new ApplicationRequestManager(this);
 
         /**
          * @type {?Date}
