@@ -3,7 +3,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 
 ## Application
 - [X] Setup `connect()` function ([PteroApp](https://github.com/devnote-dev/PteroJS/blob/main/src/application/PteroApp.js#L33))
-- [ ] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/application/managers/RequestManager.js))
+- [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/application/managers/RequestManager.js))
 - [ ] Implement helper functions for all the managers
 - [ ] Create and implement `NestEggsManager`
 
@@ -13,7 +13,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Create and implement `WebsocketManager`
 - [ ] Rename endpoints in endpoints structure
 - [X] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
-- [ ] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
+- [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
 - [ ] Implement helper functions for all the managers
 - [ ] Implement `ClientUser` required fetch on startup
 
