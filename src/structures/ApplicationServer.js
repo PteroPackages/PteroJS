@@ -1,3 +1,7 @@
+const AllocationManager = require('../managers/AllocationManager');
+const DatabaseManager = require('../managers/DatabaseManager');
+const FileManager = require('../managers/FileManager');
+
 class ApplicationServer {
     constructor(client, data) {
         this.client = client;
@@ -96,37 +100,11 @@ class ApplicationServer {
          * @type {?number}
          */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
+
+        this.databases = new DatabaseManager(this.client, data.databases);
+        this.files = new FileManager(this.client, data.files);
+        this.allocations = new AllocationManager(data.allocations);
     }
-
-    /**
-     * @todo database submanager
-     */
-    get databases() {}
-
-    /**
-     * @todo file submanager
-     */
-    get files() {}
-
-    /**
-     * @todo schedule submanager
-     */
-    get schedules() {}
-
-    /**
-     * @todo subuser manager
-     */
-    get users() {}
-
-    /**
-     * @todo backup submanager
-     */
-    get backups() {}
-
-    /**
-     * @todo resource manager
-     */
-    get resources() {}
 
     sendCommand(command) {}
 
