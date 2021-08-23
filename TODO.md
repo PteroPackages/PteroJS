@@ -9,9 +9,9 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 
 ## Client
 - [X] Use typed `ClientOptions` for startup ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L13))
-- [ ] Setup `connect()` function ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L26))
+- [X] Setup `connect()` function ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L26))
 - [ ] Create and implement `WebsocketManager`
-- [ ] Rename endpoints in endpoints structure
+- [X] Rename endpoints in endpoints structure
 - [X] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
 - [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
 - [ ] Implement helper functions for all the managers
