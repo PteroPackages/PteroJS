@@ -48,15 +48,19 @@ class PteroApp {
         this.locations = new NodeLocationManager(this);
     }
 
+    /**
+     * Sends a ping request to the API before performing additional startup requests.
+     * @returns {Promise<boolean>}
+     */
     async connect() {
         const start = Date.now();
         await this.requests.make('/');
+        this.ping = start - Date.now();
         if (this.options.fetchUsers) await this.users.fetch();
         if (this.options.fetchNodes) await this.nodes.fetch();
         if (this.options.fetchNests) await this.nests.fetch();
         if (this.options.fetchServers) await this.servers.fetch();
         if (this.options.fetchLocations) await this.locations.fetch();
-        this.ping = start - Date.now();
         this.readyAt = Date.now();
         return true;
     }
