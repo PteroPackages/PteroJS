@@ -107,6 +107,14 @@ class Node {
     async getConfig() {}
 
     async update(options) {}
+
+    /**
+     * Returns the JSON value of the Node.
+     * @returns {object}
+     */
+    toJSON() {
+        return JSON.parse(JSON.stringify(this));
+    }
 }
 
 module.exports = Node;
