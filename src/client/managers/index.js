@@ -1,12 +1,12 @@
 const BackupManager = require('./BackupManager');
-const RequestManager = require('./RequestManager');
+const ClientRequestManager = require('./ClientRequestManager');
 const ServerManager = require('./ServerManager');
 const UserManager = require('./UserManager');
 const WebSocketManager = require('./WebSocketManager');
 
 module.exports = {
     BackupManager,
-    RequestManager,
+    ClientRequestManager,
     ServerManager,
     UserManager,
     WebSocketManager

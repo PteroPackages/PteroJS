@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 const { RequestError } = require('../../structures');
 const { version } = require('../../../package.json');
 
-class RequestManager {
+class ClientRequestManager {
     constructor(client) {
         this.client = client
         this.headers['Authorization'] = `Bearer ${client.auth}`;
@@ -45,4 +45,4 @@ class RequestManager {
     }
 }
 
-module.exports = RequestManager;
+module.exports = ClientRequestManager;
