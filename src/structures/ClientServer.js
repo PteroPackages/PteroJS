@@ -2,6 +2,7 @@ const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const Permissions = require('./Permissions');
+const endpoints = require('../client/managers/Endpoints');
 
 class ClientServer {
     constructor(client, data) {
@@ -62,16 +63,17 @@ class ClientServer {
         this.suspended = attr.suspended;
 
         /**
+         * @type {string}
+         */
+        this.state = 'unknown';
+
+        /**
          * @type {boolean}
          */
         this.installing = attr.installing;
-
         this.allocations = new AllocationManager(attr);
-
         this.permissions = new Permissions(data.meta.user_permissions);
-
         this.databases = new DatabaseManager(client, null);
-
         this.files = new FileManager(client, null);
     }
 
@@ -81,9 +83,34 @@ class ClientServer {
 
     get resources() {}
 
-    async sendCommand(command) {}
+    /**
+     * Sends a command to the server terminal.
+     * @param {string} command The command to send.
+     * @returns {Promise<boolean>}
+     */
+    async sendCommand(command) {
+        return await this.client.requests.make(
+            endpoints.servers.command(this.identifier), { command }, 'POST'
+        );
+    }
 
-    async setPowerState(state) {}
+    /**
+     * Changes the server's power state. This can be one of the following:
+     * * start
+     * * stop
+     * * restart
+     * * kill
+     * @param {string} state The power state to set the server to.
+     * @returns {Promise<boolean>}
+     */
+    async setPowerState(state) {
+        if (!['start', 'stop', 'restart', 'kill'].includes(state)) throw new Error('Invalid power state.');
+        await this.client.requests.make(
+            endpoints.servers.power(this.identifier), { signal: state }, 'POST'
+        );
+        this.state = state;
+        return true;
+    }
 }
 
 module.exports = ClientServer;

@@ -1,3 +1,5 @@
+const endpoints = require('../application/managers/Endpoints');
+
 class Node {
     constructor(client, data) {
         this.client = client;
@@ -104,9 +106,34 @@ class Node {
         this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
     }
 
-    async getConfig() {}
+    /**
+     * Returns the node's config (untyped).
+     * @returns {Promise<object>}
+     */
+    async getConfig() {
+        return await this.client.requests.make(endpoints.nodes.config(this.id));
+    }
 
-    async update(options) {}
+    /**
+     * Updates the node with the specified options.
+     * @param {object} options Node update options.
+     * @returns {Promise<Node>}
+     */
+    async update(options) {
+        return this.client.nodes.update(this, options);
+    }
+
+    /**
+     * Deletes the node from Pterodactyl.
+     * **WARNING:** This is an irreversable action and requires all servers to be removed
+     * from the node before deleting.
+     * @returns {Promise<boolean>}
+     */
+    async delete() {
+        await this.client.requests.make(endpoints.nodes.get(this.id), { method: 'DELETE' });
+        this.client.nodes.cache.delete(this.id);
+        return true;
+    }
 
     /**
      * Returns the JSON value of the Node.

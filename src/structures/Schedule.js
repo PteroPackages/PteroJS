@@ -1,6 +1,7 @@
 class Schedule {
-    constructor(client, data) {
+    constructor(client, server, data) {
         this.client = client;
+        this.server = server;
         data = data.attributes;
 
         /**
@@ -73,6 +74,21 @@ class Schedule {
          */
         this.tasks = new Set();
     }
+
+    /** @todo */
+    async update(options) {}
+
+    /** @todo */
+    async createTask(action, payload, offset) {}
+
+    /** @todo */
+    async updateTask(id, options) {}
+
+    /** @todo */
+    async deleteTask(id) {}
+
+    /** @todo */
+    async delete() {}
 }
 
 module.exports = Schedule;

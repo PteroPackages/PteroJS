@@ -1,4 +1,6 @@
-const endpoints = require('../client/managers/Endpoints');
+const Permissions = require('./Permissions');
+const a_path = require('../application/managers/Endpoints');
+const c_path = require('../client/managers/Endpoints');
 
 /**
  * @abstract
@@ -38,7 +40,11 @@ class BaseUser {
         this.language = data.language;
     }
 
-    get fullname() {
+    /**
+     * Returns the string value of the user.
+     * @returns {string}
+     */
+    toString() {
         return this.firstname +' '+ this.lastname;
     }
 
@@ -95,6 +101,9 @@ class PteroUser extends BaseUser {
          */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
     }
+
+    /** @todo */
+    async update(options) {}
 }
 
 class PteroSubUser extends BaseUser {
@@ -126,10 +135,21 @@ class PteroSubUser extends BaseUser {
          */
         this.createdTimestamp = this.createdAt.getTime();
 
-        /**
-         * @type {Array<string>}
-         */
-        this.permissions = data.permissions;
+        this.permissions = new Permissions(data.permissions);
+    }
+
+    /**
+     * Updates the subuser's server permissions.
+     * @param {Permissions.PermissionResolvable} perms The permissions to set.
+     * @returns {Promise<PteroSubUser>}
+     */
+    async setPermissions(perms) {
+        perms = new Permissions(perms);
+        await this.client.requests.make(
+            c_path.servers.users.get(this.id), { permissions: perms.toStrings() }, 'POST'
+        );
+        this.permissions = perms;
+        return this;
     }
 }
 
@@ -156,7 +176,7 @@ class ClientUser extends BaseUser {
     }
 
     async get2faCode() {
-        const data = await this.client.requests.make(endpoints.account.tfa);
+        const data = await this.client.requests.make(c_path.account.tfa);
         return data.data.image_url_data;
     }
 

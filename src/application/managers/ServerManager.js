@@ -52,6 +52,14 @@ class ServerManager {
      * Creates a new Pterodactyl server for a specified user.
      * @param {number|PteroUser} user The user to create the server for.
      * @param {object} options Base server options.
+     * @param {string} options.name The name of the server.
+     * @param {number} options.egg The egg for the server.
+     * @param {string} options.image The docker image for the server.
+     * @param {string} options.startup The startup command for the server.
+     * @param {object} options.env Server environment options.
+     * @param {object} [options.limits] Resource limits for the server.
+     * @param {object} [options.featureLimits] Feature limits for the server.
+     * @param {object} [options.allocation] Allocation options for the server.
      * @returns {Promise<ApplicationServer>}
      */
     async create(user, options) {
@@ -59,9 +67,22 @@ class ServerManager {
         if (
             !options.name ||
             !options.egg ||
+            !options.image ||
+            !options.startup ||
             !options.env
         ) throw new Error('Missing required server option.');
-        // WIP
+
+        const payload = { name, egg, startup } = options;
+        payload.docker_image = options.image;
+        payload.environment = options.env;
+        if (options.limits) payload.limits = options.limits;
+        if (options.featureLimits) payload.feature_limits = options.featureLimits;
+        if (options.allocation) payload.allocation = options.allocation;
+
+        const data = await this.client.requests.make(
+            endpoints.servers.main, payload, 'POST'
+        );
+        return this._patch(data);
     }
 
     /**
