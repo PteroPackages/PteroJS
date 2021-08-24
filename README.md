@@ -1,18 +1,18 @@
 <h1 align="center">PteroJS</h1>
 <h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
 
-[![discord](https://img.shields.io/badge/discord-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rmRw4W5XXz)
-![version](https://img.shields.io/badge/version-1.1.0a-3572A5?style=for-the-badge)
+[![discord](https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rmRw4W5XXz)
+![version](https://img.shields.io/badge/version-1.1.1-3572A5?style=for-the-badge)
 [![issues](https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge)](https://github.com/devnote-dev/PteroJS/issues)
 
 ## About
 PteroJS utilises the verbose classes structure seen in libraries like Discord.js to give developers the most amount of control over their code.
 
 ## Installing
-*This package is not currently available on NPM so you have to download a zip of the repository to use.*
 ```
 npm i pterojs
 ```
+Please join the [support server](https://discord.gg/rmRw4W5XXz) if you experience package installation issues.
 
 ## Setting Up
 PteroJS uses separate classes for the client and application sides of the Pterodactyl API. While you can use both classes to receive websocket events and manage applications, it is recommended to only use one.
@@ -22,7 +22,7 @@ PteroJS uses separate classes for the client and application sides of the Pterod
 const { PteroClient } = require('pterojs');
 
 // Initialising the client
-const client = new PteroClient('your.domain.here', 'pterodactyl_api_key', { ws: true });
+const client = new PteroClient('your.domain.here', 'pterodactyl_api_key');
 
 // Adding servers to listen for
 client.addSocksetServer([ 'kgujg66h', 'avipgt6e' ]);
@@ -42,16 +42,18 @@ client.connect();
 const { PteroApp } = require('pterojs');
 
 // Initialising the application
-const client = new PteroApp('your.domain.here', 'pterodactyl_api_key', { startup:{ fetchServers: true }});
-
-// Accessing information
-client.servers.fetch('evuk98yu').then(console.log);
+const client = new PteroApp('your.domain.here', 'pterodactyl_api_key');
 
 // Connecting to Pterodactyl
 client.connect();
+
+// Accessing information
+client.servers.fetch('evuk98yu').then(console.log);
 ```
 
 ## Contributing
+Please see the [todo list](https://github.com/devnote-dev/PteroJS/blob/main/TODO.md) or [issues](https://github.com/devnote-dev/PteroJS/issues) sections for contributing ideas. New ideas are also welcome.
+
 1. Fork this repo
 2. Make a branch from `main`
 3. Commit your changes
