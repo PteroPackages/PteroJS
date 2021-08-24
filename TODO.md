@@ -28,3 +28,4 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 ## Misc.
 - [ ] Add proper notes and annotations to JSDocs (not priority)
 - [ ] Overall testing of the package (priority)
+- [ ] TypeScript support (`index.d.ts`)
