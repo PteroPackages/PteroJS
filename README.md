@@ -10,7 +10,7 @@ PteroJS utilises the verbose classes structure seen in libraries like Discord.js
 
 ## Installing
 ```
-npm i pterojs
+npm i @devnote-dev/pterojs
 ```
 Please join the [support server](https://discord.gg/rmRw4W5XXz) if you experience package installation issues.
 
@@ -52,7 +52,7 @@ client.servers.fetch('evuk98yu').then(console.log);
 ```
 
 ## Contributing
-Please see the [todo list](https://github.com/devnote-dev/PteroJS/blob/main/TODO.md) or [issues](https://github.com/devnote-dev/PteroJS/issues) sections for contributing ideas. New ideas are also welcome.
+Please see the [todo list](https://github.com/devnote-dev/PteroJS/blob/main/TODO.md) or [issues](https://github.com/devnote-dev/PteroJS/issues) section for contributing ideas. New ideas are also welcome.
 
 1. Fork this repo
 2. Make a branch from `main`
