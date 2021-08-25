@@ -10,7 +10,7 @@ class FileManager {
     }
 
     _patch(data) {
-        if (data === null) return;
+        if (!data) return;
         if (data.data) {
             for (const file of data.data) {
                 const attr = file.attributes;

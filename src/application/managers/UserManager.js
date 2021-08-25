@@ -14,14 +14,15 @@ class UserManager {
     _patch(data) {
         if (data.data) {
             const s = new Map();
-            for (const o of data.data) {
+            for (let o of data.data) {
+                o = o.attributes;
                 const u = new PteroUser(this.client, o);
                 this.cache.set(u.id, u);
                 s.set(u.id, u);
             }
             return s;
         }
-        const u = new PteroUser(this.client, data);
+        const u = new PteroUser(this.client, data.attributes);
         this.cache.set(u.id, u);
         return u;
     }
@@ -53,9 +54,11 @@ class UserManager {
      * @param {boolean} [options.withServers] Whether to include servers the user has.
      * @returns {Promise<PteroUser>}
      */
-    async fetchExternal(id, options = {}) {
-        if (options.force !== true) this.cache.forEach(u => { if (id === u.externalId) return u });
-        const data = await this.client.requests.make(endpoints.users.ext(id) + (options.withServers ? '?include=servers' : ''));
+    async fetchExternal(id, options) {
+        if (options?.force !== true) this.cache.forEach(u => { if (id === u.externalId) return u });
+        const data = await this.client.requests.make(
+            endpoints.users.ext(id) + (options?.withServers ? '?include=servers' : '')
+        );
         return this._patch(data);
     }
 
@@ -89,23 +92,23 @@ class UserManager {
      * @returns {Promise<PteroUser>}
      */
     async update(user, options) {
-        if (!options.password) throw new Error('User password is required.');
+        if (!options?.password) throw new Error('User password is required.');
         if (
-            !options.email &&
-            !options.username &&
-            !options.firstname &&
-            !options.lastname &&
-            !options.language
+            !options?.email &&
+            !options?.username &&
+            !options?.firstname &&
+            !options?.lastname &&
+            !options?.language
         ) throw new Error('Too few parameters to update.');
         if (typeof user === 'number') user = await this.fetch(user);
 
         const { password } = options;
         let { email, username, firstname, lastname, language } = user;
-        if (options.email) email = options.email;
-        if (options.username) username = options.username;
-        if (options.firstname) firstname = options.firstname;
-        if (options.lastname) lastname = options.lastname;
-        if (options.language) language = options.language;
+        if (options?.email) email = options.email;
+        if (options?.username) username = options.username;
+        if (options?.firstname) firstname = options.firstname;
+        if (options?.lastname) lastname = options.lastname;
+        if (options?.language) language = options.language;
 
         const data = await this.client.requests.make(
             endpoints.users.get(user.id),

@@ -10,9 +10,10 @@ class DatabaseManager {
     }
 
     _patch(data) {
-        if (data === null) return;
-        if (Array.isArray(data)) {
-            for (const db of data) {
+        if (!data) return;
+        if (data.data) {
+            for (let db of data.data) {
+                db = db.attributes;
                 this.cache.add({
                     id: db.id,
                     host: db.host,
@@ -24,6 +25,7 @@ class DatabaseManager {
                 });
             }
         } else {
+            data = data.attributes;
             this.cache.add({
                 id: data.id,
                 host: data.host,

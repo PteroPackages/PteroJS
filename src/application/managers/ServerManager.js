@@ -15,14 +15,15 @@ class ServerManager {
     _patch(data) {
         if (data.data) {
             const s = new Map();
-            for (const o of data.data) {
+            for (let o of data.data) {
+                o = o.attributes;
                 const server = new ApplicationServer(this.client, o);
                 this.cache.set(server.id, server);
                 s.set(server.id, server);
             }
             return s;
         }
-        const s = new ApplicationServer(this.client, data);
+        const s = new ApplicationServer(this.client, data.attributes);
         this.cache.set(s.id, s);
         return s;
     }
@@ -37,12 +38,12 @@ class ServerManager {
      */
     async fetch(id, options) {
         if (id) {
-            if (options.force !== true) {
+            if (options?.force !== true) {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
             const data = await this.client.requests.make(
-                endpoints.servers.get(id) + joinParams(options.include)
+                endpoints.servers.get(id) + joinParams(options?.include)
             );
             return this._patch(data);
         }
@@ -77,9 +78,9 @@ class ServerManager {
         const payload = { name, egg, startup } = options;
         payload.docker_image = options.image;
         payload.environment = options.env;
-        if (options.limits) payload.limits = options.limits;
-        if (options.featureLimits) payload.feature_limits = options.featureLimits;
-        if (options.allocation) payload.allocation = options.allocation;
+        if (options?.limits) payload.limits = options.limits;
+        if (options?.featureLimits) payload.feature_limits = options.featureLimits;
+        if (options?.allocation) payload.allocation = options.allocation;
 
         const data = await this.client.requests.make(
             endpoints.servers.main, payload, 'POST'

@@ -8,6 +8,7 @@ class AllocationManager {
     }
 
     _patch(data) {
+        if (!data) return;
         for (const alloc of data.relationships.allocations.data) {
             this.cache.add({
                 id: alloc.id,

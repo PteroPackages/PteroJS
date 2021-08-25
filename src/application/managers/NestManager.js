@@ -15,7 +15,7 @@ class NestManager {
 
     _patch(data) {
         if (data.data) {
-            for (const o of data.data) {
+            for (let o of data.data) {
                 o = o.attributes;
                 this.cache.add({
                     id: o.id,
@@ -29,14 +29,15 @@ class NestManager {
             }
             return this.cache;
         }
+        data = data.attributes;
         return this.cache.add({
-            id: o.id,
-            uuid: o.uuid,
-            author: o.author,
-            name: o.name,
-            description: o.description,
-            createdAt: new Date(o.created_at),
-            updatedAt: o.updated_at ? new Date(o.updated_at) : null
+            id: data.id,
+            uuid: data.uuid,
+            author: data.author,
+            name: data.name,
+            description: data.description,
+            createdAt: new Date(data.created_at),
+            updatedAt: data.updated_at ? new Date(data.updated_at) : null
         });
     }
 
