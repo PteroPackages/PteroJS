@@ -42,7 +42,7 @@ class PteroClient extends EventEmitter {
      * @returns {Promise<boolean>}
      */
     async connect() {
-        await this.requests.make('/');
+        await this.requests.make('/api/client');
         if (this.options?.fetchServers) await this.servers.fetch();
         return true;
     }
