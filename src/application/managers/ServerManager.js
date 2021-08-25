@@ -35,13 +35,15 @@ class ServerManager {
      * @param {Array<string>} [options.include] Additional fetch parameters to include.
      * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>}
      */
-    async fetch(id, options = {}) {
+    async fetch(id, options) {
         if (id) {
             if (options.force !== true) {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
-            const data = await this.client.requests.make(endpoints.servers.get(id) + joinParams(options.include));
+            const data = await this.client.requests.make(
+                endpoints.servers.get(id) + joinParams(options.include)
+            );
             return this._patch(data);
         }
         const data = await this.client.requests.make(endpoints.servers.main);
@@ -87,14 +89,17 @@ class ServerManager {
 
     /**
      * Deletes a specified server.
-     * @param {number} id The ID of the server.
+     * @param {number|ApplicationServer} server The ID of the server.
      * @param {boolean} [force] Whether to force delete the server.
-     * @returns {Promise<number>}
+     * @returns {Promise<boolean>}
      */
-    async delete(id, force = false) {
-        await this.client.requests.make(endpoints.servers.get(id) + (force ? '/force' : ''), { method: 'DELETE' });
-        this.cache.delete(id);
-        return id;
+    async delete(server, force = false) {
+        if (server instanceof ApplicationServer) server = server.id;
+        await this.client.requests.make(
+            endpoints.servers.get(server) + (force ? '/force' : ''), { method: 'DELETE' }
+        );
+        this.cache.delete(server);
+        return true;
     }
 }
 
