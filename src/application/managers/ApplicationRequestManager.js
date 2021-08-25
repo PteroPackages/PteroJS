@@ -42,7 +42,7 @@ class ApplicationRequestManager {
 
         if ([201, 204].includes(data.status)) return;
         if (data.ok) return await data.json();
-        return null;
+        throw new RequestError(`Pterodactyl API returned an invalid or malformed payload (code: ${data.status}).`);
     }
 }
 
