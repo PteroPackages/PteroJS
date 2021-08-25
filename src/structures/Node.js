@@ -28,7 +28,7 @@ class Node {
         /**
          * @type {?string}
          */
-        this.description = dat.description || null;
+        this.description = data.description || null;
 
         /**
          * @type {number}
@@ -87,7 +87,7 @@ class Node {
             /**
              * @type {number}
              */
-            sfpt: data.daemon_sfpt,
+            sftp: data.daemon_sftp,
 
             /**
              * @type {string}
