@@ -1,3 +1,4 @@
+const NestEggsManager = require('./NestEggsManager');
 const endpoints = require('./Endpoints');
 
 class NestManager {
@@ -8,6 +9,8 @@ class NestManager {
          * @type {Set<Nest>}
          */
         this.cache = new Set();
+
+        this.eggs = new NestEggsManager(this.client);
     }
 
     _patch(data) {
@@ -46,11 +49,6 @@ class NestManager {
         if (id) return this._patch(await this.client.requests.make(endpoints.nests.get(id)));
         return this._patch(await this.client.requests.make(endpoints.nests.main));
     }
-
-    /**
-     * @todo Return NestEggsManager
-     */
-    get eggs() {}
 }
 
 module.exports = NestManager;
