@@ -118,13 +118,13 @@ class UserManager {
     /**
      * Deletes the user account from Pterodactyl.
      * @param {number|PteroUser} user The user to delete.
-     * @returns {number}
+     * @returns {Promise<boolean>}
      */
     async delete(user) {
         if (user instanceof PteroUser) user = user.id;
         await this.client.requests.make(endpoints.users.get(user), { method: 'DELETE' });
         this.cache.delete(user);
-        return user;
+        return true;
     }
 }
 
