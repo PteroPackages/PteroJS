@@ -4,8 +4,8 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 ## Application
 - [X] Setup `connect()` function ([PteroApp](https://github.com/devnote-dev/PteroJS/blob/main/src/application/PteroApp.js#L33))
 - [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/application/managers/RequestManager.js))
-- [ ] Implement helper functions for all the managers
-- [ ] Create and implement `NestEggsManager`
+- [X] Implement helper functions for all the managers
+- [X] Create and implement `NestEggsManager`
 
 ## Client
 - [X] Use typed `ClientOptions` for startup ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L13))
