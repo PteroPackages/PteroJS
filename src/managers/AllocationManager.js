@@ -9,14 +9,15 @@ class AllocationManager {
 
     _patch(data) {
         if (!data) return;
-        for (const alloc of data.relationships.allocations.data) {
+        for (let o of data.relationships.allocations.data) {
+            o = o.attributes;
             this.cache.add({
-                id: alloc.id,
-                ip: alloc.ip,
-                ipAlias: alloc.ip_alias ?? null,
-                port: alloc.port,
-                notes: alloc.notes || null,
-                isDefault: alloc.is_default
+                id: o.id,
+                ip: o.ip,
+                ipAlias: o.ip_alias ?? null,
+                port: o.port,
+                notes: o.notes || null,
+                isDefault: o.is_default
             });
         }
     }
