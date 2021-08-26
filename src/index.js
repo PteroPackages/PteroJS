@@ -1,11 +1,13 @@
 module.exports = {
     AllocationManager: require('./managers/AllocationManager'),
     ApplicationRequestManager: require('./application/managers/ApplicationRequestManager'),
+    ApplicationServerManager: require('./application/managers/ApplicationServerManager'),
     ApplicationServer: require('./structures/ApplicationServer'),
     BackupManager: require('./client/managers/BackupManager'),
     BaseUser: require('./structures/User').BaseUser,
     ClientRequestManager: require('./client/managers/ClientRequestManager'),
     ClientServer: require('./structures/ClientServer'),
+    ClientServerManager: require('./client/managers/ClientServerManager'),
     ClientUser: require('./structures/User').ClientUser,
     DatabaseManager: require('./managers/DatabaseManager'),
     Errors: require('./structures/Errors'),
