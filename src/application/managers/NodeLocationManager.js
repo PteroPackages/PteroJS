@@ -13,7 +13,8 @@ class NodeLocationManager {
     _patch(data) {
         if (data.data) {
             const s = new Map();
-            for (const o of data.data) {
+            for (let o of data.data) {
+                o = o.attributes;
                 this.cache.set(o.id, {
                     id: o.id,
                     long: o.long,
