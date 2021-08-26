@@ -3,6 +3,7 @@ const ClientRequestManager = require('./managers/ClientRequestManager');
 const ClientServerManager = require('./managers/ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const WebSocketManager = require('./managers/WebSocketManager');
+const endpoints = require('./managers/Endpoints');
 
 /**
  * The base class for the Pterodactyl client API.
@@ -15,6 +16,8 @@ class PteroClient extends EventEmitter {
      * @param {ClientOptions} [options] Additional client options.
      */
     constructor(domain, auth, options) {
+        super();
+
         /**
          * @type {string}
          */
@@ -31,7 +34,17 @@ class PteroClient extends EventEmitter {
          */
         this.options = options;
 
-        this.user = new ClientUser(this, null); // WIP
+        /**
+         * @type {?Date}
+         */
+        this.readyAt = null;
+
+        /**
+          * @type {?number}
+          */
+        this.ping = null;
+
+        this.user = null;
         this.ws = new WebSocketManager(this);
         this.requests = new ClientRequestManager(this);
         this.servers = new ClientServerManager(this);
@@ -42,9 +55,19 @@ class PteroClient extends EventEmitter {
      * @returns {Promise<boolean>}
      */
     async connect() {
-        await this.requests.make('/api/client');
+        const start = Date.now();
+        await this.requests.ping();
+        this.ping = Date.now() - start;
+        this.ping = await this._fetchClient();
         if (this.options?.fetchServers) await this.servers.fetch();
+        if (this.options?.ws) await this.ws.connect();
+        this.readyAt = Date.now();
         return true;
+    }
+
+    async _fetchClient() {
+        const data = await this.requests.make(endpoints.account.main);
+        this.user = new ClientUser(this, data.attributes);
     }
 
     /**
@@ -69,7 +92,7 @@ module.exports = PteroClient;
 /**
  * Startup options for the client API.
  * @typedef {object} ClientOptions
+ * @property {boolean} [ws] Whether to enable server websocket connections (default: `false`).
  * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
- * @property {boolean} [reconnect] Whether to reconnect after token refreshes (default: `true`).
  * @property {Array<string>} [disableEvents] An array of events to disable (wont be emitted).
  */
