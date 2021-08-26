@@ -25,7 +25,6 @@ class ApplicationRequestManager {
     async make(path, params, method = 'GET') {
         if (this.suspended) throw new RequestError('[429] Application is ratelimited.');
         const body = params?.raw ?? (params ? JSON.stringify(params) : null);
-        console.log(this.client.domain + path);
         const data = await fetch(this.client.domain + path, {
             method,
             body,
