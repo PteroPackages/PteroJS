@@ -23,6 +23,7 @@ class ApplicationRequestManager {
      * @returns {Promise<object|void>}
      */
     async make(path, params, method = 'GET') {
+        if (this.client.ping === null) throw new Error('Attempted request before application was ready.');
         if (this.suspended) throw new RequestError('[429] Application is ratelimited.');
         const body = params?.raw ?? (params ? JSON.stringify(params) : null);
         const data = await fetch(this.client.domain + path, {
@@ -52,6 +53,7 @@ class ApplicationRequestManager {
      */
     async ping() {
         try {
+            this.client.ping = -1;
             await this.make('/api/application');
         } catch (err) {
             if (!err?.code) throw new RequestError('Pterodactyl API is unavailable.');
