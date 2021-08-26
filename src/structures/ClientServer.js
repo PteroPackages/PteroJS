@@ -37,9 +37,9 @@ class ClientServer {
         /**
          * @type {object}
          */
-        this.sfpt = {
-            ip: attr.sfpt_details.ip,
-            port: attr.sfpt_details.port
+        this.sftp = {
+            ip: attr.sftp_details.ip,
+            port: attr.sftp_details.port
         }
 
         /**
@@ -60,7 +60,7 @@ class ClientServer {
         /**
          * @type {boolean}
          */
-        this.suspended = attr.suspended;
+        this.suspended = attr.is_suspended;
 
         /**
          * @type {string}
@@ -70,11 +70,12 @@ class ClientServer {
         /**
          * @type {boolean}
          */
-        this.installing = attr.installing;
+        this.installing = attr.is_installing;
+
         this.allocations = new AllocationManager(attr);
-        this.permissions = new Permissions(data.meta.user_permissions);
-        this.databases = new DatabaseManager(client, null);
-        this.files = new FileManager(client, null);
+        this.permissions = new Permissions(data.meta?.user_permissions ?? {});
+        this.databases = new DatabaseManager(client, data.databases);
+        this.files = new FileManager(client, data.files);
     }
 
     addWebsocket() {
@@ -86,7 +87,7 @@ class ClientServer {
     /**
      * Sends a command to the server terminal.
      * @param {string} command The command to send.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<void>}
      */
     async sendCommand(command) {
         return await this.client.requests.make(
@@ -101,7 +102,7 @@ class ClientServer {
      * * restart
      * * kill
      * @param {string} state The power state to set the server to.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<void>}
      */
     async setPowerState(state) {
         if (!['start', 'stop', 'restart', 'kill'].includes(state)) throw new Error('Invalid power state.');
@@ -109,7 +110,6 @@ class ClientServer {
             endpoints.servers.power(this.identifier), { signal: state }, 'POST'
         );
         this.state = state;
-        return true;
     }
 }
 
