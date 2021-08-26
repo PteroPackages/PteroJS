@@ -2,7 +2,7 @@
 <h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
 
 [![discord](https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rmRw4W5XXz)
-![version](https://img.shields.io/badge/version-1.1.1-3572A5?style=for-the-badge)
+![version](https://img.shields.io/badge/version-1.1.5-3572A5?style=for-the-badge)
 [![issues](https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge)](https://github.com/devnote-dev/PteroJS/issues)
 
 ## About
@@ -10,19 +10,19 @@ PteroJS utilises the verbose classes structure seen in libraries like Discord.js
 
 ## Installing
 ```
-npm i @devnote-dev/pterojs
+npm install @devnote-dev/pterojs
 ```
 Please join the [support server](https://discord.gg/rmRw4W5XXz) if you experience package installation issues.
 
 ## Setting Up
-PteroJS uses separate classes for the client and application sides of the Pterodactyl API. While you can use both classes to receive websocket events and manage applications, it is recommended to only use one.
+PteroJS uses separate classes for the client and application sides of the Pterodactyl API.
 
 ### Using the client API
 ```js
 const { PteroClient } = require('pterojs');
 
 // Initialising the client
-const client = new PteroClient('your.domain.here', 'pterodactyl_api_key');
+const client = new PteroClient('your.domain.here', 'pterodactyl_api_key', { ws: true });
 
 // Adding servers to listen for
 client.addSocksetServer([ 'kgujg66h', 'avipgt6e' ]);
