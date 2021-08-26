@@ -1,7 +1,7 @@
 const { EventEmitter } = require('events');
 const ClientRequestManager = require('./managers/ClientRequestManager');
+const ClientServerManager = require('./managers/ClientServerManager');
 const { ClientUser } = require('../structures/User');
-const ServerManager = require('./managers/ServerManager');
 const WebSocketManager = require('./managers/WebSocketManager');
 
 /**
@@ -14,7 +14,7 @@ class PteroClient extends EventEmitter {
      * @param {string} auth The authentication key for Pterodactyl.
      * @param {ClientOptions} [options] Additional client options.
      */
-    constructor(domain, auth, options = {}) {
+    constructor(domain, auth, options) {
         /**
          * @type {string}
          */
@@ -34,7 +34,7 @@ class PteroClient extends EventEmitter {
         this.user = new ClientUser(this, null); // WIP
         this.ws = new WebSocketManager(this);
         this.requests = new ClientRequestManager(this);
-        this.servers = new ServerManager(this);
+        this.servers = new ClientServerManager(this);
     }
 
     /**

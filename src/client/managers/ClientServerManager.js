@@ -1,7 +1,7 @@
 const ClientServer = require('../../structures/ClientServer');
 const endpoints = require('./Endpoints');
 
-class ServerManager {
+class ClientServerManager {
     constructor(client) {
         this.client = client
 
@@ -48,7 +48,7 @@ class ServerManager {
     }
 }
 
-module.exports = ServerManager;
+module.exports = ClientServerManager;
 
 function joinParams(params) {
     if (!params) return '';
