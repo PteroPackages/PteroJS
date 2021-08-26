@@ -54,7 +54,7 @@ class PteroApp {
      */
     async connect() {
         const start = Date.now();
-        await this.requests.make('/api/application');
+        await this.requests.ping();
         this.ping = Date.now() - start;
         if (this.options.fetchUsers) await this.users.fetch();
         if (this.options.fetchNodes) await this.nodes.fetch();
