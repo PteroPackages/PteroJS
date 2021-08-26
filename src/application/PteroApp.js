@@ -1,8 +1,8 @@
 const ApplicationRequestManager = require('./managers/ApplicationRequestManager');
+const ApplicationServerManager = require('./managers/ApplicationServerManager');
 const NestManager = require('./managers/NestManager');
 const NodeLocationManager = require('./managers/NodeLocationManager');
 const NodeManager = require('./managers/NodeManager');
-const ServerManager = require('./managers/ServerManager');
 const UserManager = require('./managers/UserManager');
 
 /**
@@ -14,7 +14,7 @@ class PteroApp {
      * @param {string} auth The authentication key for Pterodactyl.
      * @param {ApplicationOptions} [options] Additional application options.
      */
-    constructor(domain, auth, options = {}) {
+    constructor(domain, auth, options) {
         /**
          * @type {string}
          */
@@ -44,7 +44,7 @@ class PteroApp {
         this.users = new UserManager(this);
         this.nodes = new NodeManager(this);
         this.nests = new NestManager(this);
-        this.servers = new ServerManager(this);
+        this.servers = new ApplicationServerManager(this);
         this.locations = new NodeLocationManager(this);
     }
 
