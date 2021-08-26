@@ -15,7 +15,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
 - [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
 - [ ] Implement helper functions for all the managers
-- [ ] Implement `ClientUser` required fetch on startup
+- [X] Implement `ClientUser` required fetch on startup
 
 ## Global Managers
 - [ ] Implement helper functions for all the managers
