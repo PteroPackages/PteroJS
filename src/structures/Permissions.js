@@ -45,42 +45,49 @@ const FLAGS = {
     SETTINGS_RENAME: 34,
     SETTINGS_REINSTALL: 35,
 
-    ADMIN_WEBSOCKET_INSTALL: 39,
-    ADMIN_WEBSOCKET_ERRORS: 40
+    '*': 40,
+    ADMIN_WEBSOCKET_ERRORS: 41,
+    ADMIN_WEBSOCKET_INSTALL: 42,
+    ADMIN_WEBSOCKET_TRANSFER: 43
 }
 
 class Permissions {
     /**
      * An object containing all Pterodactyl permissions.
      */
-    FLAGS = Object.freeze(FLAGS);
+    static get FLAGS() {
+        return Object.freeze(FLAGS);
+    }
 
     /**
      * Default Pterodactyl user permissions.
      */
-    DEFAULT = Object.freeze({
-        CONTROL_CONSOLE: 1,
-        CONTROL_START: 2,
-        CONTROL_STOP: 3,
-        CONTROL_RESTART: 4
-    });
+    static get DEFAULT() {
+        return Object.freeze({
+            CONTROL_CONSOLE: 1,
+            CONTROL_START: 2,
+            CONTROL_STOP: 3,
+            CONTROL_RESTART: 4
+        });
+    }
 
     constructor(data) {
         /**
          * The raw permissions object.
          * @type {object}
          */
-        this.raw = this.resolve(data);
+        this.raw = Permissions.resolve(data);
     }
 
     /**
      * Returns a boolean on whether the specified permissions are currently available.
+     * This function uses AND logic for checking more than one permission.
      * @param {string|number|PermissionResolvable} perms The permissions to check for.
      * @returns {boolean}
      */
     has(perms) {
         if (typeof perms === 'string' || typeof perms === 'number') perms = [perms];
-        perms = Object.keys(this.resolve(perms));
+        perms = Object.keys(Permissions.resolve(perms));
 
         for (const p of perms) if (!this.raw[p]) return false;
         return true;
@@ -103,13 +110,16 @@ class Permissions {
     static resolve(perms) {
         const res = {};
         if (typeof perms === 'object' && !Array.isArray(perms)) perms = Object.keys(perms);
-        if (!perms.every(p => typeof p == 'string' || typeof p == 'number')) throw new Error('Invalid permissions type array (must be strings or numbers only).');
-        if (diff(perms)) throw new Error('Permissions must be all strings or all numbers.');
+        if (!perms || !perms?.length) return {};
+        if (diff(perms)) throw new TypeError('Permissions must be all strings or all numbers.');
 
-        if (perms.some(p => typeof p === 'string')) perms = this.resolve(this.fromStrings(perms));
+        if (typeof perms[0] === 'string') perms = Object.keys(this.fromStrings(perms));
         const entries = Object.entries(this.FLAGS);
         for (const p of perms) {
-            if (!this.FLAGS[p] && !entries.find(e => e[1] === p)) throw new Error(`Unknown permission '${p}.`);
+            if (
+                this.FLAGS[p] === undefined &&
+                !entries.find(e => e[1] === p)
+            ) throw new Error(`Unknown permission '${p}'.`);
             const e = entries.find(e => e.includes(p));
             res[e[0]] = e[1];
         }
@@ -123,7 +133,7 @@ class Permissions {
      */
     serialize() {
         const res = {};
-        Object.keys(this.FLAGS).forEach(f => res[f] = this.has(f));
+        Object.keys(Permissions.FLAGS).forEach(f => res[f] = this.has(f));
         return res;
     }
 
@@ -140,7 +150,7 @@ class Permissions {
      * @returns {Array<string>}
      */
     toStrings() {
-        return this.toArray().map(p => p.toLowerCase().replace('_', '.'));
+        return this.toArray().map(p => p.toLowerCase().replace(/_/g, '.'));
     }
 
     /**
@@ -149,7 +159,13 @@ class Permissions {
      * @returns {object}
      */
     static fromStrings(perms) {
-        return Object.keys(this.resolve(perms)).map(p => p.toUpperCase().replace('.', '_'));
+        const res = {};
+        for (let p of perms) {
+            p = p.toUpperCase().replace(/\./g, '_');
+            if (Permissions.FLAGS[p] === undefined) throw new Error(`Unknown permission '${p}'.`);
+            res[p] = Permissions.FLAGS[p];
+        }
+        return res;
     }
 }
 
