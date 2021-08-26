@@ -58,7 +58,7 @@ class PteroClient extends EventEmitter {
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
-        this.ping = await this._fetchClient();
+        this.user = await this._fetchClient();
         if (this.options?.fetchServers) await this.servers.fetch();
         if (this.options?.ws) await this.ws.connect();
         this.readyAt = Date.now();
