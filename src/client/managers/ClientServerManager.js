@@ -40,10 +40,14 @@ class ClientServerManager {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
-            const data = await this.client.requests.make(endpoints.servers.get(id) + joinParams(options.include));
+            const data = await this.client.requests.make(
+                endpoints.servers.get(id) + joinParams(options.include)
+            );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(endpoints.main + joinParams(options.include));
+        const data = await this.client.requests.make(
+            endpoints.main + joinParams(options.include)
+        );
         return this._patch(data);
     }
 }
