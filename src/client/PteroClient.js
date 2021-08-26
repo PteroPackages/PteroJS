@@ -65,6 +65,10 @@ class PteroClient extends EventEmitter {
         return true;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     async _fetchClient() {
         const data = await this.requests.make(endpoints.account.main);
         this.user = new ClientUser(this, data.attributes);
