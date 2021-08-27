@@ -9,3 +9,7 @@ exports.PteroAPIError = class PteroAPIError extends Error {
         this.code = data.code;
     }
 }
+
+exports.WebSocketError = class WebSocketError extends Error {
+    constructor(message) { super(message) };
+}
