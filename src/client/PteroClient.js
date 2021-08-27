@@ -100,3 +100,13 @@ module.exports = PteroClient;
  * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
  * @property {Array<string>} [disableEvents] An array of events to disable (wont be emitted).
  */
+
+/**
+ * Emitted when the websocket manager is ready.
+ * @event PteroClient#ready
+ */
+
+/**
+ * Debug event emitted for websocket events.
+ * @event PteroClient#debug
+ */
