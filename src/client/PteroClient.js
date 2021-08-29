@@ -2,7 +2,6 @@ const { EventEmitter } = require('events');
 const ClientRequestManager = require('./managers/ClientRequestManager');
 const ClientServerManager = require('./managers/ClientServerManager');
 const { ClientUser } = require('../structures/User');
-const WebSocketManager = require('./managers/WebSocketManager');
 const endpoints = require('./managers/Endpoints');
 
 /**
@@ -45,7 +44,6 @@ class PteroClient extends EventEmitter {
         this.ping = null;
 
         this.user = null;
-        this.ws = new WebSocketManager(this);
         this.requests = new ClientRequestManager(this);
         this.servers = new ClientServerManager(this);
     }
@@ -60,7 +58,6 @@ class PteroClient extends EventEmitter {
         this.ping = Date.now() - start;
         this.user = await this._fetchClient();
         if (this.options?.fetchServers) await this.servers.fetch();
-        if (this.options?.ws) await this.ws.connect();
         this.readyAt = Date.now();
         return true;
     }
