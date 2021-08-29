@@ -29,3 +29,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Add proper notes and annotations to JSDocs (not priority)
 - [ ] Overall testing of the package (priority)
 - [ ] TypeScript support (`index.d.ts`)
+
+## Feature Plans
+- [ ] Optional webhook client
+- [ ] Python version of the library
