@@ -43,7 +43,11 @@ class PteroClient extends EventEmitter {
           */
         this.ping = null;
 
+        /**
+         * @type {?ClientUser}
+         */
         this.user = null;
+
         this.requests = new ClientRequestManager(this);
         this.servers = new ClientServerManager(this);
     }
@@ -51,24 +55,24 @@ class PteroClient extends EventEmitter {
     /**
      * Sends a ping request to the API before establishing websocket connections.
      * @returns {Promise<boolean>}
+     * @fires PteroClient#ready
      */
     async connect() {
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
-        this.user = await this._fetchClient();
+        this.user = await this.fetchClient();
         if (this.options?.fetchServers) await this.servers.fetch();
         this.readyAt = Date.now();
         return true;
     }
 
     /**
-     * @private
-     * @returns {void}
+     * @returns {Promise<ClientUser>}
      */
-    async _fetchClient() {
+    async fetchClient() {
         const data = await this.requests.make(endpoints.account.main);
-        this.user = new ClientUser(this, data.attributes);
+        return new ClientUser(this, data.attributes);
     }
 
     /**
@@ -95,6 +99,8 @@ module.exports = PteroClient;
  * @typedef {object} ClientOptions
  * @property {boolean} [ws] Whether to enable server websocket connections (default: `false`).
  * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
+ * @property {boolean} [cacheServers] Whether to cache servers (default `true`).
+ * @property {boolean} [cacheSubUsers] Whether to cache server subusers (default `true`).
  * @property {Array<string>} [disableEvents] An array of events to disable (wont be emitted).
  */
 
@@ -106,4 +112,5 @@ module.exports = PteroClient;
 /**
  * Debug event emitted for websocket events.
  * @event PteroClient#debug
+ * @param {string} message The message emitted with the event.
  */
