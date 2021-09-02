@@ -16,6 +16,7 @@ module.exports = {
     NodeLocationManager: require('./application/managers/NodeLocationManager'),
     NodeManager: require('./application/managers/NestManager'),
     Permissions: require('./structures/Permissions'),
+    Presets: require('./structures/Presets'),
     PteroApp: require('./application/PteroApp'),
     PteroClient: require('./client/PteroClient'),
     PteroSubUser: require('./structures/User').PteroSubUser,
