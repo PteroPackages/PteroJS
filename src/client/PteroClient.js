@@ -3,6 +3,7 @@ const ClientRequestManager = require('./managers/ClientRequestManager');
 const ClientServerManager = require('./managers/ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const endpoints = require('./managers/Endpoints');
+const presets = require('../structures/Presets');
 
 /**
  * The base class for the Pterodactyl client API.
@@ -14,7 +15,7 @@ class PteroClient extends EventEmitter {
      * @param {string} auth The authentication key for Pterodactyl.
      * @param {ClientOptions} [options] Additional client options.
      */
-    constructor(domain, auth, options) {
+    constructor(domain, auth, options = {}) {
         super();
 
         /**
@@ -31,7 +32,7 @@ class PteroClient extends EventEmitter {
         /**
          * @type {ClientOptions}
          */
-        this.options = options;
+        this.options = presets.client(options);
 
         /**
          * @type {?Date}
@@ -61,8 +62,8 @@ class PteroClient extends EventEmitter {
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
-        this.user = await this.fetchClient();
-        if (this.options?.fetchServers) await this.servers.fetch();
+        if (this.options.fetchClient) this.user = await this.fetchClient();
+        if (this.options.fetchServers && this.options.cacheServers) await this.servers.fetch();
         this.readyAt = Date.now();
         return true;
     }
@@ -98,6 +99,7 @@ module.exports = PteroClient;
  * Startup options for the client API.
  * @typedef {object} ClientOptions
  * @property {boolean} [ws] Whether to enable server websocket connections (default: `false`).
+ * @property {boolean} [fetchClient] Whether to fetch the client user (default `true`).
  * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
  * @property {boolean} [cacheServers] Whether to cache servers (default `true`).
  * @property {boolean} [cacheSubUsers] Whether to cache server subusers (default `true`).
