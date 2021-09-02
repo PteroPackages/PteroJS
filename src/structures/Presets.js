@@ -1,4 +1,5 @@
 const { ApplicationOptions } = require('../application/PteroApp');
+const { ClientOptions } = require('../client/PteroClient');
 
 /**
  * Creates a preset application option object with all the options not
@@ -7,7 +8,7 @@ const { ApplicationOptions } = require('../application/PteroApp');
  * @returns {ApplicationOptions}
  */
 function application(data) {
-    if (typeof data !== 'object') throw new TypeError('Invalid client options object.');
+    if (typeof data !== 'object') throw new TypeError('Invalid application options object.');
 
     data.fetchUsers ??= false;
     data.fetchNodes ??= false;
@@ -24,4 +25,22 @@ function application(data) {
     return data;
 }
 
+/**
+ * Creates a preset client option object with all the options not
+ * specified by the user.
+ * @param {ClientOptions} data Data to parse client options from.
+ * @returns {ClientOptions}
+ */
+function client(data) {
+    if (typeof data !== 'object') throw new TypeError('Invalid client options object.');
+
+    data.ws ??= false;
+    data.fetchClient ??= true;
+    data.fetchServers ??= false;
+    data.disableEvents ??= [];
+
+    return data;
+}
+
 exports.application = application;
+exports.client = client;
