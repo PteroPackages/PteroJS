@@ -14,10 +14,11 @@ class NestManager {
     }
 
     _patch(data) {
+        const res = new Set();
         if (data.data) {
             for (let o of data.data) {
                 o = o.attributes;
-                this.cache.add({
+                res.add({
                     id: o.id,
                     uuid: o.uuid,
                     author: o.author,
@@ -27,10 +28,11 @@ class NestManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
-            return this.cache;
+            if (this.client.options.cacheNests !== false) res.forEach(n => this.cache.add(n));
+            return res;
         }
         data = data.attributes;
-        return this.cache.add({
+        res.add({
             id: data.id,
             uuid: data.uuid,
             author: data.author,
@@ -39,6 +41,8 @@ class NestManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         });
+        if (this.client.options.cacheNests !== false) res.forEach(n => this.cache.add(n));
+        return res;
     }
 
     /**

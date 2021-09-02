@@ -14,17 +14,17 @@ class ServerManager {
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const res = new Map();
             for (let o of data.data) {
                 o = o.attributes;
-                const server = new ApplicationServer(this.client, o);
-                this.cache.set(server.id, server);
-                s.set(server.id, server);
+                const s = new ApplicationServer(this.client, o);
+                res.set(s.id, s);
             }
-            return s;
+            if (this.client.options.cacheServers !== false) res.forEach((v, k) => this.cache.set(k,v ));
+            return res;
         }
         const s = new ApplicationServer(this.client, data.attributes);
-        this.cache.set(s.id, s);
+        if (this.client.options.cacheServers !== false) this.cache.set(s.id, s);
         return s;
     }
 

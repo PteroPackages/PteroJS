@@ -13,17 +13,17 @@ class UserManager {
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const res = new Map();
             for (let o of data.data) {
                 o = o.attributes;
                 const u = new PteroUser(this.client, o);
-                this.cache.set(u.id, u);
-                s.set(u.id, u);
+                res.set(u.id, u);
             }
-            return s;
+            if (this.client.options.cacheUsers !== false) res.forEach((v, k) => this.cache.set(k, v));
+            return res;
         }
         const u = new PteroUser(this.client, data.attributes);
-        this.cache.set(u.id, u);
+        if (this.client.options.cacheUsers !== false) this.cache.set(u.id, u);
         return u;
     }
 

@@ -12,29 +12,30 @@ class NodeLocationManager {
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const res = new Map();
             for (let o of data.data) {
                 o = o.attributes;
-                this.cache.set(o.id, {
+                res.set(o.id, {
                     id: o.id,
                     long: o.long,
                     short: o.short,
                     createdAt: new Date(o.created_at),
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
-                s.set(o.id, this.cache.get(o.id));
             }
-            return s;
+            if (this.client.options.cacheLocations !== false) res.forEach((v, k) => this.cache.set(k, v));
+            return res;
         }
         data = data.attributes;
-        this.cache.set(data.id, {
+        const loc = {
             id: data.id,
             long: data.long,
             short: data.short,
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
-        });
-        return this.cache.get(data.id);
+        }
+        if (this.client.options.cacheLocations !== false) this.cache.set(data.id, loc);
+        return loc;
     }
 
     /**

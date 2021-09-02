@@ -13,16 +13,16 @@ class NodeManager {
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const res = new Map();
             for (const o of data.data) {
                 const n = new Node(this.client, o);
-                this.cache.set(n.id, n);
-                s.set(n.id, n);
+                res.set(n.id, n);
             }
-            return s;
+            if (this.client.options.cacheNodes !== false) res.forEach((v, k) => this.cache.set(k, v));
+            return res;
         }
         const n = new Node(this.client, data);
-        this.cache.set(n.id, n);
+        if (this.client.options.cacheNodes !== false) this.cache.set(n.id, n);
         return n;
     }
 
