@@ -26,7 +26,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Figure out and implement a consistent management system for `Permissions` ([Permissions](https://github.com/devnote-dev/PteroJS/blob/main/src/structures/Permissions.js))
 
 ## Misc.
-- [ ] Add proper notes and annotations to JSDocs (not priority)
+- [X] Add proper notes and annotations to JSDocs
 - [ ] Overall testing of the package (priority)
 - [ ] TypeScript support (`index.d.ts`)
 
