@@ -5,11 +5,9 @@ class NestManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Set<Nest>}
-         */
+        /**  @type {Set<Nest>} */
         this.cache = new Set();
-
+        /** @type {NestEggsManager} */
         this.eggs = new NestEggsManager(this.client);
     }
 
@@ -48,7 +46,7 @@ class NestManager {
     /**
      * Fetches a nest from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the nest.
-     * @returns {Promise<Set<Nest>>}
+     * @returns {Promise<Set<Nest>>} The fetched nests.
      */
     async fetch(id) {
         if (id) return this._patch(await this.client.requests.make(endpoints.nests.get(id)));
@@ -60,7 +58,6 @@ module.exports = NestManager;
 
 /**
  * Represents a nest on Pterodactyl.
- * @readonly
  * @typedef {object} Nest
  * @property {number} id The ID of the nest.
  * @property {string} uuid The UUID of the nest.
@@ -69,4 +66,5 @@ module.exports = NestManager;
  * @property {string} description The description of the nest.
  * @property {Date} createdAt The date the nest was created.
  * @property {?Date} updatedAt The date the nest was last updated.
+ * @readonly
  */

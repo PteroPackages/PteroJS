@@ -7,9 +7,7 @@ class UserManager {
         this.client = client;
         this.server = server;
 
-        /**
-         * @type {Map<string, PteroSubUser>}
-         */
+        /** @type {Map<string, PteroSubUser>} */
         this.cache = new Map();
     }
 
@@ -30,9 +28,9 @@ class UserManager {
 
     /**
      * Fetches a server subuser from the Pterodactyl API with an optional cache check.
-     * @param {string} id The UUID of the user.
-     * @param {boolean} force Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<PteroSubUser|Map<string, PteroSubUser>>}
+     * @param {string} [id] The UUID of the user.
+     * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
+     * @returns {Promise<PteroSubUser|Map<string, PteroSubUser>>} The fetched user(s).
      */
     async fetch(id, force = false) {
         if (id) {

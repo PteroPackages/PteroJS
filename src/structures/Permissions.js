@@ -71,6 +71,9 @@ class Permissions {
         });
     }
 
+    /**
+     * @param {PermissionResolvable} data The data to resolve permissions from.
+     */
     constructor(data) {
         /**
          * The raw permissions object.
@@ -105,7 +108,7 @@ class Permissions {
      * Resolves a permissions object from a specified source.
      * @see {@link PermissionResolvable}
      * @param {PermissionResolvable} perms The data to resolve the permissions from.
-     * @returns {object}
+     * @returns {object} The resolved permissions.
      */
     static resolve(perms) {
         const res = {};
@@ -129,7 +132,7 @@ class Permissions {
     /**
      * Returns an object with all the permissions having `true` or `false` values
      * if they are currently present.
-     * @returns {object}
+     * @returns {object} The serialized permissions.
      */
     serialize() {
         const res = {};
@@ -139,7 +142,7 @@ class Permissions {
 
     /**
      * Returns an array of the current permissions.
-     * @returns {string[]}
+     * @returns {string[]} The permissions array.
      */
     toArray() {
         return Object.keys(this.raw);
@@ -147,7 +150,7 @@ class Permissions {
 
     /**
      * Returns an array of the current permissions in string form.
-     * @returns {string[]}
+     * @returns {string[]} The permission strings array.
      */
     toStrings() {
         return this.toArray().map(p => p.toLowerCase().replace(/_/g, '.'));
@@ -156,7 +159,7 @@ class Permissions {
     /**
      * Returns a permission object from the default string permissions.
      * @param {string[]} perms The array of default permissions.
-     * @returns {object}
+     * @returns {object} The resolved permissions.
      */
     static fromStrings(perms) {
         const res = {};

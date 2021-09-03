@@ -1,8 +1,6 @@
 class AllocationManager {
     constructor(data) {
-        /**
-         * @type {Set<Allocation>}
-         */
+        /** @type {Set<Allocation>} */
         this.cache = new Set();
         this._patch(data);
     }

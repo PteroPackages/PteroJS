@@ -6,9 +6,7 @@ class ServerManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Map<number, ApplicationServer>}
-         */
+        /** @type {Map<number, ApplicationServer>} */
         this.cache = new Map();
     }
 
@@ -34,7 +32,7 @@ class ServerManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>}
+     * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
         if (id) {
@@ -63,7 +61,7 @@ class ServerManager {
      * @param {object} [options.limits] Resource limits for the server.
      * @param {object} [options.featureLimits] Feature limits for the server.
      * @param {object} [options.allocation] Allocation options for the server.
-     * @returns {Promise<ApplicationServer>}
+     * @returns {Promise<ApplicationServer>} The new server.
      */
     async create(user, options = {}) {
         if (
@@ -76,6 +74,7 @@ class ServerManager {
         if (user instanceof PteroUser) user = user.id;
 
         const payload = {};
+        payload.user = user;
         payload.name = options.name;
         payload.egg = options.egg;
         payload.startup = options.startup;

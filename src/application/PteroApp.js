@@ -8,6 +8,11 @@ const presets = require('../structures/Presets');
 
 /**
  * The base class for the Pterodactyl application API.
+ * This operates using a Pterodactyl application API key which can be found
+ * at <your.domain.name/admin/api>.
+ * 
+ * **Warning:** Keep your API key private at all times. Exposing this can lead
+ * to your servers, nodes, configurations and more being corrupted and/or deleted.
  */
 class PteroApp {
     /**
@@ -17,40 +22,56 @@ class PteroApp {
      */
     constructor(domain, auth, options = {}) {
         /**
+         * The domain for your Pterodactyl panel. This should be the main URL only
+         * (not "/api"). Any additional paths will count as the API path.
          * @type {string}
          */
         this.domain = domain.endsWith('/') ? domain.slice(0, -1) : domain;
 
         /**
+         * The API key for your Pterodactyl panel. This should be kept private at
+         * all times. Full access must be granted in the panel for the whole library
+         * to be accessible.
          * @type {string}
          */
         this.auth = auth;
 
         /**
+         * Additional startup options for the application (optional).
          * @type {ApplicationOptions}
          */
         this.options = presets.application(options);
 
         /**
+         * The date the application was ready at.
          * @type {?Date}
          */
         this.readyAt = null;
 
         /**
+         * The ping for the Pteroactyl connection.
          * @type {?number}
          */
         this.ping = null;
 
+        /** @type {UserManager} */
         this.users = new UserManager(this);
+        /** @type {NodeManager} */
         this.nodes = new NodeManager(this);
+        /** @type {NestManager} */
         this.nests = new NestManager(this);
+        /** @type {ApplicationServerManager} */
         this.servers = new ApplicationServerManager(this);
+        /** @type {NodeLocationManager} */
         this.locations = new NodeLocationManager(this);
+        /** @type {ApplicationRequestManager} @internal */
         this.requests = new ApplicationRequestManager(this);
     }
 
     /**
      * Sends a ping request to the API before performing additional startup requests.
+     * Attempting to use the application without connecting to the API will result
+     * in an error.
      * @returns {Promise<boolean>}
      */
     async connect() {

@@ -5,9 +5,7 @@ class UserManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Map<number, PteroUser>}
-         */
+        /** @type {Map<number, PteroUser>} */
         this.cache = new Map();
     }
 
@@ -31,7 +29,7 @@ class UserManager {
      * Fetches a user from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the user.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<PteroUser|Map<number, PteroUser>>}
+     * @returns {Promise<PteroUser|Map<number, PteroUser>>} The fetched user(s).
      */
     async fetch(id, force = false) {
         if (id) {
@@ -52,7 +50,7 @@ class UserManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {boolean} [options.withServers] Whether to include servers the user has.
-     * @returns {Promise<PteroUser>}
+     * @returns {Promise<PteroUser>} The fetched user.
      */
     async fetchExternal(id, options = {}) {
         if (!options.force) for (const [, user] of this.cache) if (id === user.externalId) return user;
@@ -68,7 +66,7 @@ class UserManager {
      * @param {string} username The username for the acount.
      * @param {string} firstname The firstname for the account.
      * @param {string} lastname The lastname for the account.
-     * @returns {Promise<PteroUser>}
+     * @returns {Promise<PteroUser>} The new user.
      */
     async create(email, username, firstname, lastname) {
         const data = await this.client.requests.make(
@@ -89,7 +87,7 @@ class UserManager {
      * @param {string} [options.lastname] The new lastname for the account.
      * @param {string} [options.language] The new language for the account.
      * @param {string} options.password The password for the user account.
-     * @returns {Promise<PteroUser>}
+     * @returns {Promise<PteroUser>} The updated user instance.
      */
     async update(user, options = {}) {
         if (!options.password) throw new Error('User password is required.');

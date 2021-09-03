@@ -5,7 +5,7 @@ exports.RequestError = class RequestError extends Error {
 exports.PteroAPIError = class PteroAPIError extends Error {
     constructor(data) {
         data = data.errors[0];
-        super(`[${data.status}] ${data.detail}\nError Code: ${data.code}`);
+        super(`[${data.status}] ${data.detail}`);
         this.code = data.code;
     }
 }

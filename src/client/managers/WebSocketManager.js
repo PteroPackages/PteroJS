@@ -27,11 +27,13 @@ class WebSocketManager {
         this.status = 'DISCONNECTED';
 
         /**
+         * A map of active websockets.
          * @type {Map<string, WebSocket>}
          */
         this.sockets = new Map();
 
         /**
+         * The timestamp of the last WebSocketManager ping.
          * @type {number}
          */
         this.lastPing = -1;
@@ -78,7 +80,7 @@ class WebSocketManager {
         this.lastPing = Date.now();
         this.#debug('All websockets launched.');
         this.status = 'READY';
-        this.handleTimeout();
+        this.#handleTimeout();
         return this.client.emit('ready');
     }
 
@@ -87,34 +89,31 @@ class WebSocketManager {
         return this.sockets.get(id).send({ event, args:[data ?? null] });
     }
 
-    /** @private */
-    async reconnect() {
+    async #reconnect() {
         if (this.status === 'DESTROYED') return;
-        if (this.client.options.reconnect === false) return this.destroy();
+        if (this.client.options.reconnect === false) return this.#destroy();
         try {
             this.#debug('Attempting reconnect...');
             this.status = 'RECONNECTING';
             return await this.connect();
         } catch (err) {
             console.error(err);
-            return this.destroy();
+            return this.#destroy();
         }
     }
 
-    /** @private */
-    handleTimeout() {
+    #handleTimeout() {
         const since = Date.now() - this.lastPing;
         if (since < 600000) {
             this.sockets.forEach(s => s.readyState === 1 && s.ping());
             this.lastPing = Date.now();
-            setTimeout(() => this.handleTimeout(), 300000);
+            setTimeout(() => this.#handleTimeout(), 300000);
             return;
         }
         setTimeout(() => this.reconnect(), since);
     }
 
-    /** @private */
-    destroy() {
+    #destroy() {
         this.status = 'DESTROYED';
         this.sockets.forEach((socket, key) => {
             this.#debug(`Websocket ${key}: Destroyed`);

@@ -2,9 +2,7 @@ class DatabaseManager {
     constructor(client, data) {
         this.client = client;
 
-        /**
-         * @type {Set<Database>}
-         */
+        /** @type {Set<Database>} */
         this.cache = new Set();
         this._patch(data);
     }

@@ -6,76 +6,91 @@ class Node {
         data = data.attributes;
 
         /**
+         * The ID of the node.
          * @type {number}
          */
         this.id = data.id;
 
         /**
+         * The internal UUID of the node.
          * @type {string}
          */
         this.uuid = data.uuid;
 
         /**
+         * Whether the node is public to other users.
          * @type {boolean}
          */
         this.public = data.public;
 
         /**
+         * The name of the node.
          * @type {string}
          */
         this.name = data.name;
 
         /**
+         * A brief description of the node (if set).
          * @type {?string}
          */
         this.description = data.description || null;
 
         /**
+         * The ID of the node location.
          * @type {number}
          */
         this.location = data.location_id;
 
         /**
+         * The FQDN for the node.
          * @type {string}
          */
         this.fqdn = data.fqdn;
 
         /**
+         * The HTTP scheme for the node.
          * @type {string}
          */
         this.scheme = data.scheme;
 
         /**
+         * Whether the node is behind a proxy.
          * @type {boolean}
          */
         this.behindProxy = data.behind_proxy;
 
         /**
+         * Whether the node is in maintenance mode.
          * @type {boolean}
          */
         this.maintenance = data.maintenance_mode;
 
         /**
+         * The amount of memory the node has.
          * @type {number}
          */
         this.memory = data.memory;
 
         /**
+         * The amount of memory the node has overallocated.
          * @type {number}
          */
         this.overallocatedMemory = data.memory_overallocate;
 
         /**
+         * The amount of disk the node has overallocated.
          * @type {number}
          */
         this.overallocatedDisk = data.disk_overallocate;
 
         /**
+         * The maximum upload size for the node.
          * @type {number}
          */
         this.uploadSize = data.upload_size;
 
         /**
+         * An object containing Pterodactyl Daemon details.
          * @type {object}
          */
         this.daemon = {
@@ -96,11 +111,13 @@ class Node {
         }
 
         /**
+         * The date the node was created.
          * @type {Date}
          */
         this.createdAt = new Date(data.created_at);
 
         /**
+         * The date the node was last updated.
          * @type {?Date}
          */
         this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
@@ -108,7 +125,7 @@ class Node {
 
     /**
      * Returns the node's config (untyped).
-     * @returns {Promise<object>}
+     * @returns {Promise<object>} The node config.
      */
     async getConfig() {
         return await this.client.requests.make(endpoints.nodes.config(this.id));
@@ -129,7 +146,7 @@ class Node {
      * @param {number} [options.upload_size] The maximum upload size for the node.
      * @param {number} [options.memory_overallocate] The amount of memory over allocation.
      * @param {number} [options.disk_overallocate] The amount of disk over allocation.
-     * @returns {Promise<Node>}
+     * @returns {Promise<Node>} The updated node instance.
      */
     async update(options = {}) {
         return this.client.nodes.update(this, options);
@@ -149,7 +166,7 @@ class Node {
 
     /**
      * Returns the JSON value of the Node.
-     * @returns {object}
+     * @returns {object} The JSON value.
      */
     toJSON() {
         return JSON.parse(JSON.stringify(this));

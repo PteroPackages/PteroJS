@@ -10,31 +10,37 @@ class ClientServer {
         const attr = data.attributes;
 
         /**
+         * Whether the client user is the owner of the server.
          * @type {boolean}
          */
         this.isOwner = attr.server_owner;
 
         /**
+         * A substring of the server's UUID to easily identify it.
          * @type {string}
          */
         this.identifier = attr.identifier;
 
         /**
+         * The internal UUID of the server.
          * @type {string}
          */
         this.uuid = attr.uuid;
 
         /**
+         * The name of the server.
          * @type {string}
          */
         this.name = attr.name;
 
         /**
+         * The name of the node the server is on.
          * @type {string}
          */
         this.node = attr.node;
 
         /**
+         * An object containing SFTP details.
          * @type {object}
          */
         this.sftp = {
@@ -43,45 +49,60 @@ class ClientServer {
         }
 
         /**
+         * A brief description of the server (if set).
          * @type {?string}
          */
-        this.description = attr.description;
+        this.description = attr.description || null;
 
         /**
+         * An object containing the server's limits.
          * @type {object}
          */
         this.limits = attr.limits;
 
         /**
+         * An object containing the server's feature limits.
          * @type {object}
          */
         this.featureLimits = attr.feature_limits;
 
         /**
+         * Whether the server is suspended from action.
          * @type {boolean}
          */
         this.suspended = attr.is_suspended;
 
         /**
+         * The current power state of the server.
          * @type {string}
          */
         this.state = 'unknown';
 
         /**
+         * Whether the server is currently being installed.
          * @type {boolean}
          */
         this.installing = attr.is_installing;
 
+        /** @type {AllocationManager} */
         this.allocations = new AllocationManager(attr);
+        /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
+        /** @type {DatabaseManager} */
         this.databases = new DatabaseManager(client, data.databases);
+        /** @type {FileManager} */
         this.files = new FileManager(client, data.files);
     }
 
+    /**
+     * Adds the server to the WebSocket connection list to be established.
+     * @returns {void}
+     */
     addWebSocket() {
         this.client.addSocketServer(this.identifier);
     }
 
+    /** @todo */
     get resources() {}
 
     /**

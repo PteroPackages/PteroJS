@@ -5,9 +5,7 @@ class NodeManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Map<number, Node>}
-         */
+        /** @type {Map<number, Node>} */
         this.cache = new Map();
     }
 
@@ -30,7 +28,7 @@ class NodeManager {
      * Fetches a node from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the node.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<Node|Map<number, Node>>}
+     * @returns {Promise<Node|Map<number, Node>>} The fetched node(s).
      */
     async fetch(id, force = false) {
         if (id) {
@@ -55,12 +53,12 @@ class NodeManager {
      * @param {number} options.memory The amount of memory for the node.
      * @param {number} options.disk The amount of disk for the node.
      * @param {object} options.sftp SFTP options.
-     * @param {number} options.sftp.port The port for the SFPT.
-     * @param {number} options.sftp.listener The listener port for the SFPT.
+     * @param {number} options.sftp.port The port for the SFTP.
+     * @param {number} options.sftp.listener The listener port for the SFTP.
      * @param {number} [options.upload_size] The maximum upload size for the node.
      * @param {number} [options.memory_overallocate] The amount of memory over allocation.
      * @param {number} [options.disk_overallocate] The amount of disk over allocation.
-     * @returns {Promise<Node>}
+     * @returns {Promise<Node>} The new node.
      */
     async create(options = {}) {
         if (
@@ -103,12 +101,12 @@ class NodeManager {
      * @param {number} [options.memory] The amount of memory for the node.
      * @param {number} [options.disk] The amount of disk for the node.
      * @param {object} [options.sftp] SFTP options.
-     * @param {number} [options.sftp.port] The port for the SFPT.
-     * @param {number} [options.sftp.listener] The listener port for the SFPT.
+     * @param {number} [options.sftp.port] The port for the SFTP.
+     * @param {number} [options.sftp.listener] The listener port for the SFTP.
      * @param {number} [options.upload_size] The maximum upload size for the node.
      * @param {number} [options.memory_overallocate] The amount of memory over allocation.
      * @param {number} [options.disk_overallocate] The amount of disk over allocation.
-     * @returns {Promise<Node>}
+     * @returns {Promise<Node>} The updated node instance.
      */
     async update(node, options = {}) {
         if (typeof node === 'number') node = this.fetch(node);

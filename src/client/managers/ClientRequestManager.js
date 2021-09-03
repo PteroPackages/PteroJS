@@ -2,6 +2,11 @@ const fetch = require('node-fetch');
 const { RequestError, PteroAPIError } = require('../../structures/Errors');
 const { version } = require('../../../package.json');
 
+/**
+ * The requests manager for the client API. This is not for public use. Using
+ * this manually may result in unwanted modifications of your Pterodactyl
+ * servers and/or account.
+ */
 class ClientRequestManager {
     constructor(client) {
         this.client = client
@@ -15,12 +20,12 @@ class ClientRequestManager {
         'Accept': 'application/json'
     }
 
-    /** Sends a request to the Pterodactyl API. Returns a json object or `null` if
+    /** Sends a request to the Pterodactyl API. Returns a json object or an error if
      * an unknown response code is received.
      * @param {string} path The path to request.
-     * @param {object} [params] Optional payload data (POST, PUT and PATCH).
+     * @param {?object} [params] Optional payload data (POST, PUT and PATCH).
      * @param {string} [method] The method or HTTP verb to use.
-     * @returns {Promise<object|void>}
+     * @returns {Promise<object|void>} The response object, if any.
      */
     async make(path, params, method = 'GET') {
         if (this.client.ping === null) throw new Error('Attempted request before client was ready.');

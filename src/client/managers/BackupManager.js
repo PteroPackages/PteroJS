@@ -5,9 +5,7 @@ class BackupManager {
         this.client = client;
         this.server = server;
 
-        /**
-         * @type {Map<string, Backup>}
-         */
+        /** @type {Map<string, Backup>} */
         this.cache = new Map();
     }
 
@@ -44,9 +42,9 @@ class BackupManager {
 
     /**
      * Fetches a backup from the Pterodactyl API with an optional cache check.
-     * @param {string} id The UUID of the backup.
+     * @param {string} [id] The UUID of the backup.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<Backup|Map<string, Backup>>}
+     * @returns {Promise<Backup|Map<string, Backup>>} The fetched backup(s).
      */
     async fetch(id, force = false) {
         if (id) {
@@ -67,7 +65,7 @@ class BackupManager {
 
     /**
      * Creates a new backup.
-     * @returns {Promise<Backup>}
+     * @returns {Promise<Backup>} The new backup object.
      */
     async create() {
         return this._patch(
@@ -81,7 +79,7 @@ class BackupManager {
     /**
      * Returns a download link for the backup.
      * @param {string} id The UUID of the backup.
-     * @returns {Promise<string>}
+     * @returns {Promise<string>} The download link.
      */
     async download(id) {
         const url = await this.client.requests.make(
@@ -93,14 +91,14 @@ class BackupManager {
     /**
      * Deletes a specified backup.
      * @param {string} id The UUID of the backup.
-     * @returns {Promise<string>}
+     * @returns {Promise<boolean>}
      */
     async delete(id) {
         await this.client.requests.make(
             endpoints.servers.backups.get(this.server.identifier, id), { method: 'DELETE' }
         );
         this.cache.delete(id);
-        return id;
+        return true;
     }
 }
 
@@ -111,7 +109,7 @@ module.exports = BackupManager;
  * @typedef {object} Backup
  * @property {string} uuid The UUID of the backup.
  * @property {string} name The name of the backup.
- * @property {Array<unknown>} ignoredFiles An array of files ignored by the backup.
+ * @property {unknown[]} ignoredFiles An array of files ignored by the backup.
  * @property {?string} hash The sha256 hash for the backup.
  * @property {number} bytes The size of the backup in bytes.
  * @property {Date} createdAt The date the backup was created.

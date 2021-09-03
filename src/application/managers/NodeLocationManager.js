@@ -4,9 +4,7 @@ class NodeLocationManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Map<number, NodeLocation>}
-         */
+        /** @type {Map<number, NodeLocation>} */
         this.cache = new Map();
     }
 
@@ -42,7 +40,7 @@ class NodeLocationManager {
      * Fetches a node location from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the location.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<NodeLocation|Map<number, NodeLocation>>}
+     * @returns {Promise<NodeLocation|Map<number, NodeLocation>>} The fetched node location(s).
      */
     async fetch(id, force = false) {
         if (id) {
@@ -61,7 +59,7 @@ class NodeLocationManager {
      * Creates a new node location.
      * @param {string} short The short location code of the location.
      * @param {string} long The long location code of the location.
-     * @returns {Promise<NodeLocation>}
+     * @returns {Promise<NodeLocation>} The new node location.
      */
     async create(short, long) {
         return this._patch(
@@ -76,9 +74,9 @@ class NodeLocationManager {
     /**
      * Updates an existing node location.
      * @param {number} id The ID of the node location.
-     * @param {?string} short The short location code of the location.
-     * @param {?string} long The long location code of the location.
-     * @returns {Promise<NodeLocation>}
+     * @param {string} short The short location code of the location.
+     * @param {string} long The long location code of the location.
+     * @returns {Promise<NodeLocation>} The updated node location instance.
      */
     async update(id, { short, long } = {}) {
         return this._patch(
@@ -107,11 +105,11 @@ module.exports = NodeLocationManager;
 /**
  * Represents a location on Pterodactyl.
  * Location objects have little to no methodic usage so they are readonly.
- * @readonly
  * @typedef {object} NodeLocation
  * @property {number} id The ID of the location.
  * @property {string} long The long location code.
  * @property {string} short The short location code (or country code).
  * @property {Date} createdAt The date the location was created.
  * @property {?Date} updatedAt The date the location was last updated.
+ * @readonly
  */

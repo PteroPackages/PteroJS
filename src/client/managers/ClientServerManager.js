@@ -5,9 +5,7 @@ class ClientServerManager {
     constructor(client) {
         this.client = client
 
-        /**
-         * @type {Map<string, ClientServer>}
-         */
+        /** @type {Map<string, ClientServer>} */
         this.cache = new Map();
     }
 
@@ -33,11 +31,11 @@ class ClientServerManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ClientServer|Map<string, ClientServer>>}
+     * @returns {Promise<ClientServer|Map<string, ClientServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
         if (id) {
-            if (options.force !== true) {
+            if (!options.force) {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }

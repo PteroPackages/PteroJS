@@ -2,9 +2,7 @@ class FileManager {
     constructor(client, data) {
         this.client = client;
 
-        /**
-         * @type {Map<string, PteroFile>}
-         */
+        /** @type {Map<string, PteroFile>} */
         this.cache = new Map();
         this._patch(data);
     }

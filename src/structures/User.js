@@ -1,5 +1,5 @@
+const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
-const a_path = require('../application/managers/Endpoints');
 const c_path = require('../client/managers/Endpoints');
 
 /**
@@ -9,40 +9,28 @@ class BaseUser {
     constructor(client, data) {
         this.client = client;
 
-        /**
-         * @type {number}
-         */
+        /** @type {number} */
         this.id = data.id;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.username = data.username;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.email = data.email;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.firstname = data.first_name;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.lastname = data.last_name;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.language = data.language;
     }
 
     /**
      * Returns the string value of the user.
-     * @returns {string}
+     * @returns {string} The fullname.
      */
     toString() {
         return this.firstname +' '+ this.lastname;
@@ -50,7 +38,7 @@ class BaseUser {
 
     /**
      * Returns the JSON value of the User.
-     * @returns {object}
+     * @returns {object} The JSON value.
      */
     toJSON() {
         return JSON.parse(JSON.stringify(this));
@@ -61,44 +49,26 @@ class PteroUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.externalId = data.external_id;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.uuid = data.uuid;
 
-        /**
-         * @type {boolean}
-         */
+        /** @type {boolean} */
         this.isAdmin = data.root_admin ?? false;
 
-        /**
-         * @type {boolean}
-         */
+        /** @type {boolean} */
         this.tfa = data['2fa'];
 
-        /**
-         * @type {Date}
-         */
+        /** @type {Date} */
         this.createdAt = new Date(data.created_at);
-
-        /**
-         * @type {number}
-         */
+        /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
-        /**
-         * @type {?Date}
-         */
+        /** @type {?Date} */
         this.updatedAt = data['updated_at'] ? new Date(data['updated_at']) : null;
-
-        /**
-         * @type {?number}
-         */
+        /** @type {?number} */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
     }
 
@@ -110,38 +80,28 @@ class PteroSubUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.uuid = data.uuid;
 
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         this.image = data.image;
 
-        /**
-         * @type {boolean}
-         */
+        /** @type {boolean} */
         this.enabled = data['2fa_enabled'];
 
-        /**
-         * @type {Date}
-         */
+        /** @type {Date} */
         this.createdAt = new Date(data.created_at);
-
-        /**
-         * @type {number}
-         */
+        /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
+        /** @type {Permissions} */
         this.permissions = new Permissions(data.permissions ?? {});
     }
 
     /**
      * Updates the subuser's server permissions.
      * @param {PermissionResolvable} perms The permissions to set.
-     * @returns {Promise<PteroSubUser>}
+     * @returns {Promise<PteroSubUser>} The updated user instance.
      */
     async setPermissions(perms) {
         perms = new Permissions(perms);
@@ -157,9 +117,7 @@ class ClientUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
 
-        /**
-         * @type {boolean}
-         */
+        /** @type {boolean} */
         this.isAdmin = data.admin;
 
         /**
@@ -175,11 +133,20 @@ class ClientUser extends BaseUser {
         this.apikeys = [];
     }
 
+    /**
+     * Fetches a 2FA code linked to the client's account.
+     * @returns {Promise<string>} The 2FA code.
+     */
     async get2faCode() {
         const data = await this.client.requests.make(c_path.account.tfa);
         return data.data.image_url_data;
     }
 
+    /**
+     * Enables 2FA for the client user and returns an array of authentication tokens.
+     * @param {string} code The 2FA code to authenticate with.
+     * @returns {Promise<string[]>} The auth tokens.
+     */
     async enable2fa(code) {
         const data = await this.client.requests.make(
             endpoints.account.tfa, { code }, 'POST'
@@ -188,20 +155,39 @@ class ClientUser extends BaseUser {
         return this.tokens;
     }
 
+    /**
+     * Disables 2FA for the client user.
+     * @param {string} password The client user's account password.
+     * @returns {Promise<void>}
+     */
     async disable2fa(password) {
-        return await this.client.requests.make(
+        await this.client.requests.make(
             endpoints.account.tfa, { password }, 'DELETE'
         );
+        this.tokens = [];
     }
 
+    /**
+     * Updates the client user's email.
+     * @param {string} email The new email.
+     * @param {string} password The client user's password.
+     * @returns {Promise<ClientUser>} The updated client user instance.
+     */
     async updateEmail(email, password) {
         await this.client.requests.make(
             endpoints.account.email, { email, password }, 'PUT'
         );
         this.email = email;
-        return true;
+        return this;
     }
 
+    /**
+     * Updates the client user's password. **Note:** the PteroJS library does not store
+     * passwords on the client user object.
+     * @param {string} oldpass The current account password.
+     * @param {string} newpass The new account password.
+     * @returns {Promise<void>}
+     */
     async updatePassword(oldpass, newpass) {
         if (oldpass === newpass) return;
         return await this.client.requests.make(
@@ -215,6 +201,10 @@ class ClientUser extends BaseUser {
         );
     }
 
+    /**
+     * Returns an array of API keys linked to the client user's account.
+     * @returns {Promise<APIKey[]>} An array of APIKey objects.
+     */
     async fetchKeys() {
         const data = await this.client.requests.make(endpoints.account.apiKeys);
         this.apikeys = [];
@@ -230,10 +220,16 @@ class ClientUser extends BaseUser {
         return this.apikeys;
     }
 
-    async createKey(description, allowed) {
+    /**
+     * Creates a new API key linked to the client user's account.
+     * @param {string} description A brief description of the use of the API key.
+     * @param {string[]} [allowed] An array of whitelisted IPs for the key.
+     * @returns {Promise<APIKey>} The new API key.
+     */
+    async createKey(description, allowed = []) {
         const data = await this.client.requests.make(
             endpoints.account.apiKeys,
-            { description, allowed_ips: allowed ?? [] },
+            { description, allowed_ips: allowed },
             'POST'
         );
         const att = data.attributes;
@@ -247,11 +243,14 @@ class ClientUser extends BaseUser {
         return this.apikeys.find(k => k.identifier === att.identifier);
     }
 
-    async deleteKey(key) {
-        await this.client.requests.make(c_path.account.apikeys +`/${key}`, { method: 'DELETE' });
-        const i = this.apikeys.indexOf(this.apikeys.find(k => k === key));
-        if (i < 0) return;
-        this.apikeys.splice(i);
+    /**
+     * Deletes the specified API key linked to the client user's account.
+     * @param {string} id The identifier of the API key to delete.
+     * @returns {Promise<void>}
+     */
+    async deleteKey(id) {
+        await this.client.requests.make(c_path.account.apikeys +`/${id}`, { method: 'DELETE' });
+        this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 }
 

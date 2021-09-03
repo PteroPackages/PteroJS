@@ -4,9 +4,7 @@ class NestEggsManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Map<number, object>}
-         */
+        /** @type {Map<number, object>} */
         this.cache = new Map();
     }
 
@@ -17,7 +15,7 @@ class NestEggsManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<object|Map<number, object>>}
+     * @returns {Promise<object|Map<number, object>>} The fetched egg(s).
      */
     async fetch(nest, id, options = {}) {
         if (id) {
@@ -45,7 +43,7 @@ class NestEggsManager {
     /**
      * Searches the cache for eggs that are for the specified nest.
      * @param {number} nest The ID of the nest to search.
-     * @returns {object[]}
+     * @returns {object[]} The nest's eggs.
      */
     for(nest) {
         const res = [];
