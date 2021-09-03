@@ -38,7 +38,7 @@ class UserManager {
         if (id) {
             if (!force) {
                 const u = this.cache.get(id);
-                if (u) return u;
+                if (u) return Promise.resolve(u);
             }
             const data = await this.client.requests.make(
                 endpoints.servers.users.get(this.server.identifier, id)
@@ -72,14 +72,14 @@ class UserManager {
     /**
      * Removes the specified subuser from the server.
      * @param {string} id The UUID of the subuser.
-     * @returns {Promise<string>}
+     * @returns {Promise<boolean>}
      */
     async remove(id) {
         await this.client.requests.make(
             endpoints.servers.users.get(this.server.identifier, id), { method: 'DELETE' }
         );
         this.cache.delete(id);
-        return id;
+        return true;
     }
 }
 

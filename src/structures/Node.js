@@ -117,9 +117,21 @@ class Node {
     /**
      * Updates the node with the specified options.
      * @param {object} options Node update options.
+     * @param {string} [options.name] The name of the node.
+     * @param {number} [options.location] The ID of the location for the node.
+     * @param {string} [options.fqdn] The FQDN for the node.
+     * @param {string} [options.scheme] The HTTP/HTTPS scheme for the node.
+     * @param {number} [options.memory] The amount of memory for the node.
+     * @param {number} [options.disk] The amount of disk for the node.
+     * @param {object} [options.sftp] SFTP options.
+     * @param {number} [options.sftp.port] The port for the SFPT.
+     * @param {number} [options.sftp.listener] The listener port for the SFPT.
+     * @param {number} [options.upload_size] The maximum upload size for the node.
+     * @param {number} [options.memory_overallocate] The amount of memory over allocation.
+     * @param {number} [options.disk_overallocate] The amount of disk over allocation.
      * @returns {Promise<Node>}
      */
-    async update(options) {
+    async update(options = {}) {
         return this.client.nodes.update(this, options);
     }
 

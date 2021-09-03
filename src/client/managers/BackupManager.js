@@ -52,7 +52,7 @@ class BackupManager {
         if (id) {
             if (!force) {
                 const b = this.cache.get(id);
-                if (b) return b;
+                if (b) return Promise.resolve(b);
             }
             const data = await this.client.requests.make(
                 endpoints.servers.backups.get(this.server.identifier, id)

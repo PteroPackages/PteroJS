@@ -32,7 +32,7 @@ class ClientServerManager {
      * @param {string} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
-     * @param {Array<string>} [options.include] Additional fetch parameters to include.
+     * @param {string[]} [options.include] Additional fetch parameters to include.
      * @returns {Promise<ClientServer|Map<string, ClientServer>>}
      */
     async fetch(id, options = {}) {

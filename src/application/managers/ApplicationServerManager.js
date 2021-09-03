@@ -20,11 +20,11 @@ class ServerManager {
                 const s = new ApplicationServer(this.client, o);
                 res.set(s.id, s);
             }
-            if (this.client.options.cacheServers !== false) res.forEach((v, k) => this.cache.set(k,v ));
+            if (this.client.options.cacheServers) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         const s = new ApplicationServer(this.client, data.attributes);
-        if (this.client.options.cacheServers !== false) this.cache.set(s.id, s);
+        if (this.client.options.cacheServers) this.cache.set(s.id, s);
         return s;
     }
 
@@ -33,17 +33,17 @@ class ServerManager {
      * @param {number} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
-     * @param {Array<string>} [options.include] Additional fetch parameters to include.
+     * @param {string[]} [options.include] Additional fetch parameters to include.
      * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>}
      */
-    async fetch(id, options) {
+    async fetch(id, options = {}) {
         if (id) {
-            if (options?.force !== true) {
+            if (options.force) {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
             const data = await this.client.requests.make(
-                endpoints.servers.get(id) + joinParams(options?.include)
+                endpoints.servers.get(id) + joinParams(options.include)
             );
             return this._patch(data);
         }
@@ -65,8 +65,7 @@ class ServerManager {
      * @param {object} [options.allocation] Allocation options for the server.
      * @returns {Promise<ApplicationServer>}
      */
-    async create(user, options) {
-        if (user instanceof PteroUser) user = user.id;
+    async create(user, options = {}) {
         if (
             !options.name ||
             !options.egg ||
@@ -74,13 +73,17 @@ class ServerManager {
             !options.startup ||
             !options.env
         ) throw new Error('Missing required server option.');
+        if (user instanceof PteroUser) user = user.id;
 
-        const payload = { name, egg, startup } = options;
+        const payload = {};
+        payload.name = options.name;
+        payload.egg = options.egg;
+        payload.startup = options.startup;
         payload.docker_image = options.image;
         payload.environment = options.env;
-        if (options?.limits) payload.limits = options.limits;
-        if (options?.featureLimits) payload.feature_limits = options.featureLimits;
-        if (options?.allocation) payload.allocation = options.allocation;
+        if (options.limits) payload.limits = options.limits;
+        if (options.featureLimits) payload.feature_limits = options.featureLimits;
+        if (options.allocation) payload.allocation = options.allocation;
 
         const data = await this.client.requests.make(
             endpoints.servers.main, payload, 'POST'

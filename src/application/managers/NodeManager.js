@@ -18,11 +18,11 @@ class NodeManager {
                 const n = new Node(this.client, o);
                 res.set(n.id, n);
             }
-            if (this.client.options.cacheNodes !== false) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.cacheNodes) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         const n = new Node(this.client, data);
-        if (this.client.options.cacheNodes !== false) this.cache.set(n.id, n);
+        if (this.client.options.cacheNodes) this.cache.set(n.id, n);
         return n;
     }
 
@@ -62,7 +62,7 @@ class NodeManager {
      * @param {number} [options.disk_overallocate] The amount of disk over allocation.
      * @returns {Promise<Node>}
      */
-    async create(options) {
+    async create(options = {}) {
         if (
             !options.name ||
             !options.location ||
@@ -74,7 +74,14 @@ class NodeManager {
             !options.sftp?.listener
         ) throw new Error('Missing required Node creation option.');
 
-        const payload = { name, location, fqdn, scheme, memory, disk } = options;
+        const payload = {};
+        payload.name = options.name;
+        payload.location = options.location;
+        payload.fqdn = options.fqdn;
+        payload.scheme = options.scheme;
+        payload.memory = options.memory;
+        payload.disk = options.disk;
+        payload.sftp = options.sftp;
         payload.upload_size = options.upload_size ?? 100;
         payload.memory_overallocate = options.memory_overallocate ?? 0;
         payload.disk_overallocate = options.disk_overallocate ?? 0;
@@ -88,7 +95,7 @@ class NodeManager {
     /**
      * Updates a specified node.
      * @param {number|Node} node The node to update.
-     * @param {object} options Node creation options.
+     * @param {object} options Node update options.
      * @param {string} [options.name] The name of the node.
      * @param {number} [options.location] The ID of the location for the node.
      * @param {string} [options.fqdn] The FQDN for the node.
@@ -103,12 +110,12 @@ class NodeManager {
      * @param {number} [options.disk_overallocate] The amount of disk over allocation.
      * @returns {Promise<Node>}
      */
-    async update(node, options) {
+    async update(node, options = {}) {
         if (typeof node === 'number') node = this.fetch(node);
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
         const { id } = node;
         const payload = {};
-        Object.entries(node.toJSON()).forEach((k, v) => payload[k] = options[k] ?? v);
+        Object.entries(node.toJSON()).forEach(e => payload[e[0]] = options[e[0]] ?? e[1]);
 
         const data = await this.client.requests.make(
             endpoints.nodes.get(id), payload, 'PATCH'
@@ -119,13 +126,13 @@ class NodeManager {
     /**
      * Deletes a node from Pterodactyl.
      * @param {number|Node} node The node to delete.
-     * @returns {number}
+     * @returns {Promise<boolean>}
      */
     async delete(node) {
         if (node instanceof Node) node = node.id;
         await this.client.requests.make(endpoints.nodes.get(node), { method: 'DELETE' });
         this.cache.delete(node);
-        return node;
+        return true;
     }
 }
 

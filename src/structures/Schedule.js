@@ -76,13 +76,13 @@ class Schedule {
     }
 
     /** @todo */
-    async update(options) {}
+    async update(options = {}) {}
 
     /** @todo */
     async createTask(action, payload, offset) {}
 
     /** @todo */
-    async updateTask(id, options) {}
+    async updateTask(id, options = {}) {}
 
     /** @todo */
     async deleteTask(id) {}

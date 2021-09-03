@@ -78,7 +78,7 @@ class ClientServer {
         this.files = new FileManager(client, data.files);
     }
 
-    addWebsocket() {
+    addWebSocket() {
         this.client.addSocketServer(this.identifier);
     }
 
@@ -90,7 +90,7 @@ class ClientServer {
      * @returns {Promise<void>}
      */
     async sendCommand(command) {
-        return await this.client.requests.make(
+        await this.client.requests.make(
             endpoints.servers.command(this.identifier), { command }, 'POST'
         );
     }

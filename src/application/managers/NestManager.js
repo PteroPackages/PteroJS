@@ -28,7 +28,7 @@ class NestManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
-            if (this.client.options.cacheNests !== false) res.forEach(n => this.cache.add(n));
+            if (this.client.options.cacheNests) res.forEach(n => this.cache.add(n));
             return res;
         }
         data = data.attributes;
@@ -41,7 +41,7 @@ class NestManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         });
-        if (this.client.options.cacheNests !== false) res.forEach(n => this.cache.add(n));
+        if (this.client.options.cacheNests) res.forEach(n => this.cache.add(n));
         return res;
     }
 

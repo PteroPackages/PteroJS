@@ -139,7 +139,7 @@ class Permissions {
 
     /**
      * Returns an array of the current permissions.
-     * @returns {Array<string>}
+     * @returns {string[]}
      */
     toArray() {
         return Object.keys(this.raw);
@@ -147,7 +147,7 @@ class Permissions {
 
     /**
      * Returns an array of the current permissions in string form.
-     * @returns {Array<string>}
+     * @returns {string[]}
      */
     toStrings() {
         return this.toArray().map(p => p.toLowerCase().replace(/_/g, '.'));
@@ -155,7 +155,7 @@ class Permissions {
 
     /**
      * Returns a permission object from the default string permissions.
-     * @param {Array<string>} perms The array of default permissions.
+     * @param {string[]} perms The array of default permissions.
      * @returns {object}
      */
     static fromStrings(perms) {
@@ -180,5 +180,5 @@ function diff(perms) {
  * * An array of strings
  * * An array of numbers
  * * An object
- * @typedef {Array<string>|Array<number>|object} PermissionResolvable
+ * @typedef {string[]|number[]|object} PermissionResolvable
  */

@@ -78,7 +78,7 @@ class PteroClient extends EventEmitter {
 
     /**
      * Adds a server or an array of servers to be connected to websockets.
-     * @param {string|Array<string>} ids The identifier of the server, or an array of server identifiers.
+     * @param {string|string[]} ids The identifier of the server, or an array of server identifiers.
      */
     addSocketServer(ids) {
         Array.isArray(ids) ? this.ws.servers.push(...ids) : this.ws.servers.push(ids);
@@ -86,7 +86,7 @@ class PteroClient extends EventEmitter {
 
     /**
      * Removes a server from websocket connections.
-     * @param {sting} id The identifier of the server.
+     * @param {string} id The identifier of the server.
      */
     removeSocketServer(id) {
         this.ws.servers.splice(id);
@@ -103,7 +103,7 @@ module.exports = PteroClient;
  * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
  * @property {boolean} [cacheServers] Whether to cache servers (default `true`).
  * @property {boolean} [cacheSubUsers] Whether to cache server subusers (default `true`).
- * @property {Array<string>} [disableEvents] An array of events to disable (wont be emitted).
+ * @property {string[]} [disableEvents] An array of events to disable (wont be emitted).
  */
 
 /**

@@ -117,7 +117,7 @@ class ApplicationServer {
      * @param {string} [options.description] The new description of the server.
      * @returns {Promise<ApplicationServer>}
      */
-    async updateDetails(options) {
+    async updateDetails(options = {}) {
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
 
         const payload = {};
@@ -142,14 +142,14 @@ class ApplicationServer {
      * @param {object} options Build options.
      * @todo
      */
-    async updateBuild(options) {}
+    async updateBuild(options = {}) {}
 
     /**
      * Updates the server's startup configuration.
      * @param {object} options Startup options.
      * @todo
      */
-    async updateStartup(options) {}
+    async updateStartup(options = {}) {}
 
     /**
      * Suspends the server.
@@ -171,10 +171,10 @@ class ApplicationServer {
 
     /**
      * Reinstalls the server.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<void>}
      */
     async reinstall() {
-        return await this.client.requests.make(endpoints.servers.reinstall(this.id), { method: 'POST' });
+        await this.client.requests.make(endpoints.servers.reinstall(this.id), { method: 'POST' });
     }
 
     /**

@@ -16,14 +16,14 @@ class NestEggsManager {
      * @param {number} [id] The ID of the egg.
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
-     * @param {Array<string>} [options.include] Additional fetch parameters to include.
+     * @param {string[]} [options.include] Additional fetch parameters to include.
      * @returns {Promise<object|Map<number, object>>}
      */
-    async fetch(nest, id, options) {
+    async fetch(nest, id, options = {}) {
         if (id) {
-            if (options.force !== true) {
+            if (options.force) {
                 const e = this.cache.get(id);
-                if (e) return e;
+                if (e) return Promise.resolve(e);
             }
             const data = await this.client.requests.make(
                 endpoints.nests.eggs.get(nest, id) + joinParams(options.include)
@@ -45,11 +45,11 @@ class NestEggsManager {
     /**
      * Searches the cache for eggs that are for the specified nest.
      * @param {number} nest The ID of the nest to search.
-     * @returns {Array<object>}
+     * @returns {object[]}
      */
     for(nest) {
         const res = [];
-        for (const egg of this.cache) if (egg.nest === nest) res.push(egg);
+        for (const [, egg] of this.cache) if (egg.nest === nest) res.push(egg);
         return res;
     }
 }

@@ -2,13 +2,13 @@ const WebSocket = require('ws');
 const { WebSocketError } = require('../../structures/Errors');
 const endpoints = require('./Endpoints');
 
-const EVENTS = {
-    'auth success': 'serverConnect',
-    'console output': 'serverOutput',
-    'token expired': 'serverDisconnect',
-    'status': 'statusUpdate',
-    'stats': 'statsUpdate'
-}
+// const EVENTS = {
+//     'auth success': 'serverConnect',
+//     'console output': 'serverOutput',
+//     'token expired': 'serverDisconnect',
+//     'status': 'statusUpdate',
+//     'stats': 'statsUpdate'
+// }
 
 class WebSocketManager {
     constructor(client) {
@@ -16,7 +16,7 @@ class WebSocketManager {
 
         /**
          * Server identifiers to establish connections with.
-         * @type {Array<string>}
+         * @type {string[]}
          */
         this.servers = [];
 
@@ -37,15 +37,14 @@ class WebSocketManager {
         this.lastPing = -1;
     }
 
-    /** @private */
-    debug(msg) {
+    #debug(msg) {
         this.client.emit('debug', `[DEBUG] ${msg}`);
     }
 
     async connect() {
         if (!this.servers.length) return this.client.emit('ready');
         if (this.status === 'CLOSED') throw new WebSocketError('WebSocket was closed by the client.');
-        this.debug('Attempting server websocket connections...');
+        this.#debug('Attempting server websocket connections...');
         this.status = 'CONNECTING';
 
         for (const id of this.servers) {
@@ -53,7 +52,7 @@ class WebSocketManager {
             const WS = new WebSocket(socket, { headers:{ 'Authorization': `Bearer ${token}` }});
 
             WS.onopen = (_) => {
-                this.debug(`WebSocket ${id}: Opened`);
+                this.#debug(`WebSocket ${id}: Opened`);
                 // WS.send({ events:'auth', args:[token] });
                 this.client.emit('serverConnect', id);
             }
@@ -63,21 +62,21 @@ class WebSocketManager {
             }
 
             WS.onerror = ({ message }) => {
-                this.debug(`WebSocket ${id}: Error\nMessage: ${message}`);
+                this.#debug(`WebSocket ${id}: Error\nMessage: ${message}`);
             }
 
             WS.onclose = ({ reason, code }) => {
-                this.debug(`WebSocket ${id}: Closed\nCode: ${code} - ${reason || 'No Reason Sent.'}`);
+                this.#debug(`WebSocket ${id}: Closed\nCode: ${code} - ${reason || 'No Reason Sent.'}`);
                 this.client.emit('serverDisconnect', id);
                 this.sockets.delete(id);
             }
 
             this.sockets.set(id, WS);
-            this.debug(`WebSocket ${id}: Launched`);
+            this.#debug(`WebSocket ${id}: Launched`);
         }
 
         this.lastPing = Date.now();
-        this.debug('All websockets launched.');
+        this.#debug('All websockets launched.');
         this.status = 'READY';
         this.handleTimeout();
         return this.client.emit('ready');
@@ -93,7 +92,7 @@ class WebSocketManager {
         if (this.status === 'DESTROYED') return;
         if (this.client.options.reconnect === false) return this.destroy();
         try {
-            this.debug('Attempting reconnect...');
+            this.#debug('Attempting reconnect...');
             this.status = 'RECONNECTING';
             return await this.connect();
         } catch (err) {
@@ -118,7 +117,7 @@ class WebSocketManager {
     destroy() {
         this.status = 'DESTROYED';
         this.sockets.forEach((socket, key) => {
-            this.debug(`Websocket ${key}: Destroyed`);
+            this.#debug(`Websocket ${key}: Destroyed`);
             socket.close(1000, 'Client destroyed.');
         });
         this.sockets.clear();
@@ -131,5 +130,5 @@ module.exports = WebSocketManager;
  * Represents a websocket response object.
  * @typedef {object} WebSocketResponse
  * @property {string} event The event received.
- * @property {?Array<*>} args Additional arguments received.
+ * @property {?any[]} args Additional arguments received.
  */

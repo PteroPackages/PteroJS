@@ -4,7 +4,7 @@ const { ClientOptions } = require('../client/PteroClient');
 /**
  * Creates a preset application option object with all the options not
  * specified by the user.
- * @param {ApplicationOptions} data Data to parse application options from.
+ * @param {object} data Data to parse application options from.
  * @returns {ApplicationOptions}
  */
 function application(data) {
@@ -28,7 +28,7 @@ function application(data) {
 /**
  * Creates a preset client option object with all the options not
  * specified by the user.
- * @param {ClientOptions} data Data to parse client options from.
+ * @param {object} data Data to parse client options from.
  * @returns {ClientOptions}
  */
 function client(data) {

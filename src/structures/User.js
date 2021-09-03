@@ -1,4 +1,4 @@
-const Permissions = require('./Permissions');
+const { PermissionResolvable } = require('./Permissions');
 const a_path = require('../application/managers/Endpoints');
 const c_path = require('../client/managers/Endpoints');
 
@@ -103,7 +103,7 @@ class PteroUser extends BaseUser {
     }
 
     /** @todo */
-    async update(options) {}
+    async update(options = {}) {}
 }
 
 class PteroSubUser extends BaseUser {
@@ -135,12 +135,12 @@ class PteroSubUser extends BaseUser {
          */
         this.createdTimestamp = this.createdAt.getTime();
 
-        this.permissions = new Permissions(data.permissions);
+        this.permissions = new Permissions(data.permissions ?? {});
     }
 
     /**
      * Updates the subuser's server permissions.
-     * @param {Permissions.PermissionResolvable} perms The permissions to set.
+     * @param {PermissionResolvable} perms The permissions to set.
      * @returns {Promise<PteroSubUser>}
      */
     async setPermissions(perms) {
@@ -164,13 +164,13 @@ class ClientUser extends BaseUser {
 
         /**
          * An array of 2FA authentication tokens.
-         * @type {Array<string>}
+         * @type {string[]}
          */
         this.tokens = [];
 
         /**
          * An array of API keys for Pterodactyl.
-         * @type {Array<APIKey>}
+         * @type {APIKey[]}
          */
         this.apikeys = [];
     }
@@ -217,6 +217,7 @@ class ClientUser extends BaseUser {
 
     async fetchKeys() {
         const data = await this.client.requests.make(endpoints.account.apiKeys);
+        this.apikeys = [];
         for (const o of data.data) {
             this.apikeys.push({
                 identifier: o.identifier,
@@ -247,7 +248,7 @@ class ClientUser extends BaseUser {
     }
 
     async deleteKey(key) {
-        await this.client.requests.make(endpoints.account.apiKeys +`/${key}`, { method: 'DELETE' });
+        await this.client.requests.make(c_path.account.apikeys +`/${key}`, { method: 'DELETE' });
         const i = this.apikeys.indexOf(this.apikeys.find(k => k === key));
         if (i < 0) return;
         this.apikeys.splice(i);
@@ -264,7 +265,7 @@ exports.ClientUser = ClientUser;
  * @typedef {object} APIKey
  * @property {string} identifier The identifier of the API key.
  * @property {string} description The description of the API key, usually for usage.
- * @property {Array<string>} allowedIPs An array of IPs allowed to use this API key.
+ * @property {string[]} allowedIPs An array of IPs allowed to use this API key.
  * @property {?Date} lastUsedAt The last recorded date of usage.
  * @property {Date} createdAt The date the API key was created.
  */

@@ -23,7 +23,7 @@ class NodeLocationManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
-            if (this.client.options.cacheLocations !== false) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.cacheLocations) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         data = data.attributes;
@@ -34,7 +34,7 @@ class NodeLocationManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         }
-        if (this.client.options.cacheLocations !== false) this.cache.set(data.id, loc);
+        if (this.client.options.cacheLocations) this.cache.set(data.id, loc);
         return loc;
     }
 
@@ -48,7 +48,7 @@ class NodeLocationManager {
         if (id) {
             if (!force) {
                 const l = this.cache.get(id);
-                if (l) return l;
+                if (l) return Promise.resolve(l);
             }
             const data = await this.client.requests.make(endpoints.locations.get(id));
             return this._patch(data);
@@ -76,8 +76,8 @@ class NodeLocationManager {
     /**
      * Updates an existing node location.
      * @param {number} id The ID of the node location.
-     * @param {string} short The short location code of the location.
-     * @param {string} long The long location code of the location.
+     * @param {?string} short The short location code of the location.
+     * @param {?string} long The long location code of the location.
      * @returns {Promise<NodeLocation>}
      */
     async update(id, { short, long } = {}) {
@@ -93,12 +93,12 @@ class NodeLocationManager {
     /**
      * Deletes a node location.
      * @param {number} id The ID of the node location.
-     * @returns {Promise<number>}
+     * @returns {Promise<boolean>}
      */
     async delete(id) {
         await this.client.requests.make(endpoints.locations.get(id), { method: 'DELETE' });
         this.cache.delete(id);
-        return id;
+        return true;
     }
 }
 
