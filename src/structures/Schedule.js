@@ -21,24 +21,16 @@ class Schedule {
          * @type {object}
          */
         this.cron = {
-            /**
-             * @type {string}
-             */
+            /** @type {string} */
             week: data.cron.day_of_week,
 
-            /**
-             * @type {string}
-             */
+            /** @type {string} */
             month: data.crong.day_of_month,
 
-            /**
-             * @type {string}
-             */
+            /** @type {string} */
             hour: data.cron.hour,
 
-            /**
-             * @type {string}
-             */
+            /** @type {string} */
             minute: data.cron.minute
         }
 

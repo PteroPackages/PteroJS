@@ -44,21 +44,13 @@ class PteroClient extends EventEmitter {
          */
         this.options = presets.client(options);
 
-        /**
-         * The date the client was ready at.
-         * @type {?Date}
-         */
+        /** @type {?Date} */
         this.readyAt = null;
 
-        /**
-         * The ping for the Pteroactyl connection.
-         * @type {?number}
-         */
+        /** @type {?number} */
         this.ping = null;
 
-        /**
-         * @type {?ClientUser}
-         */
+        /** @type {?ClientUser} */
         this.user = null;
 
         /** @type {ClientServerManager} */

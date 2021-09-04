@@ -42,16 +42,10 @@ class PteroApp {
          */
         this.options = presets.application(options);
 
-        /**
-         * The date the application was ready at.
-         * @type {?Date}
-         */
+        /** @type {?Date} */
         this.readyAt = null;
 
-        /**
-         * The ping for the Pteroactyl connection.
-         * @type {?number}
-         */
+        /** @type {?number} */
         this.ping = null;
 
         /** @type {UserManager} */
