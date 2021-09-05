@@ -27,6 +27,24 @@ class ServerManager {
     }
 
     /**
+     * Resolves a server from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * Returns `null` if not found.
+     * @param {string|number|object|ApplicationServer} obj The object to resolve from.
+     * @returns {?ApplicationServer} The resolved server.
+     */
+    resolve(obj) {
+        if (obj instanceof ApplicationServer) return obj;
+        if (typeof obj === 'number') return this.cache.get(obj) || null;
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
+        return null;
+    }
+
+    /**
      * Fetches a server from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.
