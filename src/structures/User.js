@@ -1,3 +1,4 @@
+const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
 const c_path = require('../client/managers/Endpoints');
@@ -70,6 +71,12 @@ class PteroUser extends BaseUser {
         this.updatedAt = data['updated_at'] ? new Date(data['updated_at']) : null;
         /** @type {?number} */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
+
+        /**
+         * A map of servers the user is connected to.
+         * @type {?Map<number, ApplicationServer>}
+         */
+        this.relationships = this.client.servers.resolve(data);
     }
 
     /** @todo */
