@@ -28,19 +28,25 @@ class UserManager {
     /**
      * Fetches a user from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the user.
-     * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
+     * @param {object} [options] Additional fetch options.
+     * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
+     * @param {boolean} [options.withServers] Whether to include servers the user(s) own.
      * @returns {Promise<PteroUser|Map<number, PteroUser>>} The fetched user(s).
      */
-    async fetch(id, force = false) {
+    async fetch(id, options = {}) {
         if (id) {
-            if (!force) {
+            if (!options.force) {
                 const u = this.cache.get(id);
                 if (u) return Promise.resolve(u);
             }
-            const data = await this.client.requests.make(endpoints.users.get(id));
+            const data = await this.client.requests.make(
+                endpoints.users.get(id) + (options.withServers ? '?include=servers' : '')
+            );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(endpoints.users.main);
+        const data = await this.client.requests.make(
+            endpoints.users.main + (options.withServers ? '?include=servers' : '')
+        );
         return this._patch(data);
     }
 
