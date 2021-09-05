@@ -1,6 +1,6 @@
 const ApplicationServer = require('../../structures/ApplicationServer');
 const { PteroUser } = require('../../structures/User');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class ServerManager {
     constructor(client) {

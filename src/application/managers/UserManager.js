@@ -1,5 +1,5 @@
 const { PteroUser } = require('../../structures/User');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class UserManager {
     constructor(client) {

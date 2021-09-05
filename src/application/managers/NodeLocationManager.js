@@ -1,4 +1,4 @@
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class NodeLocationManager {
     constructor(client) {

@@ -1,5 +1,5 @@
 const Node = require('../../structures/Node');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class NodeManager {
     constructor(client) {

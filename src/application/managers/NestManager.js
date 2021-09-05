@@ -1,5 +1,5 @@
 const NestEggsManager = require('./NestEggsManager');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class NestManager {
     constructor(client) {
