@@ -1,4 +1,5 @@
-const endpoints = require('../application/managers/Endpoints');
+const { NodeLocation } = require('../application/managers/NodeLocationManager');
+const endpoints = require('../application/managers/endpoints');
 
 class Node {
     constructor(client, data) {
@@ -39,7 +40,18 @@ class Node {
          * The ID of the node location.
          * @type {number}
          */
-        this.location = data.location_id;
+        this.locationId = data.location_id;
+
+        /**
+         * The location of the node.
+         * @type {?NodeLocation}
+         */
+        this.location = this.client.locations.resolve(data);
+
+        /**
+         * A map of servers the node currently contains.
+         */
+        this.servers = this.client.servers.resolve(data);
 
         /**
          * The FQDN for the node.
