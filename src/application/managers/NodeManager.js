@@ -27,19 +27,25 @@ class NodeManager {
     /**
      * Fetches a node from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the node.
-     * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
+     * @param {object} [options] Additional fetch options.
+     * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
+     * @param {string[]} [options.include] Additional data to include about the node.
      * @returns {Promise<Node|Map<number, Node>>} The fetched node(s).
      */
-    async fetch(id, force = false) {
+    async fetch(id, options = {}) {
         if (id) {
-            if (!force) {
+            if (!options.force) {
                 const n = this.cache.get(id);
                 if (n) return Promise.resolve(n);
             }
-            const data = await this.client.requests.make(endpoints.nodes.get(id));
+            const data = await this.client.requests.make(
+                endpoints.nodes.get(id) + joinParams(options.include)
+            );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(endpoints.nodes.main);
+        const data = await this.client.requests.make(
+            endpoints.nodes.main + joinParams(options.include)
+        );
         return this._patch(data);
     }
 
@@ -109,7 +115,7 @@ class NodeManager {
      * @returns {Promise<Node>} The updated node instance.
      */
     async update(node, options = {}) {
-        if (typeof node === 'number') node = this.fetch(node);
+        if (typeof node === 'number') node = await this.fetch(node);
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
         const { id } = node;
         const payload = {};
@@ -135,3 +141,9 @@ class NodeManager {
 }
 
 module.exports = NodeManager;
+
+function joinParams(params) {
+    if (!params || !params.length) return '';
+    params = params.filter(p => ['allocations', 'location', 'servers'].includes(p));
+    return '?include='+ params.toString();
+}
