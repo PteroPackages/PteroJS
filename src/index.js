@@ -10,6 +10,7 @@ module.exports = {
     ClientServerManager: require('./client/managers/ClientServerManager'),
     ClientUser: require('./structures/User').ClientUser,
     DatabaseManager: require('./managers/DatabaseManager'),
+    Dict: require('./structures/Dict'),
     Errors: require('./structures/Errors'),
     FileManager: require('./managers/FileManager'),
     Node: require('./structures/Node'),
