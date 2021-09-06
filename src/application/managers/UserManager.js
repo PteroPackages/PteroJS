@@ -26,6 +26,24 @@ class UserManager {
     }
 
     /**
+     * Resolves a user from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * Returns `null` if not found.
+     * @param {string|number|object|PteroUser} obj The object to resolve from.
+     * @returns {?PteroUser} The resolved user.
+     */
+    resolve(obj) {
+        if (obj instanceof PteroUser) return obj;
+        if (typeof obj === 'number') return this.cache.get(obj) || null;
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (obj.relationships?.user) return this._patch(obj.relationships.user);
+        return null;
+    }
+
+    /**
      * Fetches a user from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the user.
      * @param {object} [options] Additional fetch options.
