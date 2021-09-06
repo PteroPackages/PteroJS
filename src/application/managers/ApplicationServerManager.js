@@ -127,8 +127,12 @@ class ServerManager {
 module.exports = ServerManager;
 
 function joinParams(params) {
-    if (!params) return '';
-    const res = [];
-    params.forEach(p => res.push(['include', p]));
-    return '?'+ new URLSearchParams(res).toString();
+    if (!params || !params.length) return '';
+    const valid = [
+        'allocations', 'user', 'subusers',
+        'pack', 'nest', 'egg', 'variables',
+        'location', 'node', 'databases'
+    ];
+    params = params.filter(p => valid.includes(p));
+    return '?include='+ params.toString();
 }
