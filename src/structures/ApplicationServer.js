@@ -1,6 +1,7 @@
 const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
+const Node = require('./Node');
 const { PteroUser } = require('./User');
 const endpoints = require('../application/managers/Endpoints');
 
@@ -70,18 +71,25 @@ class ApplicationServer {
         this.user = data.user;
 
         /**
-         * The server owner PteroUser object. This is not received by default but can
-         * be fetched using {@link ApplicationServer.fetchOwner}.
+         * The server owner PteroUser object. This can be fetched by including 'user' in
+         * the ApplicationServerManager.fetch, or via {@link ApplicationServer.fetchOwner}.
          * @type {?PteroUser}
          */
-        this.owner = null;
+        this.owner = this.client.users.resolve(data);
 
         /**
          * The ID of the node. This is not received by default and must be fetched
          * via the client NodeManager.
          * @type {number}
          */
-        this.node = data.node;
+        this.nodeId = data.node;
+
+        /**
+         * The node object that the server is part of. This can be fetched by including
+         * 'node' in the ApplicationServerManager.fetch.
+         * @type {?Node}
+         */
+        this.node = null;
 
         /**
          * The ID of the allocation for this server.
@@ -123,11 +131,11 @@ class ApplicationServer {
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
 
         /** @type {DatabaseManager} */
-        this.databases = new DatabaseManager(this.client, data.databases);
+        this.databases = new DatabaseManager(this.client, data);
         /** @type {FileManager} */
-        this.files = new FileManager(this.client, data.files);
+        this.files = new FileManager(this.client, data);
         /** @type {AllocationManager} */
-        this.allocations = new AllocationManager(data.allocations);
+        this.allocations = new AllocationManager(data);
     }
 
     /**
