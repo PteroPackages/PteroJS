@@ -37,6 +37,21 @@ class NodeLocationManager {
     }
 
     /**
+     * Resolves a node location from an object. This can be:
+     * * a number
+     * * an object
+     * 
+     * Returns `null` if not found.
+     * @param {number|object} obj The object to resolve from.
+     * @returns {?NodeLocation} The resolved node location.
+     */
+    resolve(obj) {
+        if (typeof obj == 'number') return this.cache.get(obj) || null;
+        if (obj.relationships?.location?.attributes) return this._patch(obj.relationships.location);
+        return null;
+    }
+
+    /**
      * Fetches a node location from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the location.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
