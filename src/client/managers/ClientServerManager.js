@@ -12,16 +12,15 @@ class ClientServerManager {
     _patch(data) {
         if (data.data) {
             const res = new Map();
-            for (let o of data.data) {
-                o = o.attributes;
+            for (const o of data.data) {
                 const s = new ClientServer(this.client, o);
-                res.set(s.id, s);
+                res.set(s.identifier, s);
             }
             if (this.client.options.cacheServers) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
-        const s = new ClientServer(this.client, data.attributes);
-        if (this.client.options.cacheServers) this.cache.set(s.id, s);
+        const s = new ClientServer(this.client, data);
+        if (this.client.options.cacheServers) this.cache.set(s.identifier, s);
         return s;
     }
 
