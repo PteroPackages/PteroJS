@@ -51,6 +51,7 @@ class WebSocketManager {
 
         for (const id of this.servers) {
             const { data:{ token, socket }} = await this.client.requests.make(endpoints.servers.ws(id));
+            this.#debug(socket);
             const WS = new WebSocket(socket, { headers:{ 'Authorization': `Bearer ${token}` }});
 
             WS.onopen = (_) => {
@@ -63,8 +64,9 @@ class WebSocketManager {
                 console.log('WS MESSAGE', event);
             }
 
-            WS.onerror = ({ message }) => {
-                this.#debug(`WebSocket ${id}: Error\nMessage: ${message}`);
+            WS.onerror = (event) => {
+                console.log(event);
+                // this.#debug(`WebSocket ${id}: Error\nMessage: ${message}`);
             }
 
             WS.onclose = ({ reason, code }) => {
