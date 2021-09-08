@@ -85,6 +85,36 @@ class UserManager {
     }
 
     /**
+     * Queries the API for a user (or users) that match the specified query filter.
+     * Keep in mind this does NOT check the cache first, it will fetch from the API directly.
+     * Available query filters are:
+     * * email
+     * * uuid
+     * * username
+     * * externalId
+     * 
+     * Available sort options are:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * 
+     * @param {string} name The name (string) to query.
+     * @param {string} filter The filter to use for the query (see above).
+     * @param {string} [sort] The order to sort the results in (see above).
+     * @returns {Promise<Map<number, PteroUser>>} A map of the queried user(s).
+     */
+    async query(entity, filter, sort) {
+        if (!['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');
+        if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
+        if (filter === 'externalId') filter = 'external_id';
+        const data = await this.client.requests.make(
+            endpoints.users.main + `?filter[${filter}]=${entity}` + (sort ? `&sort=${sort}` : '')
+        );
+        return this._patch(data);
+    }
+
+    /**
      * Creates a new Pterodactyl user account.
      * @param {string} email The email for the account.
      * @param {string} username The username for the acount.
