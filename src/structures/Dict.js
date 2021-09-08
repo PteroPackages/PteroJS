@@ -26,7 +26,7 @@ class Dict extends Map {
 
     /**
      * Checks that any of the specified keys exist in the dict.
-     * @param  {...any} keys The keys to check for.
+     * @param {...any} keys The keys to check for.
      * @returns {boolean}
      */
     hasAny(...keys) {
@@ -35,7 +35,7 @@ class Dict extends Map {
 
     /**
      * Checks that all of the specified keys exist in the dict.
-     * @param  {...any} keys The keys to check for.
+     * @param {...any} keys The keys to check for.
      * @returns {boolean}
      */
     hasAll(...keys) {
@@ -148,7 +148,7 @@ class Dict extends Map {
 
     /**
      * Joins one or more dicts with the current one and returns the value.
-     * @param  {...Dict<any, any>} dict The dicts to join.
+     * @param {...Dict<any, any>} dict The dicts to join.
      * @returns {Dict<any, any>}
      */
     join(...dict) {
@@ -165,7 +165,7 @@ class Dict extends Map {
     difference(dict) {
         const res = new Dict();
         for (const [k, v] of this) if (!dict.has(k)) res.set(k, v);
-        for (const [k, v] of dict) if (!this.has(k)) res.set(k ,v);
+        for (const [k, v] of dict) if (!this.has(k)) res.set(k, v);
         return res;
     }
 }
