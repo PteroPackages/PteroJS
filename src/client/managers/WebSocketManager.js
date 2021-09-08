@@ -51,7 +51,6 @@ class WebSocketManager {
 
         for (const id of this.servers) {
             const { data:{ token, socket }} = await this.client.requests.make(endpoints.servers.ws(id));
-            this.#debug(socket);
             const WS = new WebSocket(socket, { headers:{ 'Authorization': `Bearer ${token}` }});
 
             WS.onopen = (_) => {
