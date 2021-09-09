@@ -1,6 +1,9 @@
+const endpoints = require('../client/managers/Endpoints');
+
 class FileManager {
-    constructor(client, data) {
+    constructor(client, server, data) {
         this.client = client;
+        this.server = server;
 
         /** @type {Map<string, PteroFile>} */
         this.cache = new Map();
@@ -8,39 +11,48 @@ class FileManager {
     }
 
     _patch(data) {
-        if (!data) return;
+        console.log(data);
+        if (!data.files || !data.data || !data.attributes) return;
+        if (data.files) data = data.files.data;
         if (data.data) {
-            for (const file of data.data) {
-                const attr = file.attributes;
-                this.cache.set(attr.name, {
-                    name: attr.name,
-                    mode: attr.mode,
-                    size: attr.size,
-                    isFile: attr.is_file,
-                    isSymlink: attr.is_symlink,
-                    isEditable: attr.is_editable,
-                    mimetype: attr.mimetype,
-                    createdAt: new Date(attr.created_at),
-                    modifiedAt: attr.modified_at ? new Date(attr.modified_at) : null
+            for (let o of data.data) {
+                o = o.attributes;
+                this.cache.set(o.name, {
+                    name: o.name,
+                    mode: o.mode,
+                    size: o.size,
+                    isFile: o.is_file,
+                    isSymlink: o.is_symlink,
+                    isEditable: o.is_editable,
+                    mimetype: o.mimetype,
+                    createdAt: new Date(o.created_at),
+                    modifiedAt: o.modified_at ? new Date(o.modified_at) : null
                 });
             }
         } else {
-            const attr = data.attributes;
-            this.cache.set(attr.name, {
-                name: attr.name,
-                mode: attr.mode,
-                size: attr.size,
-                isFile: attr.is_file,
-                isSymlink: attr.is_symlink,
-                isEditable: attr.is_editable,
-                mimetype: attr.mimetype,
-                createdAt: new Date(attr.created_at),
-                modifiedAt: attr.modified_at ? new Date(attr.modified_at) : null
+            data = data.attributes;
+            this.cache.set(data.name, {
+                name: data.name,
+                mode: data.mode,
+                size: data.size,
+                isFile: data.is_file,
+                isSymlink: data.is_symlink,
+                isEditable: data.is_editable,
+                mimetype: data.mimetype,
+                createdAt: new Date(data.created_at),
+                modifiedAt: data.modified_at ? new Date(data.modified_at) : null
             });
         }
     }
 
-    async fetch(dir = '') {}
+    async #fetch(dir) {
+        dir &&= encodeURIComponent(dir);
+        console.log(endpoints.servers.files.list(this.server.indentifier));
+        const data = await this.client.requests.make(
+            endpoints.servers.files.list(this.server.indentifier)
+        );
+        return this._patch(data);
+    }
 
     async getContents(file) {}
 
