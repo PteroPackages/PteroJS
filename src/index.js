@@ -22,5 +22,7 @@ module.exports = {
     PteroClient: require('./client/PteroClient'),
     PteroSubUser: require('./structures/User').PteroSubUser,
     PteroUser: require('./structures/User').PteroUser,
-    Schedule: require('./structures/Schedule')
+    Schedule: require('./structures/Schedule'),
+    SubUserManager: require('./client/managers/SubUserManager'),
+    UserManager: require('./application/managers/UserManager')
 };
