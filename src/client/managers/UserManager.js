@@ -1,5 +1,6 @@
 const { PteroSubUser } = require('../../structures/User');
 const Permissions = require('../../structures/Permissions');
+const { PermissionResolvable } = require('../../structures/Permissions');
 const endpoints = require('./Endpoints');
 
 class UserManager {
@@ -27,6 +28,24 @@ class UserManager {
     }
 
     /**
+     * Resolves a subuser from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * Returns `null` if not found.
+     * @param {string|number|object|PteroSubUser} obj The object to resolve from.
+     * @returns {?PteroSubUser} The resolved subuser.
+     */
+    resolve(obj) {
+        if (obj instanceof PteroSubUser) return obj;
+        if (typeof obj === 'number') return this.cache.get(obj) || null;
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (obj.relationships?.user) return this._patch(obj.relationships.user);
+        return null;
+    }
+
+    /**
      * Fetches a server subuser from the Pterodactyl API with an optional cache check.
      * @param {string} [id] The UUID of the user.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
@@ -51,21 +70,34 @@ class UserManager {
 
     /**
      * Adds a specified user to the server.
-     * @todo Requires {@link Permissions} class completion.
-     * @todo Add resolvable PteroUser support.
      * @param {string} email The email of the associated account.
-     * @param {Permissions} permissions Permissions for the account.
+     * @param {PermissionResolvable} permissions Permissions for the account.
      */
-    async add(email, permissions) {}
+    async add(email, permissions) {
+        if (typeof email !== 'string') throw new Error('Email must be a string.');
+        const perms = new Permissions(permissions).toStrings();
+        if (!perms.length) throw new Error('Need at least 1 permission for the subuser.');
+        const data = await this.client.requests.make(
+            endpoints.servers.users.main(this.server.identifier),
+            { email, permissions: perms }, 'POST'
+        );
+        return this._patch(data);
+    }
 
     /**
      * Updates the specified subuser's server permissions.
-     * @todo Requires {@link Permissions} class completion.
-     * @todo Add resolvable PteroUser support.
-     * @param {string} user The UUID of the user.
-     * @param {Permissions} permissions Permissions for the subuser.
+     * @param {string} uuid The UUID of the subuser.
+     * @param {PermissionResolvable} permissions Permissions for the subuser.
      */
-    async setPermissions(user, permissions) {}
+    async setPermissions(uuid, permissions) {
+        const perms = new Permissions(permissions).toStrings();
+        if (!perms.length) throw new Error('Need at least 1 permission for the subuser.');
+        const data = await this.client.requests.make(
+            endpoints.servers.users.get(this.server.identifier, uuid),
+            { permissions: perms }, 'POST'
+        );
+        return this._patch(data);
+    }
 
     /**
      * Removes the specified subuser from the server.
