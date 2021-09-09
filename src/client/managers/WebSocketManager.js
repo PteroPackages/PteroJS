@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 const { WebSocketError } = require('../../structures/Errors');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 // const EVENTS = {
 //     'auth success': 'serverConnect',

@@ -3,7 +3,7 @@ const ClientRequestManager = require('./managers/ClientRequestManager');
 const ClientServerManager = require('./managers/ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const WebSocketManager = require('./managers/WebSocketManager');
-const endpoints = require('./managers/Endpoints');
+const endpoints = require('./managers/endpoints');
 const presets = require('../structures/Presets');
 
 /**

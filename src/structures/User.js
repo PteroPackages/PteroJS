@@ -1,7 +1,7 @@
 const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
-const c_path = require('../client/managers/Endpoints');
+const c_path = require('../client/managers/endpoints');
 
 /**
  * @abstract

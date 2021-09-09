@@ -2,7 +2,7 @@ const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const Permissions = require('./Permissions');
-const endpoints = require('../client/managers/Endpoints');
+const endpoints = require('../client/managers/endpoints');
 
 class ClientServer {
     constructor(client, data) {
