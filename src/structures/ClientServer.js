@@ -89,9 +89,9 @@ class ClientServer {
         /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
         /** @type {DatabaseManager} */
-        this.databases = new DatabaseManager(client, data.databases);
+        this.databases = new DatabaseManager(client, this, attr.relationships);
         /** @type {FileManager} */
-        this.files = new FileManager(client, data.files);
+        this.files = new FileManager(client, this, attr.relationships);
     }
 
     /**
