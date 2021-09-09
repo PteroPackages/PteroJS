@@ -7,9 +7,13 @@ class ClientServerManager {
 
         /** @type {Map<string, ClientServer>} */
         this.cache = new Map();
+
+        /** @type {PageData} */
+        this.pageData = {};
     }
 
     _patch(data) {
+        this._resolveMeta(data.meta?.pagination);
         if (data.data) {
             const res = new Map();
             for (const o of data.data) {
@@ -22,6 +26,18 @@ class ClientServerManager {
         const s = new ClientServer(this.client, data);
         if (this.client.options.cacheServers) this.cache.set(s.identifier, s);
         return s;
+    }
+
+    _resolveMeta(data) {
+        if (!data) return;
+        this.pageData = {
+            current: data.current_page,
+            total: data.total,
+            count: data.count,
+            perPage: data.per_page,
+            totalPages: data.total_pages,
+            links: data.links
+        }
     }
 
     /**
@@ -53,8 +69,17 @@ class ClientServerManager {
 module.exports = ClientServerManager;
 
 function joinParams(params) {
-    if (!params) return '';
-    const res = [];
-    params.forEach(p => res.push(['include', p]));
-    return '?'+ new URLSearchParams(res).toString();
+    if (!params || !params.length) return '';
+    params = params.filter(p => ['egg', 'subusers'].includes(p));
+    return '?include='+ params.toString();
 }
+
+/**
+ * @typedef {object} PageData
+ * @property {number} current The current page.
+ * @property {number} total
+ * @property {number} count The number of items on that page.
+ * @property {number} perPage The max amount of items per page.
+ * @property {number} totalPages The total number of pages.
+ * @property {object} links
+ */
