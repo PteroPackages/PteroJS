@@ -1,18 +1,27 @@
-class DatabaseManager {
-    constructor(client, data) {
-        this.client = client;
+const endpoints = require('../client/managers/Endpoints');
 
-        /** @type {Set<Database>} */
-        this.cache = new Set();
+class DatabaseManager {
+    constructor(client, server, data) {
+        this.client = client;
+        this.server = server;
+
+        /**
+         * Whether the client using this manager is the PteroClient or PteroApp.
+         * @type {boolean}
+         */
+        this.isClient = client.constructor.name === 'PteroClient';
+
+        /** @type {Map<string, Database>} */
+        this.cache = new Map();
         this._patch(data);
     }
 
     _patch(data) {
-        if (!data) return;
+        if (!data?.databases) return;
         if (data.data) {
             for (let db of data.data) {
                 db = db.attributes;
-                this.cache.add({
+                this.cache.set(db.id, {
                     id: db.id,
                     host: db.host,
                     name: db.name,
@@ -24,7 +33,7 @@ class DatabaseManager {
             }
         } else {
             data = data.attributes;
-            this.cache.add({
+            this.cache.set(data.id, {
                 id: data.id,
                 host: data.host,
                 name: data.name,
@@ -34,6 +43,40 @@ class DatabaseManager {
                 maxConnections: data.max_connections
             });
         }
+    }
+
+    async fetch(withPass = false) {
+        if (!this.isClient) return Promise.resolve();
+        const data = await this.client.requests.make(
+            endpoints.servers.databases.get(this.server.identifier) + (withPass ? '?include=password' : '')
+        );
+        return this._patch(data);
+    }
+
+    async create(database, remote) {
+        if (!this.isClient) return Promise.resolve();
+        const data = await this.client.requests.make(
+            endpoints.servers.databases.get(this.server.identifier),
+            { database, remote }, 'POST'
+        );
+        return this._patch(data);
+    }
+
+    async rotate(id) {
+        if (!this.isClient) return Promise.resolve();
+        const data = await this.client.requests.make(
+            endpoints.servers.databases.rotate(this.server.identifier, id), { method: 'POST' }
+        );
+        return this._patch(data);
+    }
+
+    async delete(id) {
+        if (!this.isClient) return Promise.resolve();
+        await this.client.requests.make(
+            endpoints.servers.databases.delete(this.server.identifier, id), { method: 'DELETE' }
+        );
+        this.cache.delete(id);
+        return true;
     }
 }
 
