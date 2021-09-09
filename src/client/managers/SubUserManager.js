@@ -3,7 +3,7 @@ const Permissions = require('../../structures/Permissions');
 const { PermissionResolvable } = require('../../structures/Permissions');
 const endpoints = require('./endpoints');
 
-class UserManager {
+class SubUserManager {
     constructor(client, server) {
         this.client = client;
         this.server = server;
@@ -113,4 +113,4 @@ class UserManager {
     }
 }
 
-module.exports = UserManager;
+module.exports = SubUserManager;
