@@ -38,7 +38,10 @@ class ClientRequestManager {
         });
 
         if ([201, 204].includes(data.status)) return;
-        if (data.status === 200) return await data.json();
+        if (data.status === 200) {
+            if (data.headers.get('content-type').startsWith('application/json')) return await data.json();
+            return await data.buffer();
+        }
         if ([400, 404].includes(data.status)) throw new PteroAPIError(await data.json());
         if (data.status === 401) throw new RequestError('[401] Unauthorized API request.');
         if (data.status === 403) throw new RequestError('[403] API Path forbidden.');
