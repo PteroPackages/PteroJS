@@ -85,7 +85,7 @@ class ClientServer {
         this.installing = attr.is_installing;
 
         /** @type {AllocationManager} */
-        this.allocations = new AllocationManager(attr);
+        this.allocations = new AllocationManager(client, this, attr.relationships);
         /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
         /** @type {DatabaseManager} */
