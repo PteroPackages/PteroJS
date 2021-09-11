@@ -5,6 +5,12 @@ class FileManager {
         this.client = client;
         this.server = server;
 
+        /**
+         * Whether the client using this manager is the PteroClient or PteroApp.
+         * @type {boolean}
+         */
+        this.isClient = client.constructor.name === 'PteroClient';
+
         /** @type {Map<string, Map<string, PteroFile>>} */
         this.cache = new Map();
         this.cache.set('/', new Map());
@@ -71,6 +77,7 @@ class FileManager {
      * @returns {Promise<Map<string, PteroFile>>}
      */
     async fetch(dir) {
+        if (!this.isClient) return Promise.resolve();
         dir &&= dir.startsWith('.') ? dir.slice(1) : dir;
         dir &&= encodeURIComponent(dir);
         const data = await this.client.requests.make(
@@ -86,6 +93,7 @@ class FileManager {
      * @returns {Promise<string>}
      */
     async getContents(filePath) {
+        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
         const data = await this.client.requests.make(
@@ -100,6 +108,7 @@ class FileManager {
      * @returns {Promise<string>}
      */
     async download(filePath) {
+        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
         const data = await this.client.requests.make(
@@ -117,6 +126,7 @@ class FileManager {
      * @protected
      */
     async rename(filePath, name) {
+        if (!this.isClient) return Promise.resolve();
         filePath ??= '/';
         filePath = filePath.startsWith('.') ? filePath.slice(1) : filePath;
         const sub = filePath.split('/');
@@ -139,6 +149,7 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async copy(filePath) {
+        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         await this.client.requests.make(
             endpoints.servers.files.copy(this.server.identifier),
@@ -153,6 +164,7 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async write(filePath, content) {
+        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
         if (content instanceof Buffer) content = content.toString();
@@ -169,6 +181,7 @@ class FileManager {
      * @returns {Promise<PteroFile>} The compressed file.
      */
     async compress(dir, files) {
+        if (!this.isClient) return Promise.resolve();
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
         if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
         if (dir.startsWith('.')) dir = dir.slice(1);
@@ -186,6 +199,7 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async decompress(dir, file) {
+        if (!this.isClient) return Promise.resolve();
         if (dir.startsWith('.')) dir = dir.slice(1);
         if (file.startsWith('.')) file = file.slice(1);
         await this.client.requests.make(
@@ -201,6 +215,7 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async delete(dir, files) {
+        if (!this.isClient) return Promise.resolve();
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
         if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
         if (dir.startsWith('.')) dir = dir.slice(1);
@@ -217,6 +232,7 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async createFolder(dir, name) {
+        if (!this.isClient) return Promise.resolve();
         await this.client.requests.make(
             endpoints.servers.files.create(this.server.identifier),
             { root: dir, name }, 'POST'
@@ -228,6 +244,7 @@ class FileManager {
      * @returns {Promise<string>} The upload URL.
      */
     async getUploadURL() {
+        if (!this.isClient) return Promise.resolve();
         const data = await this.client.requests.make(
             endpoints.servers.files.upload(this.server.identifier)
         );
