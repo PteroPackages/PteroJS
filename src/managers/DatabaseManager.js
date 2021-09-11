@@ -17,11 +17,13 @@ class DatabaseManager {
     }
 
     _patch(data) {
-        if (!data?.databases) return;
+        if (!data.databases && !data.data && !data.attributes) return;
+        if (data.databases) data = data.databases.data;
         if (data.data) {
+            const res = new Map();
             for (let db of data.data) {
                 db = db.attributes;
-                this.cache.set(db.id, {
+                res.set(db.id, {
                     id: db.id,
                     host: db.host,
                     name: db.name,
@@ -31,9 +33,11 @@ class DatabaseManager {
                     maxConnections: db.max_connections
                 });
             }
+            res.forEach((v, k) => this.cache.set(k, v));
+            return res;
         } else {
             data = data.attributes;
-            this.cache.set(data.id, {
+            const o = {
                 id: data.id,
                 host: data.host,
                 name: data.name,
@@ -41,14 +45,16 @@ class DatabaseManager {
                 password: data.password ?? null,
                 connections: data.connections,
                 maxConnections: data.max_connections
-            });
+            }
+            this.cache.set(data.id, o);
+            return o;
         }
     }
 
     async fetch(withPass = false) {
         if (!this.isClient) return Promise.resolve();
         const data = await this.client.requests.make(
-            endpoints.servers.databases.get(this.server.identifier) + (withPass ? '?include=password' : '')
+            endpoints.servers.databases.main(this.server.identifier) + (withPass ? '?include=password' : '')
         );
         return this._patch(data);
     }
