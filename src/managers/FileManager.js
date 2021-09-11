@@ -65,6 +65,11 @@ class FileManager {
         }
     }
 
+    /**
+     * Fetches all files from a specified directory (default is the root folder: `/home/container`).
+     * @param {string} [dir] The directory (folder) to fetch from.
+     * @returns {Promise<Map<string, PteroFile>>}
+     */
     async fetch(dir) {
         dir &&= dir.startsWith('.') ? dir.slice(1) : dir;
         dir &&= encodeURIComponent(dir);
@@ -75,6 +80,11 @@ class FileManager {
         return this._patch(data);
     }
 
+    /**
+     * Returns the contents of a specified file.
+     * @param {string} filePath The path to the file in the server.
+     * @returns {Promise<string>}
+     */
     async getContents(filePath) {
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
@@ -84,6 +94,11 @@ class FileManager {
         return data.toString();
     }
 
+    /**
+     * Returns a URL that can be used to download the specified file.
+     * @param {string} filePath The path to the file in the server.
+     * @returns {Promise<string>}
+     */
     async download(filePath) {
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
@@ -93,6 +108,14 @@ class FileManager {
         return data.attributes.url;
     }
 
+    /**
+     * Renames the specified file.
+     * EXPERIMENTAL: may not be working properly.
+     * @param {string} filePath The path to the file in the server.
+     * @param {string} name The new name of the file.
+     * @returns {Promise<void>}
+     * @protected
+     */
     async rename(filePath, name) {
         filePath ??= '/';
         filePath = filePath.startsWith('.') ? filePath.slice(1) : filePath;
@@ -110,6 +133,11 @@ class FileManager {
         );
     }
 
+    /**
+     * Creates a copy of the specified file in the same directory.
+     * @param {string} filePath The path to the file in the server.
+     * @returns {Promise<void>}
+     */
     async copy(filePath) {
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         await this.client.requests.make(
@@ -118,15 +146,28 @@ class FileManager {
         );
     }
 
-    async write(filePath, contents) {
+    /**
+     * Writes content to the specified file.
+     * @param {string} filePath The path to the file in the server.
+     * @param {string|Buffer} content The content to write to the file.
+     * @returns {Promise<void>}
+     */
+    async write(filePath, content) {
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
+        if (content instanceof Buffer) content = content.toString();
         await this.client.requests.make(
             endpoints.servers.files.write(this.server.identifier, filePath),
-            { raw: contents }, 'POST'
+            { raw: content }, 'POST'
         );
     }
 
+    /**
+     * Compresses one or more files into a zip file (`tar.gz`).
+     * @param {string} dir The directory (folder) of the file(s).
+     * @param {string[]} files An array of the file name(s) to compress.
+     * @returns {Promise<PteroFile>} The compressed file.
+     */
     async compress(dir, files) {
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
         if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
@@ -138,6 +179,12 @@ class FileManager {
         return this._patch(data);
     }
 
+    /**
+     * Decompresses a zip file to it's original contents.
+     * @param {string} dir The directory (folder) of the file.
+     * @param {string} file The name of file to decompress.
+     * @returns {Promise<void>}
+     */
     async decompress(dir, file) {
         if (dir.startsWith('.')) dir = dir.slice(1);
         if (file.startsWith('.')) file = file.slice(1);
@@ -147,6 +194,12 @@ class FileManager {
         );
     }
 
+    /**
+     * Deletes one or more files in the specified directory.
+     * @param {string} dir The directory (folder) of the file(s).
+     * @param {string[]} files An array of the file name(s) to delete.
+     * @returns {Promise<void>}
+     */
     async delete(dir, files) {
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
         if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
@@ -157,6 +210,12 @@ class FileManager {
         );
     }
 
+    /**
+     * Creates a new folder in a specified directory.
+     * @param {string} dir The directory (folder) to create the folder in.
+     * @param {string} name The name of the folder.
+     * @returns {Promise<void>}
+     */
     async createFolder(dir, name) {
         await this.client.requests.make(
             endpoints.servers.files.create(this.server.identifier),
@@ -164,6 +223,10 @@ class FileManager {
         );
     }
 
+    /**
+     * Returns an upload URL that can be used to upload files to the server.
+     * @returns {Promise<string>} The upload URL.
+     */
     async getUploadURL() {
         const data = await this.client.requests.make(
             endpoints.servers.files.upload(this.server.identifier)
