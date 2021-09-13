@@ -37,6 +37,8 @@ function client(data) {
     data.ws ??= false;
     data.fetchClient ??= true;
     data.fetchServers ??= false;
+    data.cacheServers ??= true;
+    data.cacheSubUsers ??= true;
     data.disableEvents ??= [];
 
     return data;
