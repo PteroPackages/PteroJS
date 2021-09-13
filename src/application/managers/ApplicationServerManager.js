@@ -1,31 +1,47 @@
 const ApplicationServer = require('../../structures/ApplicationServer');
 const { PteroUser } = require('../../structures/User');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class ServerManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Map<number, ApplicationServer>}
-         */
+        /** @type {Map<number, ApplicationServer>} */
         this.cache = new Map();
     }
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const res = new Map();
             for (let o of data.data) {
                 o = o.attributes;
-                const server = new ApplicationServer(this.client, o);
-                this.cache.set(server.id, server);
-                s.set(server.id, server);
+                const s = new ApplicationServer(this.client, o);
+                res.set(s.id, s);
             }
-            return s;
+            if (this.client.options.cacheServers) res.forEach((v, k) => this.cache.set(k, v));
+            return res;
         }
         const s = new ApplicationServer(this.client, data.attributes);
-        this.cache.set(s.id, s);
+        if (this.client.options.cacheServers) this.cache.set(s.id, s);
         return s;
+    }
+
+    /**
+     * Resolves a server from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * Returns `null` if not found.
+     * @param {string|number|object|ApplicationServer} obj The object to resolve from.
+     * @returns {?ApplicationServer} The resolved server.
+     */
+    resolve(obj) {
+        if (obj instanceof ApplicationServer) return obj;
+        if (typeof obj === 'number') return this.cache.get(obj) || null;
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
+        return null;
     }
 
     /**
@@ -33,17 +49,17 @@ class ServerManager {
      * @param {number} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
-     * @param {Array<string>} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>}
+     * @param {string[]} [options.include] Additional fetch parameters to include.
+     * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>} The fetched server(s).
      */
-    async fetch(id, options) {
+    async fetch(id, options = {}) {
         if (id) {
-            if (options?.force !== true) {
+            if (options.force) {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
             const data = await this.client.requests.make(
-                endpoints.servers.get(id) + joinParams(options?.include)
+                endpoints.servers.get(id) + joinParams(options.include)
             );
             return this._patch(data);
         }
@@ -63,10 +79,9 @@ class ServerManager {
      * @param {object} [options.limits] Resource limits for the server.
      * @param {object} [options.featureLimits] Feature limits for the server.
      * @param {object} [options.allocation] Allocation options for the server.
-     * @returns {Promise<ApplicationServer>}
+     * @returns {Promise<ApplicationServer>} The new server.
      */
-    async create(user, options) {
-        if (user instanceof PteroUser) user = user.id;
+    async create(user, options = {}) {
         if (
             !options.name ||
             !options.egg ||
@@ -74,13 +89,18 @@ class ServerManager {
             !options.startup ||
             !options.env
         ) throw new Error('Missing required server option.');
+        if (user instanceof PteroUser) user = user.id;
 
-        const payload = { name, egg, startup } = options;
+        const payload = {};
+        payload.user = user;
+        payload.name = options.name;
+        payload.egg = options.egg;
+        payload.startup = options.startup;
         payload.docker_image = options.image;
         payload.environment = options.env;
-        if (options?.limits) payload.limits = options.limits;
-        if (options?.featureLimits) payload.feature_limits = options.featureLimits;
-        if (options?.allocation) payload.allocation = options.allocation;
+        if (options.limits) payload.limits = options.limits;
+        if (options.featureLimits) payload.feature_limits = options.featureLimits;
+        if (options.allocation) payload.allocation = options.allocation;
 
         const data = await this.client.requests.make(
             endpoints.servers.main, payload, 'POST'
@@ -107,8 +127,12 @@ class ServerManager {
 module.exports = ServerManager;
 
 function joinParams(params) {
-    if (!params) return '';
-    const res = [];
-    params.forEach(p => res.push(['include', p]));
-    return '?'+ new URLSearchParams(res).toString();
+    if (!params || !params.length) return '';
+    const valid = [
+        'allocations', 'user', 'subusers',
+        'pack', 'nest', 'egg', 'variables',
+        'location', 'node', 'databases'
+    ];
+    params = params.filter(p => valid.includes(p));
+    return '?include='+ params.toString();
 }

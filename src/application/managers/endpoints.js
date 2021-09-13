@@ -1,7 +1,7 @@
 module.exports = {
     users:{
         main: '/api/application/users',
-        get: u => `/api/application/user/${u}`,
+        get: u => `/api/application/users/${u}`,
         ext: u => `/api/application/users/external/${u}`
     },
     nodes:{

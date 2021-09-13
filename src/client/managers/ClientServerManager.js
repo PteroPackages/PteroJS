@@ -1,29 +1,43 @@
 const ClientServer = require('../../structures/ClientServer');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class ClientServerManager {
     constructor(client) {
         this.client = client
 
-        /**
-         * @type {Map<string, ClientServer>}
-         */
+        /** @type {Map<string, ClientServer>} */
         this.cache = new Map();
+
+        /** @type {PageData} */
+        this.pageData = {};
     }
 
     _patch(data) {
+        this._resolveMeta(data.meta?.pagination);
         if (data.data) {
-            const s = new Map();
+            const res = new Map();
             for (const o of data.data) {
-                const server = new ClientServer(this.client, o);
-                this.cache.set(server.identifier, server);
-                s.set(server.identifier, server);
+                const s = new ClientServer(this.client, o);
+                res.set(s.identifier, s);
             }
-            return s;
+            if (this.client.options.cacheServers) res.forEach((v, k) => this.cache.set(k, v));
+            return res;
         }
         const s = new ClientServer(this.client, data);
-        this.cache.set(s.identifier, s);
+        if (this.client.options.cacheServers) this.cache.set(s.identifier, s);
         return s;
+    }
+
+    _resolveMeta(data) {
+        if (!data) return;
+        this.pageData = {
+            current: data.current_page,
+            total: data.total,
+            count: data.count,
+            perPage: data.per_page,
+            totalPages: data.total_pages,
+            links: data.links
+        }
     }
 
     /**
@@ -31,12 +45,12 @@ class ClientServerManager {
      * @param {string} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
-     * @param {Array<string>} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ClientServer|Map<string, ClientServer>>}
+     * @param {string[]} [options.include] Additional fetch parameters to include.
+     * @returns {Promise<ClientServer|Map<string, ClientServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
         if (id) {
-            if (options.force !== true) {
+            if (!options.force) {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
@@ -55,8 +69,17 @@ class ClientServerManager {
 module.exports = ClientServerManager;
 
 function joinParams(params) {
-    if (!params) return '';
-    const res = [];
-    params.forEach(p => res.push(['include', p]));
-    return '?'+ new URLSearchParams(res).toString();
+    if (!params || !params.length) return '';
+    params = params.filter(p => ['egg', 'subusers'].includes(p));
+    return '?include='+ params.toString();
 }
+
+/**
+ * @typedef {object} PageData
+ * @property {number} current The current page.
+ * @property {number} total
+ * @property {number} count The number of items on that page.
+ * @property {number} perPage The max amount of items per page.
+ * @property {number} totalPages The total number of pages.
+ * @property {object} links
+ */

@@ -10,17 +10,17 @@ module.exports = {
         main: '/api/client/servers',
         get: s => `/api/client/servers/${s}`,
         databases:{
-            get: s => `/api/client/servers/${s}/databases`,
-            rotate: (s, id) => `/api/client/servers/${s}/databases/${id}/rotate-password`,
-            delete: (s, id) => `/api/client/servers/${s}/databases/${id}`
+            main: s => `/api/client/servers/${s}/databases`,
+            get: (s, id) => `/api/client/servers/${s}/databases/${id}`,
+            rotate: (s, id) => `/api/client/servers/${s}/databases/${id}/rotate-password`
         },
         files:{
-            list: s => `/api/client/servers/${s}/files/list`,
-            contents: s => `/api/client/servers/${s}/files/contents`,
-            download: s => `/api/client/servers/${s}/files/download`,
+            main: s => `/api/client/servers/${s}/files/list`,
+            contents: (s, f) => `/api/client/servers/${s}/files/contents?file=${f}`,
+            download: (s, f) => `/api/client/servers/${s}/files/download?file=${f}`,
             rename: s => `/api/client/servers/${s}/files/rename`,
             copy: s => `/api/client/servers/${s}/files/copy`,
-            write: s => `/api/client/servers/${s}/files/write`,
+            write: (s, f) => `/api/client/servers/${s}/files/write?file=${f}`,
             compress: s => `/api/client/servers/${s}/files/compress`,
             decompress: s => `/api/client/servers/${s}/files/decompress`,
             delete: s => `/api/client/servers/${s}/files/delete`,
@@ -36,7 +36,7 @@ module.exports = {
             }
         },
         network:{
-            alloc: s => `/api/client/servers/${s}/network/allocations`,
+            main: s => `/api/client/servers/${s}/network/allocations`,
             get: (s, id) => `/api/client/servers/${s}/network/allocations/${id}`,
             primary: (s, id) => `/api/client/servers/${s}/network/allocations/${id}/primary`
         },

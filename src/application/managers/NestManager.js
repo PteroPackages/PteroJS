@@ -1,23 +1,22 @@
 const NestEggsManager = require('./NestEggsManager');
-const endpoints = require('./Endpoints');
+const endpoints = require('./endpoints');
 
 class NestManager {
     constructor(client) {
         this.client = client;
 
-        /**
-         * @type {Set<Nest>}
-         */
+        /**  @type {Set<Nest>} */
         this.cache = new Set();
-
+        /** @type {NestEggsManager} */
         this.eggs = new NestEggsManager(this.client);
     }
 
     _patch(data) {
+        const res = new Set();
         if (data.data) {
             for (let o of data.data) {
                 o = o.attributes;
-                this.cache.add({
+                res.add({
                     id: o.id,
                     uuid: o.uuid,
                     author: o.author,
@@ -27,10 +26,11 @@ class NestManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
-            return this.cache;
+            if (this.client.options.cacheNests) res.forEach(n => this.cache.add(n));
+            return res;
         }
         data = data.attributes;
-        return this.cache.add({
+        res.add({
             id: data.id,
             uuid: data.uuid,
             author: data.author,
@@ -39,12 +39,14 @@ class NestManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         });
+        if (this.client.options.cacheNests) res.forEach(n => this.cache.add(n));
+        return res;
     }
 
     /**
      * Fetches a nest from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the nest.
-     * @returns {Promise<Set<Nest>>}
+     * @returns {Promise<Set<Nest>>} The fetched nests.
      */
     async fetch(id) {
         if (id) return this._patch(await this.client.requests.make(endpoints.nests.get(id)));
@@ -56,7 +58,6 @@ module.exports = NestManager;
 
 /**
  * Represents a nest on Pterodactyl.
- * @readonly
  * @typedef {object} Nest
  * @property {number} id The ID of the nest.
  * @property {string} uuid The UUID of the nest.
@@ -65,4 +66,5 @@ module.exports = NestManager;
  * @property {string} description The description of the nest.
  * @property {Date} createdAt The date the nest was created.
  * @property {?Date} updatedAt The date the nest was last updated.
+ * @readonly
  */

@@ -1,70 +1,255 @@
+const endpoints = require('../client/managers/endpoints');
+
 class FileManager {
-    constructor(client, data) {
+    constructor(client, server, data) {
         this.client = client;
+        this.server = server;
 
         /**
-         * @type {Map<string, PteroFile>}
+         * Whether the client using this manager is the PteroClient or PteroApp.
+         * @type {boolean}
          */
+        this.isClient = client.constructor.name === 'PteroClient';
+
+        /** @type {Map<string, Map<string, PteroFile>>} */
         this.cache = new Map();
+        this.cache.set('/', new Map());
         this._patch(data);
     }
 
     _patch(data) {
-        if (!data) return;
+        if (!data.files && !data.data && !data.attributes) return;
+        if (data.files) data = data.files.data;
+        const dir = decodeURIComponent(data._dir);
         if (data.data) {
-            for (const file of data.data) {
-                const attr = file.attributes;
-                this.cache.set(attr.name, {
-                    name: attr.name,
-                    mode: attr.mode,
-                    size: attr.size,
-                    isFile: attr.is_file,
-                    isSymlink: attr.is_symlink,
-                    isEditable: attr.is_editable,
-                    mimetype: attr.mimetype,
-                    createdAt: new Date(attr.created_at),
-                    modifiedAt: attr.modified_at ? new Date(attr.modified_at) : null
+            const res = new Map();
+            for (let o of data.data) {
+                o = o.attributes;
+                res.set(o.name, {
+                    name: o.name,
+                    mode: o.mode,
+                    modeBits: BigInt(o.mode_bits ?? -1),
+                    size: o.size,
+                    isFile: o.is_file,
+                    isSymlink: o.is_symlink,
+                    isEditable: o.is_editable,
+                    mimetype: o.mimetype,
+                    createdAt: new Date(o.created_at),
+                    modifiedAt: o.modified_at ? new Date(o.modified_at) : null
                 });
             }
+            let hold = this.cache.get(dir);
+            if (!hold) {
+                this.cache.set(dir, new Map());
+                hold = new Map();
+            }
+            res.forEach((v, k) => hold.set(k, v));
+            this.cache.set(dir, hold);
+            return res;
         } else {
-            const attr = data.attributes;
-            this.cache.set(attr.name, {
-                name: attr.name,
-                mode: attr.mode,
-                size: attr.size,
-                isFile: attr.is_file,
-                isSymlink: attr.is_symlink,
-                isEditable: attr.is_editable,
-                mimetype: attr.mimetype,
-                createdAt: new Date(attr.created_at),
-                modifiedAt: attr.modified_at ? new Date(attr.modified_at) : null
-            });
+            data = data.attributes;
+            const o = {
+                name: data.name,
+                mode: data.mode,
+                modeBits: BigInt(data.mode_bits ?? -1),
+                size: data.size,
+                isFile: data.is_file,
+                isSymlink: data.is_symlink,
+                isEditable: data.is_editable,
+                mimetype: data.mimetype,
+                createdAt: new Date(data.created_at),
+                modifiedAt: data.modified_at ? new Date(data.modified_at) : null
+            }
+            let hold = this.cache.get(dir);
+            if (!hold) {
+                this.cache.set(dir, new Map());
+                hold = new Map();
+            }
+            hold.set(data.name, o);
+            this.cache.set(dir, hold);
+            return o;
         }
     }
 
-    async fetch(dir = '') {}
+    /**
+     * Fetches all files from a specified directory (default is the root folder: `/home/container`).
+     * @param {string} [dir] The directory (folder) to fetch from.
+     * @returns {Promise<Map<string, PteroFile>>}
+     */
+    async fetch(dir) {
+        if (!this.isClient) return Promise.resolve();
+        dir &&= dir.startsWith('.') ? dir.slice(1) : dir;
+        dir &&= encodeURIComponent(dir);
+        const data = await this.client.requests.make(
+            endpoints.servers.files.main(this.server.identifier) + (dir ? `?directory=${dir}` : '')
+        );
+        data._dir = dir ?? '/';
+        return this._patch(data);
+    }
 
-    async getContents(file) {}
+    /**
+     * Returns the contents of a specified file.
+     * @param {string} filePath The path to the file in the server.
+     * @returns {Promise<string>}
+     */
+    async getContents(filePath) {
+        if (!this.isClient) return Promise.resolve();
+        if (filePath.startsWith('.')) filePath = filePath.slice(1);
+        filePath = encodeURIComponent(filePath);
+        const data = await this.client.requests.make(
+            endpoints.servers.files.contents(this.server.identifier, filePath)
+        );
+        return data.toString();
+    }
 
-    async getPath(file) {}
+    /**
+     * Returns a URL that can be used to download the specified file.
+     * @param {string} filePath The path to the file in the server.
+     * @returns {Promise<string>}
+     */
+    async download(filePath) {
+        if (!this.isClient) return Promise.resolve();
+        if (filePath.startsWith('.')) filePath = filePath.slice(1);
+        filePath = encodeURIComponent(filePath);
+        const data = await this.client.requests.make(
+            endpoints.servers.files.download(this.server.identifier, filePath)
+        );
+        return data.attributes.url;
+    }
 
-    async download(file) {}
+    /**
+     * Renames the specified file.
+     * EXPERIMENTAL: may not be working properly.
+     * @param {string} filePath The path to the file in the server.
+     * @param {string} name The new name of the file.
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async rename(filePath, name) {
+        if (!this.isClient) return Promise.resolve();
+        filePath ??= '/';
+        filePath = filePath.startsWith('.') ? filePath.slice(1) : filePath;
+        const sub = filePath.split('/');
+        await this.client.requests.make(
+            endpoints.servers.files.rename(this.server.identifier),
+            {
+                root: filePath,
+                files:[{
+                    from: sub.pop(),
+                    to: name
+                }]
+            },
+            'PUT'
+        );
+    }
 
-    async rename(file, name) {}
+    /**
+     * Creates a copy of the specified file in the same directory.
+     * @param {string} filePath The path to the file in the server.
+     * @returns {Promise<void>}
+     */
+    async copy(filePath) {
+        if (!this.isClient) return Promise.resolve();
+        if (filePath.startsWith('.')) filePath = filePath.slice(1);
+        await this.client.requests.make(
+            endpoints.servers.files.copy(this.server.identifier),
+            { location: filePath }, 'POST'
+        );
+    }
 
-    async copy(location) {}
+    /**
+     * Writes content to the specified file.
+     * @param {string} filePath The path to the file in the server.
+     * @param {string|Buffer} content The content to write to the file.
+     * @returns {Promise<void>}
+     */
+    async write(filePath, content) {
+        if (!this.isClient) return Promise.resolve();
+        if (filePath.startsWith('.')) filePath = filePath.slice(1);
+        filePath = encodeURIComponent(filePath);
+        if (content instanceof Buffer) content = content.toString();
+        await this.client.requests.make(
+            endpoints.servers.files.write(this.server.identifier, filePath),
+            { raw: content }, 'POST'
+        );
+    }
 
-    async write(file, contents) {}
+    /**
+     * Compresses one or more files into a zip file (`tar.gz`).
+     * @param {string} dir The directory (folder) of the file(s).
+     * @param {string[]} files An array of the file name(s) to compress.
+     * @returns {Promise<PteroFile>} The compressed file.
+     */
+    async compress(dir, files) {
+        if (!this.isClient) return Promise.resolve();
+        if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
+        if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
+        if (dir.startsWith('.')) dir = dir.slice(1);
+        const data = await this.client.requests.make(
+            endpoints.servers.files.compress(this.server.identifier),
+            { root: dir, files }, 'POST'
+        );
+        return this._patch(data);
+    }
 
-    async compress(file) {}
+    /**
+     * Decompresses a zip file to it's original contents.
+     * @param {string} dir The directory (folder) of the file.
+     * @param {string} file The name of file to decompress.
+     * @returns {Promise<void>}
+     */
+    async decompress(dir, file) {
+        if (!this.isClient) return Promise.resolve();
+        if (dir.startsWith('.')) dir = dir.slice(1);
+        if (file.startsWith('.')) file = file.slice(1);
+        await this.client.requests.make(
+            endpoints.servers.files.decompress(this.server.identifier),
+            { root: dir, file }, 'POST'
+        );
+    }
 
-    async decompress(file) {}
+    /**
+     * Deletes one or more files in the specified directory.
+     * @param {string} dir The directory (folder) of the file(s).
+     * @param {string[]} files An array of the file name(s) to delete.
+     * @returns {Promise<void>}
+     */
+    async delete(dir, files) {
+        if (!this.isClient) return Promise.resolve();
+        if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
+        if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
+        if (dir.startsWith('.')) dir = dir.slice(1);
+        await this.client.requests.make(
+            endpoints.servers.files.delete(this.server.identifier),
+            { root: dir, files }, 'POST'
+        );
+    }
 
-    async delete(file) {}
+    /**
+     * Creates a new folder in a specified directory.
+     * @param {string} dir The directory (folder) to create the folder in.
+     * @param {string} name The name of the folder.
+     * @returns {Promise<void>}
+     */
+    async createFolder(dir, name) {
+        if (!this.isClient) return Promise.resolve();
+        await this.client.requests.make(
+            endpoints.servers.files.create(this.server.identifier),
+            { root: dir, name }, 'POST'
+        );
+    }
 
-    async createFolder(path, name) {}
-
-    async getUploadURL() {}
+    /**
+     * Returns an upload URL that can be used to upload files to the server.
+     * @returns {Promise<string>} The upload URL.
+     */
+    async getUploadURL() {
+        if (!this.isClient) return Promise.resolve();
+        const data = await this.client.requests.make(
+            endpoints.servers.files.upload(this.server.identifier)
+        );
+        return data.attributes.url;
+    }
 }
 
 module.exports = FileManager;
@@ -77,6 +262,7 @@ module.exports = FileManager;
  * @typedef {object} PteroFile
  * @property {string} name The name of the file.
  * @property {string} mode The file permissions mode.
+ * @property {bigint} modeBits The bitfield representatio of the mode.
  * @property {number} size The size of the file (bytes).
  * @property {boolean} isFile Whether the object is a file.
  * @property {boolean} isSymlink Whether the file is a symbolic link.

@@ -10,15 +10,19 @@ module.exports = {
     ClientServerManager: require('./client/managers/ClientServerManager'),
     ClientUser: require('./structures/User').ClientUser,
     DatabaseManager: require('./managers/DatabaseManager'),
+    Dict: require('./structures/Dict'),
     Errors: require('./structures/Errors'),
     FileManager: require('./managers/FileManager'),
     Node: require('./structures/Node'),
     NodeLocationManager: require('./application/managers/NodeLocationManager'),
     NodeManager: require('./application/managers/NestManager'),
     Permissions: require('./structures/Permissions'),
+    Presets: require('./structures/Presets'),
     PteroApp: require('./application/PteroApp'),
     PteroClient: require('./client/PteroClient'),
     PteroSubUser: require('./structures/User').PteroSubUser,
     PteroUser: require('./structures/User').PteroUser,
-    Schedule: require('./structures/Schedule')
+    Schedule: require('./structures/Schedule'),
+    SubUserManager: require('./client/managers/SubUserManager'),
+    UserManager: require('./application/managers/UserManager')
 };

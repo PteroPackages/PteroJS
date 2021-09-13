@@ -1,79 +1,110 @@
 const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
+const Node = require('./Node');
 const { PteroUser } = require('./User');
-const endpoints = require('../application/managers/Endpoints');
+const endpoints = require('../application/managers/endpoints');
 
 class ApplicationServer {
     constructor(client, data) {
         this.client = client;
 
         /**
+         * The of the server (separate from UUID).
          * @type {number}
          */
         this.id = data.id;
 
         /**
-         * @type {string}
+         * The external ID of the server (if set).
+         * @type {?string}
          */
-        this.externalId = data.external_id;
+        this.externalId = data.external_id ?? null;
 
         /**
+         * The internal UUID of the server.
          * @type {string}
          */
         this.uuid = data.uuid;
 
         /**
+         * A substring of the server's UUID to easily identify it.
          * @type {string}
          */
         this.identifier = data.identifier;
 
         /**
+         * The name of the server.
          * @type {string}
          */
         this.name = data.name;
 
         /**
-         * @type {string}
+         * A brief description of the server (if set).
+         * @type {?string}
          */
-        this.description = data.description;
+        this.description = data.description || null;
 
         /**
+         * Whether the server is suspended from action.
          * @type {boolean}
          */
         this.suspended = data.suspended;
 
         /**
+         * An object containing the server's limits.
          * @type {object}
          */
         this.limits = data.limits;
 
         /**
+         * An object containing the server's feature limits.
          * @type {object}
          */
         this.featureLimits = data.feature_limits;
 
         /**
+         * The ID of the user. Use {@link ApplicationServer.fetchOwner} to return the
+         * full PteroUser object via {@link ApplicationServer.owner}.
          * @type {number}
          */
         this.user = data.user;
 
         /**
-         * @type {number}
+         * The server owner PteroUser object. This can be fetched by including 'user' in
+         * the ApplicationServerManager.fetch, or via {@link ApplicationServer.fetchOwner}.
+         * @type {?PteroUser}
          */
-        this.node = data.node;
+        this.owner = this.client.users.resolve(data);
 
         /**
+         * The ID of the node. This is not received by default and must be fetched
+         * via the client NodeManager.
+         * @type {number}
+         */
+        this.nodeId = data.node;
+
+        /**
+         * The node object that the server is part of. This can be fetched by including
+         * 'node' in the ApplicationServerManager.fetch.
+         * @type {?Node}
+         */
+        this.node = null;
+
+        /**
+         * The ID of the allocation for this server.
          * @type {number}
          */
         this.allocation = data.allocation;
 
         /**
+         * The ID of the nest this server is part of.
          * @type {number}
          */
         this.nest = data.nest;
 
         /**
+         * The ID of the egg this server uses.
          * @type {number}
          */
         this.egg = data.egg;
@@ -84,28 +115,27 @@ class ApplicationServer {
         this.container = null;
 
         /**
+         * The date the server was created.
          * @type {Date}
          */
         this.createdAt = new Date(data.created_at);
-
-        /**
-         * @type {number}
-         */
+        /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
         /**
+         * The date the server was last updated.
          * @type {?Date}
          */
         this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
-
-        /**
-         * @type {?number}
-         */
+        /** @type {?number} */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
 
-        this.databases = new DatabaseManager(this.client, data.databases);
-        this.files = new FileManager(this.client, data.files);
-        this.allocations = new AllocationManager(data.allocations);
+        /** @type {DatabaseManager} */
+        this.databases = new DatabaseManager(this.client, data);
+        /** @type {FileManager} */
+        this.files = new FileManager(this.client, data);
+        /** @type {AllocationManager} */
+        this.allocations = new AllocationManager(data);
     }
 
     /**
@@ -115,14 +145,15 @@ class ApplicationServer {
      * @param {number|PteroUser} [options.owner] The new owner of the server.
      * @param {string} [options.externalId] The new external ID of the server.Array
      * @param {string} [options.description] The new description of the server.
-     * @returns {Promise<ApplicationServer>}
+     * @returns {Promise<ApplicationServer>} The updated server instance.
      */
-    async updateDetails(options) {
+    async updateDetails(options = {}) {
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
 
+        const owner = options.owner instanceof PteroUser ? options.owner.id : options.owner;
         const payload = {};
         payload.name = options.name ?? this.name;
-        payload.user = options.owner ?? this.user;
+        payload.user = owner ?? this.user;
         payload.external_id = options.externalId ?? this.externalId;
         payload.description = options.description ?? this.description;
 
@@ -138,18 +169,25 @@ class ApplicationServer {
     }
 
     /**
+     * Fetches the PteroUser object of the server owner.
+     * The user can be accessed via {@link ApplicationServer.owner}.
+     * @returns {Promise<PteroUser>} The fetched user.
+     */
+    async fetchOwner() {}
+
+    /**
      * Updates the server's build structure.
      * @param {object} options Build options.
      * @todo
      */
-    async updateBuild(options) {}
+    async updateBuild(options = {}) {}
 
     /**
      * Updates the server's startup configuration.
      * @param {object} options Startup options.
      * @todo
      */
-    async updateStartup(options) {}
+    async updateStartup(options = {}) {}
 
     /**
      * Suspends the server.
@@ -171,15 +209,15 @@ class ApplicationServer {
 
     /**
      * Reinstalls the server.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<void>}
      */
     async reinstall() {
-        return await this.client.requests.make(endpoints.servers.reinstall(this.id), { method: 'POST' });
+        await this.client.requests.make(endpoints.servers.reinstall(this.id), { method: 'POST' });
     }
 
     /**
      * Returns the JSON value of the server.
-     * @returns {object}
+     * @returns {object} The JSON value.
      */
     toJSON() {
         return JSON.parse(JSON.stringify(this));
