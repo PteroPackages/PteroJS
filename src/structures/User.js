@@ -1,6 +1,7 @@
 const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
+const Dict = require('../../structures/Dict');
 const c_path = require('../client/managers/endpoints');
 
 /**
@@ -74,7 +75,7 @@ class PteroUser extends BaseUser {
 
         /**
          * A map of servers the user is connected to.
-         * @type {?Map<number, ApplicationServer>}
+         * @type {?Dict<number, ApplicationServer>}
          */
         this.relationships = this.client.servers.resolve(data);
     }

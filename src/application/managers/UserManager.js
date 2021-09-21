@@ -1,17 +1,18 @@
 const { PteroUser } = require('../../structures/User');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class UserManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, PteroUser>} */
-        this.cache = new Map();
+        /** @type {Dict<number, PteroUser>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
                 const u = new PteroUser(this.client, o);
@@ -49,7 +50,7 @@ class UserManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {boolean} [options.withServers] Whether to include servers the user(s) own.
-     * @returns {Promise<PteroUser|Map<number, PteroUser>>} The fetched user(s).
+     * @returns {Promise<PteroUser|Dict<number, PteroUser>>} The fetched user(s).
      */
     async fetch(id, options = {}) {
         if (id) {
@@ -102,7 +103,7 @@ class UserManager {
      * @param {string} name The name (string) to query.
      * @param {string} filter The filter to use for the query (see above).
      * @param {string} [sort] The order to sort the results in (see above).
-     * @returns {Promise<Map<number, PteroUser>>} A map of the queried user(s).
+     * @returns {Promise<Dict<number, PteroUser>>} A dict of the queried user(s).
      */
     async query(entity, filter, sort) {
         if (!['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');

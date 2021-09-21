@@ -1,4 +1,5 @@
 const ApplicationServer = require('../../structures/ApplicationServer');
+const Dict = require('../../structures/Dict');
 const { PteroUser } = require('../../structures/User');
 const endpoints = require('./endpoints');
 
@@ -6,13 +7,13 @@ class ServerManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, ApplicationServer>} */
-        this.cache = new Map();
+        /** @type {Dict<number, ApplicationServer>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
                 const s = new ApplicationServer(this.client, o);
@@ -50,7 +51,7 @@ class ServerManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>} The fetched server(s).
+     * @returns {Promise<ApplicationServer|Dict<number, ApplicationServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
         if (id) {

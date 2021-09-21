@@ -1,3 +1,4 @@
+const Dict = require('../../structures/Dict');
 const endpoints = require('../client/managers/endpoints');
 
 class DatabaseManager {
@@ -11,8 +12,8 @@ class DatabaseManager {
          */
         this.isClient = client.constructor.name === 'PteroClient';
 
-        /** @type {Map<string, Database>} */
-        this.cache = new Map();
+        /** @type {Dict<string, Database>} */
+        this.cache = new Dict();
         this._patch(data);
     }
 
@@ -20,7 +21,7 @@ class DatabaseManager {
         if (!data.databases && !data.data && !data.attributes) return;
         if (data.databases) data = data.databases.data;
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (let db of data.data) {
                 db = db.attributes;
                 res.set(db.id, {

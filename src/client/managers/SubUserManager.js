@@ -1,6 +1,7 @@
 const { PteroSubUser } = require('../../structures/User');
 const Permissions = require('../../structures/Permissions');
 const { PermissionResolvable } = require('../../structures/Permissions');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class SubUserManager {
@@ -8,13 +9,13 @@ class SubUserManager {
         this.client = client;
         this.server = server;
 
-        /** @type {Map<string, PteroSubUser>} */
-        this.cache = new Map();
+        /** @type {Dict<string, PteroSubUser>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const s = new Dict();
             for (const o of data.data) {
                 const u = new PteroSubUser(this.client, o);
                 this.cache.set(u.id, u);
@@ -49,7 +50,7 @@ class SubUserManager {
      * Fetches a server subuser from the Pterodactyl API with an optional cache check.
      * @param {string} [id] The UUID of the user.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<PteroSubUser|Map<string, PteroSubUser>>} The fetched user(s).
+     * @returns {Promise<PteroSubUser|Dict<string, PteroSubUser>>} The fetched user(s).
      */
     async fetch(id, force = false) {
         if (id) {

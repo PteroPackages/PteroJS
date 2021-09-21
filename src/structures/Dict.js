@@ -4,6 +4,22 @@
  * @extends {Map}
  */
 class Dict extends Map {
+    has(key) {
+        return super.has(key);
+    }
+
+    get(key) {
+        return super.get(key);
+    }
+
+    set(key, value) {
+        return super.set(key, value);
+    }
+
+    delete(key) {
+        return super.delete(key);
+    }
+
     /**
      * Checks if at least one of the items in the dict pass the function.
      * @param {Function} fn The function to apply to the dict.
@@ -30,7 +46,7 @@ class Dict extends Map {
      * @returns {boolean}
      */
     hasAny(...keys) {
-        return keys.some(k => this.has(k));
+        return keys.some(k => super.has(k));
     }
 
     /**
@@ -39,7 +55,7 @@ class Dict extends Map {
      * @returns {boolean}
      */
     hasAll(...keys) {
-        return keys.every(k => this.has(k));
+        return keys.every(k => super.has(k));
     }
 
     /**
@@ -48,7 +64,7 @@ class Dict extends Map {
      * @returns {any|any[]}
      */
     first(amount) {
-        const v = [...this.values()];
+        const v = [...super.values()];
         if (amount === undefined) return v[0];
         const s = v.splice(0, amount);
         return s.length === 1 ? s[0] : s;
@@ -60,7 +76,7 @@ class Dict extends Map {
      * @returns {any|any[]}
      */
     last(amount) {
-        const v = [...this.values()];
+        const v = [...super.values()];
         if (amount === undefined) return v[v.length-1];
         const s = v.slice(-amount);
         return s.length === 1 ? s[0] : s;
@@ -72,7 +88,7 @@ class Dict extends Map {
      * @returns {any|any[]}
      */
     random(amount) {
-        const v = [...this.values()];
+        const v = [...super.values()];
         if (amount === undefined) return v[Math.floor(Math.random() * v.length)];
         const s = [];
         for (let i=0; i<amount; i++) s.push(v[Math.floor(Math.random() * v.length)]);
@@ -118,7 +134,7 @@ class Dict extends Map {
      */
     sweep(fn) {
         let res = 0;
-        for (const [k, v] of this) if (fn(v, k, this)) this.delete(k) && res++;
+        for (const [k, v] of this) if (fn(v, k, this)) super.delete(k) && res++;
         return res;
     }
 
@@ -165,7 +181,7 @@ class Dict extends Map {
     difference(dict) {
         const res = new Dict();
         for (const [k, v] of this) if (!dict.has(k)) res.set(k, v);
-        for (const [k, v] of dict) if (!this.has(k)) res.set(k, v);
+        for (const [k, v] of dict) if (!super.has(k)) res.set(k, v);
         return res;
     }
 }

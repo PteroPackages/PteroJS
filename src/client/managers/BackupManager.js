@@ -1,3 +1,4 @@
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class BackupManager {
@@ -5,13 +6,13 @@ class BackupManager {
         this.client = client;
         this.server = server;
 
-        /** @type {Map<string, Backup>} */
-        this.cache = new Map();
+        /** @type {Dict<string, Backup>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
+            const s = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
                 this.cache.set(o.uuid, {
@@ -44,7 +45,7 @@ class BackupManager {
      * Fetches a backup from the Pterodactyl API with an optional cache check.
      * @param {string} [id] The UUID of the backup.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<Backup|Map<string, Backup>>} The fetched backup(s).
+     * @returns {Promise<Backup|Dict<string, Backup>>} The fetched backup(s).
      */
     async fetch(id, force = false) {
         if (id) {

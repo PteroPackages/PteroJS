@@ -1,17 +1,18 @@
 const Node = require('../../structures/Node');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class NodeManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, Node>} */
-        this.cache = new Map();
+        /** @type {Dict<number, Node>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (const o of data.data) {
                 const n = new Node(this.client, o);
                 res.set(n.id, n);
@@ -30,7 +31,7 @@ class NodeManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional data to include about the node.
-     * @returns {Promise<Node|Map<number, Node>>} The fetched node(s).
+     * @returns {Promise<Node|Dict<number, Node>>} The fetched node(s).
      */
     async fetch(id, options = {}) {
         if (id) {

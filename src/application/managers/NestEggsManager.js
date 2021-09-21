@@ -1,11 +1,12 @@
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class NestEggsManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, object>} */
-        this.cache = new Map();
+        /** @type {Dict<number, object>} */
+        this.cache = new Dict();
     }
 
     /**
@@ -15,7 +16,7 @@ class NestEggsManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<object|Map<number, object>>} The fetched egg(s).
+     * @returns {Promise<object|Dict<number, object>>} The fetched egg(s).
      */
     async fetch(nest, id, options = {}) {
         if (id) {
@@ -32,7 +33,7 @@ class NestEggsManager {
         const data = await this.client.requests.make(
             endpoints.nests.eggs.main(nest) + joinParams(options.include)
         );
-        const res = new Map();
+        const res = new Dict();
         for (const egg of data.data) {
             this.cache.set(egg.attributes.id, egg.attributes);
             res.set(egg.attributes.id, egg.attributes);

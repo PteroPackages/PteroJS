@@ -1,12 +1,13 @@
 const ClientServer = require('../../structures/ClientServer');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class ClientServerManager {
     constructor(client) {
         this.client = client
 
-        /** @type {Map<string, ClientServer>} */
-        this.cache = new Map();
+        /** @type {Dict<string, ClientServer>} */
+        this.cache = new Dict();
 
         /** @type {PageData} */
         this.pageData = {};
@@ -15,7 +16,7 @@ class ClientServerManager {
     _patch(data) {
         this._resolveMeta(data.meta?.pagination);
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (const o of data.data) {
                 const s = new ClientServer(this.client, o);
                 res.set(s.identifier, s);
@@ -46,7 +47,7 @@ class ClientServerManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ClientServer|Map<string, ClientServer>>} The fetched server(s).
+     * @returns {Promise<ClientServer|Dict<string, ClientServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
         if (id) {
