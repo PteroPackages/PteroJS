@@ -118,9 +118,12 @@ class NodeManager {
     async update(node, options = {}) {
         if (typeof node === 'number') node = await this.fetch(node);
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
+
         const { id } = node;
         const payload = {};
         Object.entries(node.toJSON()).forEach(e => payload[e[0]] = options[e[0]] ?? e[1]);
+        payload.memory_overallocate = payload.overallocated_memory;
+        payload.disk_overallocate = payload.overallocated_disk;
 
         const data = await this.client.requests.make(
             endpoints.nodes.get(id), payload, 'PATCH'
@@ -135,7 +138,7 @@ class NodeManager {
      */
     async delete(node) {
         if (node instanceof Node) node = node.id;
-        await this.client.requests.make(endpoints.nodes.get(node), { method: 'DELETE' });
+        await this.client.requests.make(endpoints.nodes.get(node), null, 'DELETE');
         this.cache.delete(node);
         return true;
     }

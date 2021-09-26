@@ -110,7 +110,7 @@ class NodeLocationManager {
      * @returns {Promise<boolean>}
      */
     async delete(id) {
-        await this.client.requests.make(endpoints.locations.get(id), { method: 'DELETE' });
+        await this.client.requests.make(endpoints.locations.get(id), null, 'DELETE');
         this.cache.delete(id);
         return true;
     }
