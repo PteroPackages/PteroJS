@@ -124,12 +124,13 @@ class UserManager {
      * @returns {Promise<PteroUser>} The new user.
      */
     async create(email, username, firstname, lastname) {
-        const data = await this.client.requests.make(
+        await this.client.requests.make(
             endpoints.users.main,
             { email, username, first_name: firstname, last_name: lastname },
             'POST'
         );
-        return this._patch(data);
+        const u = await this.query(email, 'email');
+        return u.first();
     }
 
     /**
@@ -146,13 +147,7 @@ class UserManager {
      */
     async update(user, options = {}) {
         if (!options.password) throw new Error('User password is required.');
-        if (
-            !options.email &&
-            !options.username &&
-            !options.firstname &&
-            !options.lastname &&
-            !options.language
-        ) throw new Error('Too few parameters to update.');
+        if (!Object.keys(options).length) throw new Error('Too few parameters to update.');
         if (typeof user === 'number') user = await this.fetch(user);
 
         const { password } = options;
@@ -178,7 +173,7 @@ class UserManager {
      */
     async delete(user) {
         if (user instanceof PteroUser) user = user.id;
-        await this.client.requests.make(endpoints.users.get(user), { method: 'DELETE' });
+        await this.client.requests.make(endpoints.users.get(user), null, 'DELETE');
         this.cache.delete(user);
         return true;
     }
