@@ -111,8 +111,29 @@ class PteroUser extends BaseUser {
         }
     }
 
-    /** @todo */
-    async update(options = {}) {}
+    /**
+     * Updates the specified user's account.
+     * @param {number|PteroUser} user The user to update.
+     * @param {object} options Changes to update the user with.
+     * @param {string} [options.email] The new email for the account.
+     * @param {string} [options.username] The new username for the account.
+     * @param {string} [options.firstname] The new firstname for the account.
+     * @param {string} [options.lastname] The new lastname for the account.
+     * @param {string} [options.language] The new language for the account.
+     * @param {string} options.password The password for the user account.
+     * @returns {Promise<PteroUser>} The updated user instance.
+     */
+    async update(options = {}) {
+        return this.client.users.update(this, options);
+    }
+
+    /**
+     * Deletes the user account from Pterodactyl.
+     * @returns {Promise<boolean>}
+     */
+    async delete() {
+        return this.client.users.delete(this);
+    }
 }
 
 class PteroSubUser extends BaseUser {
@@ -127,6 +148,8 @@ class PteroSubUser extends BaseUser {
 
         /** @type {Permissions} */
         this.permissions = new Permissions(data.permissions ?? {});
+
+        this._patch(data);
     }
 
     _patch(data) {
