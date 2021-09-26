@@ -17,7 +17,7 @@ class AllocationManager {
     }
 
     _patch(data) {
-        if (!data.allocations && !data.data && !data.attributes) return;
+        if (!data?.allocations && !data?.data && !data?.attributes) return;
         if (data.allocations) data = data.allocations;
         if (data.data) {
             const res = new Set();

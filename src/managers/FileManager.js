@@ -18,7 +18,7 @@ class FileManager {
     }
 
     _patch(data) {
-        if (!data.files && !data.data && !data.attributes) return;
+        if (!data?.files && !data?.data && !data?.attributes) return;
         if (data.files) data = data.files.data;
         const dir = decodeURIComponent(data._dir);
         if (data.data) {

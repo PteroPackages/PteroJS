@@ -1,4 +1,4 @@
-const Dict = require('../../structures/Dict');
+const Dict = require('../structures/Dict');
 const endpoints = require('../client/managers/endpoints');
 
 class DatabaseManager {
@@ -18,7 +18,7 @@ class DatabaseManager {
     }
 
     _patch(data) {
-        if (!data.databases && !data.data && !data.attributes) return;
+        if (!data?.databases && !data?.data && !data?.attributes) return;
         if (data.databases) data = data.databases.data;
         if (data.data) {
             const res = new Dict();
