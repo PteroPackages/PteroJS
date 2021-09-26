@@ -10,6 +10,22 @@ class ApplicationServer {
     constructor(client, data) {
         this.client = client;
 
+        /**
+             * The date the server was created.
+             * @type {Date}
+             */
+        this.createdAt = new Date(data.created_at);
+        /** @type {number} */
+        this.createdTimestamp = this.createdAt.getTime();
+
+        /**
+             * The date the server was last updated.
+             * @type {?Date}
+             */
+        this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
+        /** @type {?number} */
+        this.updatedTimestamp = this.updatedAt?.getTime() || null;
+
         /** @type {DatabaseManager} */
         this.databases = new DatabaseManager(client, data);
         /** @type {FileManager} */
@@ -158,26 +174,6 @@ class ApplicationServer {
              * @todo Implement container manager
              */
             this.container = null;
-        }
-
-        if ('created_at' in data) {
-            /**
-             * The date the server was created.
-             * @type {Date}
-             */
-            this.createdAt = new Date(data.created_at);
-            /** @type {number} */
-            this.createdTimestamp = this.createdAt.getTime();
-        }
-
-        if ('updated_at' in data) {
-            /**
-             * The date the server was last updated.
-             * @type {?Date}
-             */
-            this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
-            /** @type {?number} */
-            this.updatedTimestamp = this.updatedAt?.getTime() || null;
         }
     }
 
