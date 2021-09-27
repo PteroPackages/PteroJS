@@ -1,12 +1,11 @@
+<p align="center"><img src="https://cdn.discordapp.com/icons/878103328351977533/c9be4583e92d43efd1df18719f91ec37.webp?size=256" alt="pterojs-logo"></p>
 <h1 align="center">PteroJS</h1>
 <h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
-
-[![discord](https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rmRw4W5XXz)
-![version](https://img.shields.io/badge/version-1.1.6-3572A5?style=for-the-badge)
-[![issues](https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge)](https://github.com/devnote-dev/PteroJS/issues)
+<h4 align="center"><i>Logo design by aizakkusnail#1065 (Discord)</i></h4>
+<p align="center"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/version-1.1.6-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge"> <img src="https://img.shields.io/badge/docs-coming_soon-e67e22?style=for-the-badge"></p>
 
 ## About
-PteroJS utilises the verbose classes structure seen in libraries like Discord.js to give developers the most amount of control over their code.
+PteroJS is a flexible API wrapper designed to give developers full access over the Pterodactyl API. The library uses a class-based management structure often seen in popular packages like Discord.js which keeps code clean, efficient and practical for any use-case.
 
 ## Installing
 ```
