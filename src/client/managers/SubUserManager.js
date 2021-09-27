@@ -16,15 +16,16 @@ class SubUserManager {
     _patch(data) {
         if (data.data) {
             const s = new Dict();
-            for (const o of data.data) {
+            for (let o of data.data) {
+                o = o.attributes;
                 const u = new PteroSubUser(this.client, o);
-                this.cache.set(u.id, u);
-                s.set(u.id, u);
+                this.cache.set(u.uuid, u);
+                s.set(u.uuid, u);
             }
             return s;
         }
         const u = new PteroSubUser(this.client, data);
-        this.cache.set(u.id, u);
+        this.cache.set(u.uuid, u);
         return u;
     }
 
@@ -73,6 +74,7 @@ class SubUserManager {
      * Adds a specified user to the server.
      * @param {string} email The email of the associated account.
      * @param {PermissionResolvable} permissions Permissions for the account.
+     * @returns {Promise<PteroSubUser>} The new subuser.
      */
     async add(email, permissions) {
         if (typeof email !== 'string') throw new Error('Email must be a string.');
@@ -107,7 +109,7 @@ class SubUserManager {
      */
     async remove(id) {
         await this.client.requests.make(
-            endpoints.servers.users.get(this.server.identifier, id), { method: 'DELETE' }
+            endpoints.servers.users.get(this.server.identifier, id), null, 'DELETE'
         );
         this.cache.delete(id);
         return true;

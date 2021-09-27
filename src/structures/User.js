@@ -66,8 +66,6 @@ class PteroUser extends BaseUser {
     }
 
     _patch(data) {
-        super._patch(data);
-
         if ('external_id' in data) {
             /** @type {string} */
             this.externalId = data.external_id;
@@ -139,7 +137,6 @@ class PteroUser extends BaseUser {
 class PteroSubUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
-        this._patch(data);
 
         /** @type {Date} */
         this.createdAt = new Date(data.created_at);
@@ -153,8 +150,6 @@ class PteroSubUser extends BaseUser {
     }
 
     _patch(data) {
-        super._patch(data);
-
         if ('uuid' in data) {
             /** @type {string} */
             this.uuid = data.uuid;
