@@ -1,3 +1,4 @@
+const SubUserManager = require('../client/managers/SubUserManager');
 const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
@@ -9,81 +10,8 @@ class ClientServer {
         this.client = client;
         const attr = data.attributes;
 
-        /**
-         * Whether the client user is the owner of the server.
-         * @type {boolean}
-         */
-        this.isOwner = attr.server_owner;
-
-        /**
-         * A substring of the server's UUID to easily identify it.
-         * @type {string}
-         */
-        this.identifier = attr.identifier;
-
-        /**
-         * The internal UUID of the server.
-         * @type {string}
-         */
-        this.uuid = attr.uuid;
-
-        /**
-         * The name of the server.
-         * @type {string}
-         */
-        this.name = attr.name;
-
-        /**
-         * The name of the node the server is on.
-         * @type {string}
-         */
-        this.node = attr.node;
-
-        /**
-         * An object containing SFTP details.
-         * @type {object}
-         */
-        this.sftp = {
-            ip: attr.sftp_details.ip,
-            port: attr.sftp_details.port
-        }
-
-        /**
-         * A brief description of the server (if set).
-         * @type {?string}
-         */
-        this.description = attr.description || null;
-
-        /**
-         * An object containing the server's limits.
-         * @type {object}
-         */
-        this.limits = attr.limits;
-
-        /**
-         * An object containing the server's feature limits.
-         * @type {object}
-         */
-        this.featureLimits = attr.feature_limits;
-
-        /**
-         * Whether the server is suspended from action.
-         * @type {boolean}
-         */
-        this.suspended = attr.is_suspended;
-
-        /**
-         * The current power state of the server.
-         * @type {string}
-         */
-        this.state = 'unknown';
-
-        /**
-         * Whether the server is currently being installed.
-         * @type {boolean}
-         */
-        this.installing = attr.is_installing;
-
+        /** @type {SubUserManager} */
+        this.users = new SubUserManager(client, this);
         /** @type {AllocationManager} */
         this.allocations = new AllocationManager(client, this, attr.relationships);
         /** @type {Permissions} */
@@ -92,6 +20,111 @@ class ClientServer {
         this.databases = new DatabaseManager(client, this, attr.relationships);
         /** @type {FileManager} */
         this.files = new FileManager(client, this, attr.relationships);
+
+        this._patch(attr);
+    }
+
+    _patch(data) {
+        if ('server_owner' in data) {
+            /**
+             * Whether the client user is the owner of the server.
+             * @type {boolean}
+             */
+            this.isOwner = data.server_owner;
+        }
+
+        if ('identifier' in data) {
+            /**
+             * A substring of the server's UUID to easily identify it.
+             * @type {string}
+             */
+            this.identifier = data.identifier;
+        }
+
+        if ('uuid' in data) {
+            /**
+             * The internal UUID of the server.
+             * @type {string}
+             */
+            this.uuid = data.uuid;
+        }
+
+        if ('name' in data) {
+            /**
+             * The name of the server.
+             * @type {string}
+             */
+            this.name = data.name;
+        }
+
+        if ('node' in data) {
+            /**
+             * The name of the node the server is on.
+             * @type {string}
+             */
+            this.node = data.node;
+        }
+
+        if ('sftp_details' in data) {
+            /**
+             * An object containing SFTP details.
+             * @type {object}
+             */
+            this.sftp = {
+                /** @type {string} */
+                ip: data.sftp_details.ip,
+                /** @type {number} */
+                port: data.sftp_details.port
+            }
+        }
+
+        if ('description' in data) {
+            /**
+             * A brief description of the server (if set).
+             * @type {?string}
+             */
+            this.description = data.description || null;
+        }
+
+        if ('limits' in data) {
+            /**
+             * An object containing the server's limits.
+             * @type {object}
+             */
+            this.limits = data.limits;
+        }
+
+        if ('feature_limits' in data) {
+            /**
+             * An object containing the server's feature limits.
+             * @type {object}
+             */
+            this.featureLimits = data.feature_limits;
+        }
+
+        if ('is_suspended' in data) {
+            /**
+             * Whether the server is suspended from action.
+             * @type {boolean}
+             */
+            this.suspended = data.is_suspended;
+        }
+
+        if ('state' in data) {
+            /**
+             * The current power state of the server.
+             * @type {string}
+             */
+            this.state = 'unknown';
+        }
+
+        if ('is_installing' in data) {
+            /**
+             * Whether the server is currently being installed.
+             * @type {boolean}
+             */
+            this.installing = data.is_installing;
+        }
     }
 
     /**
