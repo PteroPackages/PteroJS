@@ -106,11 +106,15 @@ class UserManager {
      * @returns {Promise<Dict<number, PteroUser>>} A dict of the queried user(s).
      */
     async query(entity, filter, sort) {
-        if (!['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');
+        if (filter && !['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');
         if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
+        if (!sort && !filter) throw new Error('sort or filter is required to query');
         if (filter === 'externalId') filter = 'external_id';
         const data = await this.client.requests.make(
-            endpoints.users.main + `?filter[${filter}]=${entity}` + (sort ? `&sort=${sort}` : '')
+          endpoints.users.main +
+            (filter ? `?filter[${filter}]=${entity}` : "") +
+            (sort && filter ? `&sort=${sort}` : "") +
+            (sort && !filter ? `?sort=${sort}` : "")
         );
         return this._patch(data);
     }
