@@ -90,17 +90,15 @@ class NodeLocationManager {
     /**
      * Updates an existing node location.
      * @param {number} id The ID of the node location.
-     * @param {string} short The short location code of the location.
-     * @param {string} long The long location code of the location.
+     * @param {object} options Location update optioons.
+     * @param {string} [options.short] The short location code of the location.
+     * @param {string} [options.long] The long location code of the location.
      * @returns {Promise<NodeLocation>} The updated node location instance.
      */
-    async update(id, { short, long } = {}) {
+    async update(id, options) {
+        if (!options.short && !options.long) throw new Error('Either short or long option is required.');
         return this._patch(
-            await this.client.requests.make(
-                endpoints.locations.get(id),
-                { short, long },
-                'PATCH'
-            )
+            await this.client.requests.make(endpoints.locations.get(id), options, 'PATCH')
         );
     }
 
