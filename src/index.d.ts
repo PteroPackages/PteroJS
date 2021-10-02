@@ -1,6 +1,7 @@
 // Typedefs for PteroJS classes and structures
 
 import EventEmitter from 'events';
+import WebSocket from 'ws';
 
 export interface Allocation {
     id:        number;
@@ -473,21 +474,74 @@ export class NodeManager {
 
 export type PermissionResolvable = string[]|number[]|object;
 
+export interface PermissionFlags {
+    WEBSOCKET_CONNECT: 0;
+
+    CONTROL_CONSOLE: 1;
+    CONTROL_START: 2;
+    CONTROL_STOP: 3;
+    CONTROL_RESTART: 4;
+
+    USER_CREATE: 5;
+    USER_READ: 6;
+    USER_UPDATE: 7;
+    USER_DELETE: 8;
+
+    FILE_CREATE: 9;
+    FILE_READ: 10;
+    FILE_UPDATE: 11;
+    FILE_DELETE: 12;
+    FILE_ARCHIVE: 13;
+    FILE_SFTP: 14;
+
+    BACKUP_CREATE: 15;
+    BACKUP_READ: 16;
+    BACKUP_UPDATE: 17;
+    BACKUP_DELETE: 18;
+
+    ALLOCATION_READ: 19;
+    ALLOCATION_CREATE: 20;
+    ALLOCATION_UPDATE: 21;
+    ALLOCATION_DELETE: 22;
+
+    STARTUP_READ: 23;
+    STARTUP_UPDATE: 24;
+
+    DATABASE_CREATE: 25;
+    DATABASE_READ: 26;
+    DATABASE_UPDATE: 27;
+    DATABASE_DELETE: 28;
+    DATABASE_VIEW_PASSWORD: 29;
+
+    SCHEDULE_CREATE: 30;
+    SCHEDULE_READ: 31;
+    SCHEDULE_UPDATE: 32;
+    SCHEDULE_DELETE: 33;
+
+    SETTINGS_RENAME: 34;
+    SETTINGS_REINSTALL: 35;
+
+    '*': 40;
+    ADMIN_WEBSOCKET_ERRORS: 41;
+    ADMIN_WEBSOCKET_INSTALL: 42;
+    ADMIN_WEBSOCKET_TRANSFER: 43;
+}
+
 export class Permissions {
     public constructor(data: PermissionResolvable);
 
     public raw: object;
 
-    public static get FLAGS(): Readonly<{ [key: string]: number }>;
-    public static get DEFAULT(): Readonly<{ [key: string]: number }>;
+    public static get FLAGS(): Readonly<PermissionFlags>;
+    public static get DEFAULT(): Readonly<PermissionFlags>;
 
     public has(perms: string|number|PermissionResolvable): boolean;
     public isAdmin(): boolean;
-    public static resolve(perms: PermissionResolvable): object;
-    public serialize(): object;
+    public static resolve(perms: PermissionResolvable): { [key: string]: number };
+    public serialize(): { [key: string]: boolean };
     public toArray(): string[];
     public toStrings(): string[];
-    public static fromStrings(perms: string[]): object;
+    public static fromStrings(perms: string[]): { [key: string]: number };
 }
 
 export interface ApplicationOptions {
@@ -549,6 +603,9 @@ export class PteroClient extends EventEmitter {
     public readyAt: Date | null;
     public ping: number | null;
     public user: ClientUser|null;
+    public servers: ClientServerManager;
+    public requests: ClientRequestManager;
+    public ws: WebSocketManager;
 
     public emit<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): boolean;
     public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
@@ -654,4 +711,17 @@ export class UserManager {
         }
     ): Promise<PteroUser>;
     public delete(user: number|PteroUser): Promise<boolean>;
+}
+
+export class WebSocketManager {
+    public constructor(client: PteroClient);
+
+    public client: PteroClient;
+    public servers: string[];
+    public status: string;
+    public sockets: Map<string, WebSocket>;
+    public lastPing: number;
+
+    public connect(): Promise<boolean>;
+    public send(id: string, event: string, data: any): void;
 }
