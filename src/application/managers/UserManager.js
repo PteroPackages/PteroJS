@@ -100,8 +100,8 @@ class UserManager {
      * * uuid
      * * -uuid
      * 
-     * @param {string} name The name (string) to query.
-     * @param {string} filter The filter to use for the query (see above).
+     * @param {string} entity The entity (string) to query.
+     * @param {string} [filter] The filter to use for the query (see above).
      * @param {string} [sort] The order to sort the results in (see above).
      * @returns {Promise<Dict<number, PteroUser>>} A dict of the queried user(s).
      */
@@ -111,7 +111,7 @@ class UserManager {
         if (!sort && !filter) throw new Error('sort or filter is required to query');
         if (filter === 'externalId') filter = 'external_id';
         const data = await this.client.requests.make(
-          endpoints.users.main +
+            endpoints.users.main +
             (filter ? `?filter[${filter}]=${entity}` : "") +
             (sort && filter ? `&sort=${sort}` : "") +
             (sort && !filter ? `?sort=${sort}` : "")
