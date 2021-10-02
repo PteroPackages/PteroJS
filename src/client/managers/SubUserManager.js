@@ -18,13 +18,13 @@ class SubUserManager {
             const s = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
-                const u = new PteroSubUser(this.client, o);
+                const u = new PteroSubUser(this.client, this.server.identifier, o);
                 this.cache.set(u.uuid, u);
                 s.set(u.uuid, u);
             }
             return s;
         }
-        const u = new PteroSubUser(this.client, data);
+        const u = new PteroSubUser(this.client, this.server.identifier, data.attributes);
         this.cache.set(u.uuid, u);
         return u;
     }
