@@ -96,7 +96,7 @@ class BackupManager {
      */
     async delete(id) {
         await this.client.requests.make(
-            endpoints.servers.backups.get(this.server.identifier, id), { method: 'DELETE' }
+            endpoints.servers.backups.get(this.server.identifier, id), null, 'DELETE'
         );
         this.cache.delete(id);
         return true;

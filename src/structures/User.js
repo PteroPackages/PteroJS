@@ -322,7 +322,7 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async deleteKey(id) {
-        await this.client.requests.make(c_path.account.apikeys +`/${id}`, { method: 'DELETE' });
+        await this.client.requests.make(c_path.account.apikeys +`/${id}`, null, 'DELETE');
         this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 }

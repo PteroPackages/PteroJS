@@ -60,7 +60,7 @@ class AllocationManager {
     async assign() {
         return this._patch(
             await this.client.requests.make(
-                endpoints.servers.network.main(this.server.identifier), { method: 'POST' }
+                endpoints.servers.network.main(this.server.identifier), null, 'POST'
             )
         );
     }
@@ -76,14 +76,14 @@ class AllocationManager {
     async setPrimary(id) {
         return this._patch(
             await this.client.requests.make(
-                endpoints.servers.network.primary(this.server.identifier, id), { method: 'POST' }
+                endpoints.servers.network.primary(this.server.identifier, id), null, 'POST'
             )
         );
     }
 
     async unassign(id) {
         await this.client.requests.make(
-            endpoints.servers.network.get(this.server.identifier, id), { method: 'DELETE' }
+            endpoints.servers.network.get(this.server.identifier, id), null, 'DELETE'
         );
         const res = this.cache;
         this.cache.forEach(a => { if (a.id !== id) res.add(a) });

@@ -72,7 +72,7 @@ class DatabaseManager {
     async rotate(id) {
         if (!this.isClient) return Promise.resolve();
         const data = await this.client.requests.make(
-            endpoints.servers.databases.rotate(this.server.identifier, id), { method: 'POST' }
+            endpoints.servers.databases.rotate(this.server.identifier, id), null, 'POST'
         );
         return this._patch(data);
     }
@@ -80,7 +80,7 @@ class DatabaseManager {
     async delete(id) {
         if (!this.isClient) return Promise.resolve();
         await this.client.requests.make(
-            endpoints.servers.databases.delete(this.server.identifier, id), { method: 'DELETE' }
+            endpoints.servers.databases.delete(this.server.identifier, id), null, 'DELETE'
         );
         this.cache.delete(id);
         return true;
