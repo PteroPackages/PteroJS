@@ -1,17 +1,18 @@
 const Node = require('../../structures/Node');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class NodeManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, Node>} */
-        this.cache = new Map();
+        /** @type {Dict<number, Node>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (const o of data.data) {
                 const n = new Node(this.client, o);
                 res.set(n.id, n);
@@ -30,7 +31,7 @@ class NodeManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional data to include about the node.
-     * @returns {Promise<Node|Map<number, Node>>} The fetched node(s).
+     * @returns {Promise<Node|Dict<number, Node>>} The fetched node(s).
      */
     async fetch(id, options = {}) {
         if (id) {
@@ -117,9 +118,12 @@ class NodeManager {
     async update(node, options = {}) {
         if (typeof node === 'number') node = await this.fetch(node);
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
+
         const { id } = node;
         const payload = {};
         Object.entries(node.toJSON()).forEach(e => payload[e[0]] = options[e[0]] ?? e[1]);
+        payload.memory_overallocate = payload.overallocated_memory;
+        payload.disk_overallocate = payload.overallocated_disk;
 
         const data = await this.client.requests.make(
             endpoints.nodes.get(id), payload, 'PATCH'
@@ -134,7 +138,7 @@ class NodeManager {
      */
     async delete(node) {
         if (node instanceof Node) node = node.id;
-        await this.client.requests.make(endpoints.nodes.get(node), { method: 'DELETE' });
+        await this.client.requests.make(endpoints.nodes.get(node), null, 'DELETE');
         this.cache.delete(node);
         return true;
     }

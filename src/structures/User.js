@@ -1,32 +1,46 @@
 const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
+const Dict = require('../structures/Dict');
+const json = require('../structures/Jsonifier');
 const c_path = require('../client/managers/endpoints');
 
-/**
- * @abstract
- */
 class BaseUser {
     constructor(client, data) {
         this.client = client;
+        this._patch(data);
+    }
 
-        /** @type {number} */
-        this.id = data.id;
+    _patch(data) {
+        if ('id' in data) {
+            /** @type {number} */
+            this.id = data.id;
+        }
 
-        /** @type {string} */
-        this.username = data.username;
+        if ('username' in data) {
+            /** @type {string} */
+            this.username = data.username;
+        }
 
-        /** @type {string} */
-        this.email = data.email;
+        if ('email' in data) {
+            /** @type {string} */
+            this.email = data.email;
+        }
 
-        /** @type {string} */
-        this.firstname = data.first_name;
+        if ('first_name' in data) {
+            /** @type {string} */
+            this.firstname = data.first_name;
+        }
 
-        /** @type {string} */
-        this.lastname = data.last_name;
+        if ('last_name' in data) {
+            /** @type {string} */
+            this.lastname = data.last_name;
+        }
 
-        /** @type {string} */
-        this.language = data.language;
+        if ('language' in data) {
+            /** @type {string} */
+            this.language = data.language;
+        }
     }
 
     /**
@@ -42,59 +56,89 @@ class BaseUser {
      * @returns {object} The JSON value.
      */
     toJSON() {
-        return JSON.parse(JSON.stringify(this));
+        return json(this, ['client']);
     }
 }
 
 class PteroUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
-
-        /** @type {string} */
-        this.externalId = data.external_id;
-
-        /** @type {string} */
-        this.uuid = data.uuid;
-
-        /** @type {boolean} */
-        this.isAdmin = data.root_admin ?? false;
-
-        /** @type {boolean} */
-        this.tfa = data['2fa'];
-
-        /** @type {Date} */
-        this.createdAt = new Date(data.created_at);
-        /** @type {number} */
-        this.createdTimestamp = this.createdAt.getTime();
-
-        /** @type {?Date} */
-        this.updatedAt = data['updated_at'] ? new Date(data['updated_at']) : null;
-        /** @type {?number} */
-        this.updatedTimestamp = this.updatedAt?.getTime() || null;
-
-        /**
-         * A map of servers the user is connected to.
-         * @type {?Map<number, ApplicationServer>}
-         */
-        this.relationships = this.client.servers.resolve(data);
     }
 
-    /** @todo */
-    async update(options = {}) {}
+    _patch(data) {
+        super._patch(data);
+
+        if ('external_id' in data) {
+            /** @type {string} */
+            this.externalId = data.external_id;
+        }
+
+        if ('uuid' in data) {
+            /** @type {string} */
+            this.uuid = data.uuid;
+        }
+
+        if ('root_admin' in data) {
+            /** @type {boolean} */
+            this.isAdmin = data.root_admin ?? false;
+        }
+
+        if ('2fa' in data) {
+            /** @type {boolean} */
+            this.tfa = data['2fa'];
+        }
+
+        if ('created_at' in data) {
+            /** @type {Date} */
+            this.createdAt = new Date(data.created_at);
+            /** @type {number} */
+            this.createdTimestamp = this.createdAt.getTime();
+        }
+
+        if ('updated_at' in data) {
+            /** @type {?Date} */
+            this.updatedAt = data['updated_at'] ? new Date(data['updated_at']) : null;
+            /** @type {?number} */
+            this.updatedTimestamp = this.updatedAt?.getTime() || null;
+        }
+
+        if (!this.relationships) {
+            /**
+             * A map of servers the user is connected to.
+             * @type {?Dict<number, ApplicationServer>}
+             */
+            this.relationships = this.client.servers.resolve(data);
+        }
+    }
+
+    /**
+     * Updates the specified user's account.
+     * @param {number|PteroUser} user The user to update.
+     * @param {object} options Changes to update the user with.
+     * @param {string} [options.email] The new email for the account.
+     * @param {string} [options.username] The new username for the account.
+     * @param {string} [options.firstname] The new firstname for the account.
+     * @param {string} [options.lastname] The new lastname for the account.
+     * @param {string} [options.language] The new language for the account.
+     * @param {string} options.password The password for the user account.
+     * @returns {Promise<PteroUser>} The updated user instance.
+     */
+    async update(options = {}) {
+        return this.client.users.update(this, options);
+    }
+
+    /**
+     * Deletes the user account from Pterodactyl.
+     * @returns {Promise<boolean>}
+     */
+    async delete() {
+        return this.client.users.delete(this);
+    }
 }
 
 class PteroSubUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
-
-        /** @type {string} */
-        this.uuid = data.uuid;
-
-        /** @type {string} */
-        this.image = data.image;
-
-        /** @type {boolean} */
-        this.enabled = data['2fa_enabled'];
 
         /** @type {Date} */
         this.createdAt = new Date(data.created_at);
@@ -103,6 +147,27 @@ class PteroSubUser extends BaseUser {
 
         /** @type {Permissions} */
         this.permissions = new Permissions(data.permissions ?? {});
+
+        this._patch(data);
+    }
+
+    _patch(data) {
+        super._patch(data);
+
+        if ('uuid' in data) {
+            /** @type {string} */
+            this.uuid = data.uuid;
+        }
+
+        if ('image' in data) {
+            /** @type {string} */
+            this.image = data.image;
+        }
+
+        if ('2fa_enabled' in data) {
+            /** @type {boolean} */
+            this.enabled = data['2fa_enabled'];
+        }
     }
 
     /**
@@ -123,6 +188,7 @@ class PteroSubUser extends BaseUser {
 class ClientUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
+        super._patch(data);
 
         /** @type {boolean} */
         this.isAdmin = data.admin;
@@ -256,15 +322,17 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async deleteKey(id) {
-        await this.client.requests.make(c_path.account.apikeys +`/${id}`, { method: 'DELETE' });
+        await this.client.requests.make(c_path.account.apikeys +`/${id}`, null, 'DELETE');
         this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 }
 
-exports.BaseUser = BaseUser;
-exports.PteroUser = PteroUser;
-exports.PteroSubUser = PteroSubUser;
-exports.ClientUser = ClientUser;
+module.exports = {
+    BaseUser,
+    PteroUser,
+    PteroSubUser,
+    ClientUser
+}
 
 /**
  * Represents a Pterodactyl API key.

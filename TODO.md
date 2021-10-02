@@ -31,8 +31,8 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 ## Misc.
 - [X] Add proper notes and annotations to JSDocs
 - [ ] Overall testing of the package (priority)
-- [ ] TypeScript support (`index.d.ts`)
-- [ ] Investigate incorrectly documented endpoints
+- [X] TypeScript support (`index.d.ts`)
+- [X] Investigate incorrectly documented endpoints
 
 ## Feature Plans
 - [ ] Optional webhook client

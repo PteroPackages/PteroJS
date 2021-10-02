@@ -1,6 +1,7 @@
 const { PteroSubUser } = require('../../structures/User');
 const Permissions = require('../../structures/Permissions');
 const { PermissionResolvable } = require('../../structures/Permissions');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class SubUserManager {
@@ -8,22 +9,23 @@ class SubUserManager {
         this.client = client;
         this.server = server;
 
-        /** @type {Map<string, PteroSubUser>} */
-        this.cache = new Map();
+        /** @type {Dict<string, PteroSubUser>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const s = new Map();
-            for (const o of data.data) {
+            const s = new Dict();
+            for (let o of data.data) {
+                o = o.attributes;
                 const u = new PteroSubUser(this.client, o);
-                this.cache.set(u.id, u);
-                s.set(u.id, u);
+                this.cache.set(u.uuid, u);
+                s.set(u.uuid, u);
             }
             return s;
         }
         const u = new PteroSubUser(this.client, data);
-        this.cache.set(u.id, u);
+        this.cache.set(u.uuid, u);
         return u;
     }
 
@@ -49,7 +51,7 @@ class SubUserManager {
      * Fetches a server subuser from the Pterodactyl API with an optional cache check.
      * @param {string} [id] The UUID of the user.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
-     * @returns {Promise<PteroSubUser|Map<string, PteroSubUser>>} The fetched user(s).
+     * @returns {Promise<PteroSubUser|Dict<string, PteroSubUser>>} The fetched user(s).
      */
     async fetch(id, force = false) {
         if (id) {
@@ -72,6 +74,7 @@ class SubUserManager {
      * Adds a specified user to the server.
      * @param {string} email The email of the associated account.
      * @param {PermissionResolvable} permissions Permissions for the account.
+     * @returns {Promise<PteroSubUser>} The new subuser.
      */
     async add(email, permissions) {
         if (typeof email !== 'string') throw new Error('Email must be a string.');
@@ -106,7 +109,7 @@ class SubUserManager {
      */
     async remove(id) {
         await this.client.requests.make(
-            endpoints.servers.users.get(this.server.identifier, id), { method: 'DELETE' }
+            endpoints.servers.users.get(this.server.identifier, id), null, 'DELETE'
         );
         this.cache.delete(id);
         return true;

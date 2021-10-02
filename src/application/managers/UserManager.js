@@ -1,17 +1,18 @@
 const { PteroUser } = require('../../structures/User');
+const Dict = require('../../structures/Dict');
 const endpoints = require('./endpoints');
 
 class UserManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, PteroUser>} */
-        this.cache = new Map();
+        /** @type {Dict<number, PteroUser>} */
+        this.cache = new Dict();
     }
 
     _patch(data) {
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
                 const u = new PteroUser(this.client, o);
@@ -49,7 +50,7 @@ class UserManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {boolean} [options.withServers] Whether to include servers the user(s) own.
-     * @returns {Promise<PteroUser|Map<number, PteroUser>>} The fetched user(s).
+     * @returns {Promise<PteroUser|Dict<number, PteroUser>>} The fetched user(s).
      */
     async fetch(id, options = {}) {
         if (id) {
@@ -99,17 +100,21 @@ class UserManager {
      * * uuid
      * * -uuid
      * 
-     * @param {string} name The name (string) to query.
-     * @param {string} filter The filter to use for the query (see above).
+     * @param {string} entity The entity (string) to query.
+     * @param {string} [filter] The filter to use for the query (see above).
      * @param {string} [sort] The order to sort the results in (see above).
-     * @returns {Promise<Map<number, PteroUser>>} A map of the queried user(s).
+     * @returns {Promise<Dict<number, PteroUser>>} A dict of the queried user(s).
      */
     async query(entity, filter, sort) {
-        if (!['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');
+        if (filter && !['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');
         if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
+        if (!sort && !filter) throw new Error('sort or filter is required to query');
         if (filter === 'externalId') filter = 'external_id';
         const data = await this.client.requests.make(
-            endpoints.users.main + `?filter[${filter}]=${entity}` + (sort ? `&sort=${sort}` : '')
+            endpoints.users.main +
+            (filter ? `?filter[${filter}]=${entity}` : "") +
+            (sort && filter ? `&sort=${sort}` : "") +
+            (sort && !filter ? `?sort=${sort}` : "")
         );
         return this._patch(data);
     }
@@ -123,12 +128,13 @@ class UserManager {
      * @returns {Promise<PteroUser>} The new user.
      */
     async create(email, username, firstname, lastname) {
-        const data = await this.client.requests.make(
+        await this.client.requests.make(
             endpoints.users.main,
             { email, username, first_name: firstname, last_name: lastname },
             'POST'
         );
-        return this._patch(data);
+        const u = await this.query(email, 'email');
+        return u.first();
     }
 
     /**
@@ -145,13 +151,7 @@ class UserManager {
      */
     async update(user, options = {}) {
         if (!options.password) throw new Error('User password is required.');
-        if (
-            !options.email &&
-            !options.username &&
-            !options.firstname &&
-            !options.lastname &&
-            !options.language
-        ) throw new Error('Too few parameters to update.');
+        if (!Object.keys(options).length) throw new Error('Too few parameters to update.');
         if (typeof user === 'number') user = await this.fetch(user);
 
         const { password } = options;
@@ -177,7 +177,7 @@ class UserManager {
      */
     async delete(user) {
         if (user instanceof PteroUser) user = user.id;
-        await this.client.requests.make(endpoints.users.get(user), { method: 'DELETE' });
+        await this.client.requests.make(endpoints.users.get(user), null, 'DELETE');
         this.cache.delete(user);
         return true;
     }

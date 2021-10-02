@@ -1,4 +1,5 @@
 const ApplicationServer = require('../../structures/ApplicationServer');
+const Dict = require('../../structures/Dict');
 const { PteroUser } = require('../../structures/User');
 const endpoints = require('./endpoints');
 
@@ -6,13 +7,30 @@ class ServerManager {
     constructor(client) {
         this.client = client;
 
-        /** @type {Map<number, ApplicationServer>} */
-        this.cache = new Map();
+        /** @type {Dict<number, ApplicationServer>} */
+        this.cache = new Dict();
+    }
+
+    get defaultLimits() {
+        return {
+            memory: 128,
+            swap: 0,
+            disk: 512,
+            io: 500,
+            cpu: 100
+        }
+    }
+
+    get defaultFeatureLimits() {
+        return {
+            databases: 5,
+            backups: 1
+        }
     }
 
     _patch(data) {
-        if (data.data) {
-            const res = new Map();
+        if (data?.data) {
+            const res = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
                 const s = new ApplicationServer(this.client, o);
@@ -50,7 +68,7 @@ class ServerManager {
      * @param {object} [options] Additional fetch options.
      * @param {boolean} [options.force] Whether to skip checking the cache and fetch directly.
      * @param {string[]} [options.include] Additional fetch parameters to include.
-     * @returns {Promise<ApplicationServer|Map<number, ApplicationServer>>} The fetched server(s).
+     * @returns {Promise<ApplicationServer|Dict<number, ApplicationServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
         if (id) {
@@ -76,10 +94,10 @@ class ServerManager {
      * @param {string} options.image The docker image for the server.
      * @param {string} options.startup The startup command for the server.
      * @param {object} options.env Server environment options.
+     * @param {object} options.allocation Allocation options for the server.
      * @param {object} [options.limits] Resource limits for the server.
      * @param {object} [options.featureLimits] Feature limits for the server.
-     * @param {object} [options.allocation] Allocation options for the server.
-     * @returns {Promise<ApplicationServer>} The new server.
+     * @returns {Promise<boolean>}
      */
     async create(user, options = {}) {
         if (
@@ -98,14 +116,12 @@ class ServerManager {
         payload.startup = options.startup;
         payload.docker_image = options.image;
         payload.environment = options.env;
-        if (options.limits) payload.limits = options.limits;
-        if (options.featureLimits) payload.feature_limits = options.featureLimits;
-        if (options.allocation) payload.allocation = options.allocation;
+        payload.allocation = { default: options.allocation };
+        payload.limits = options.limits ?? this.defaultLimits;
+        payload.feature_limits = options.featureLimits ?? this.defaultFeatureLimits;
 
-        const data = await this.client.requests.make(
-            endpoints.servers.main, payload, 'POST'
-        );
-        return this._patch(data);
+        await this.client.requests.make(endpoints.servers.main, payload, 'POST');
+        return true;
     }
 
     /**
@@ -117,7 +133,7 @@ class ServerManager {
     async delete(server, force = false) {
         if (server instanceof ApplicationServer) server = server.id;
         await this.client.requests.make(
-            endpoints.servers.get(server) + (force ? '/force' : ''), { method: 'DELETE' }
+            endpoints.servers.get(server) + (force ? '/force' : ''), null, 'DELETE'
         );
         this.cache.delete(server);
         return true;
