@@ -137,8 +137,11 @@ class PteroUser extends BaseUser {
 }
 
 class PteroSubUser extends BaseUser {
-    constructor(client, data) {
+    constructor(client, server, data) {
         super(client, data);
+
+        /** @type {string} */
+        this._server = server;
 
         /** @type {Date} */
         this.createdAt = new Date(data.created_at);
@@ -178,7 +181,7 @@ class PteroSubUser extends BaseUser {
     async setPermissions(perms) {
         perms = new Permissions(perms);
         await this.client.requests.make(
-            c_path.servers.users.get(this.id), { permissions: perms.toStrings() }, 'POST'
+            c_path.servers.users.get(this._server, this.uuid), { permissions: perms.toStrings() }, 'POST'
         );
         this.permissions = perms;
         return this;
