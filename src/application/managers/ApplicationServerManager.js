@@ -3,11 +3,9 @@ const Dict = require('../../structures/Dict');
 const { PteroUser } = require('../../structures/User');
 const endpoints = require('./endpoints');
 
-class ServerManager {
+class ApplicationServerManager {
     constructor(client) {
         this.client = client;
-
-        /** @type {Dict<number, ApplicationServer>} */
         this.cache = new Dict();
     }
 
@@ -174,7 +172,7 @@ class ServerManager {
     }
 }
 
-module.exports = ServerManager;
+module.exports = ApplicationServerManager;
 
 function joinParams(params) {
     if (!params || !params.length) return '';

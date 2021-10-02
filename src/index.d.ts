@@ -33,7 +33,7 @@ export class ApplicationRequestManager {
 }
 
 export class ApplicationServerManager {
-    public constructor(client: PteroApp);
+    public constructor(public client: PteroApp);
 
     public cache: Dict<number, ApplicationServer>;
     public static get defaultLimits(): object;
