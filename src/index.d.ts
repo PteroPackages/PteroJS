@@ -617,6 +617,7 @@ export class PteroSubUser extends BaseUser {
     public constructor(client: PteroClient, data: object);
 
     public client: PteroClient;
+    public readonly _server: string;
     public uuid: string;
     public image: string;
     public enabled: boolean;
