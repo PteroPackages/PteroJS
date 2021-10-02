@@ -125,7 +125,7 @@ class ApplicationServerManager {
      * @param {string} options.image The docker image for the server.
      * @param {string} options.startup The startup command for the server.
      * @param {object} options.env Server environment options.
-     * @param {object} options.allocation Allocation options for the server.
+     * @param {number} options.allocation The allocation for the server.
      * @param {object} [options.limits] Resource limits for the server.
      * @param {object} [options.featureLimits] Feature limits for the server.
      * @returns {Promise<ApplicationServer>} The new server.
