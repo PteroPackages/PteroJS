@@ -42,6 +42,7 @@ export class ApplicationServerManager {
     public _patch(data: object): ApplicationServer|Dict<number, ApplicationServer>;
     public resolve(obj: string|number|object|ApplicationServer): ApplicationServer|null;
     public fetch(id?: number, options?:{ force?: boolean; include?: string[] }): Promise<ApplicationServer>;
+    public query(entity: string, filter?: string, sort?: 'id'|'-id'|'uuid'|'-uuid'): Promise<Dict<number, ApplicationServer>>;
     public create(
         user: number|PteroUser,
         options:{
@@ -54,8 +55,8 @@ export class ApplicationServerManager {
                 limits?: object;
                 featureLimits?: object;
             }
-        ): Promise<ApplicationServer>;
-        public delete(server: number|ApplicationServer, force?: boolean): Promise<boolean>;
+    ): Promise<ApplicationServer>;
+    public delete(server: number|ApplicationServer, force?: boolean): Promise<boolean>;
     }
 
 export class ApplicationServer {
