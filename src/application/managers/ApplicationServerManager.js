@@ -3,11 +3,9 @@ const Dict = require('../../structures/Dict');
 const { PteroUser } = require('../../structures/User');
 const endpoints = require('./endpoints');
 
-class ServerManager {
+class ApplicationServerManager {
     constructor(client) {
         this.client = client;
-
-        /** @type {Dict<number, ApplicationServer>} */
         this.cache = new Dict();
     }
 
@@ -86,6 +84,39 @@ class ServerManager {
     }
 
     /**
+     * Queries the API for a server (or servers) that match the specified query filter.
+     * Keep in mind this does NOT check the cache first, it will fetch from the API directly.
+     * Available query filters are:
+     * * name
+     * * uuid
+     * * identifier
+     * * externalId
+     * * image
+     * 
+     * Available sort options are:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     */
+    async query(entity, filter, sort) {
+        if (filter && !['name', 'uuid', 'identifier', 'externalId', 'image'].includes(filter)) throw new Error('Invalid query filter.');
+        if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
+        if (!sort && !filter) throw new Error('Sort or filter is required.');
+
+        if (filter === 'identifier') filter = 'uuidShort';
+        if (filter === 'externalId') filter = 'external_id';
+
+        const data = await this.client.requests.make(
+            endpoints.servers.main +
+            (filter ? `?filter[${filter}]=${entity}` : '') +
+            (sort && filter ? `&sort=${sort}` : '') +
+            (sort && !filter ? `?sort=${sort}` : '')
+        );
+        return this._patch(data);
+    }
+
+    /**
      * Creates a new Pterodactyl server for a specified user.
      * @param {number|PteroUser} user The user to create the server for.
      * @param {object} options Base server options.
@@ -94,10 +125,10 @@ class ServerManager {
      * @param {string} options.image The docker image for the server.
      * @param {string} options.startup The startup command for the server.
      * @param {object} options.env Server environment options.
-     * @param {object} options.allocation Allocation options for the server.
+     * @param {number} options.allocation The allocation for the server.
      * @param {object} [options.limits] Resource limits for the server.
      * @param {object} [options.featureLimits] Feature limits for the server.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<ApplicationServer>} The new server.
      */
     async create(user, options = {}) {
         if (
@@ -121,7 +152,8 @@ class ServerManager {
         payload.feature_limits = options.featureLimits ?? this.defaultFeatureLimits;
 
         await this.client.requests.make(endpoints.servers.main, payload, 'POST');
-        return true;
+        const s = await this.query(payload.name, 'name');
+        return s.first();
     }
 
     /**
@@ -140,7 +172,7 @@ class ServerManager {
     }
 }
 
-module.exports = ServerManager;
+module.exports = ApplicationServerManager;
 
 function joinParams(params) {
     if (!params || !params.length) return '';

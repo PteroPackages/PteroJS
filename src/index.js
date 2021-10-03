@@ -1,4 +1,6 @@
 module.exports = {
+    version: require('../package.json').version,
+
     AllocationManager: require('./managers/AllocationManager'),
     ApplicationRequestManager: require('./application/managers/ApplicationRequestManager'),
     ApplicationServerManager: require('./application/managers/ApplicationServerManager'),

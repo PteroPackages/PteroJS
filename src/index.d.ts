@@ -1,6 +1,7 @@
 // Typedefs for PteroJS classes and structures
 
 import EventEmitter from 'events';
+import WebSocket from 'ws';
 
 export interface Allocation {
     id:        number;
@@ -14,6 +15,8 @@ export interface Allocation {
 export class AllocationManager {
     public constructor(client: PteroApp|PteroClient, server: ApplicationServer|ClientServer, data: object);
 
+    public client: PteroApp|PteroClient;
+
     public _patch(data: object): Allocation|Set<Allocation>;
     public fetch(): Promise<Set<Allocation>>;
     public assign(): Promise<unknown>;
@@ -25,6 +28,7 @@ export class AllocationManager {
 export class ApplicationRequestManager {
     public constructor(client: PteroApp);
 
+    public client: PteroApp;
     public suspended: boolean;
     public headers: { [key: string]: string };
 
@@ -35,6 +39,7 @@ export class ApplicationRequestManager {
 export class ApplicationServerManager {
     public constructor(client: PteroApp);
 
+    public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
     public static get defaultLimits(): object;
     public static get defaultFeatureLimits(): object;
@@ -42,6 +47,7 @@ export class ApplicationServerManager {
     public _patch(data: object): ApplicationServer|Dict<number, ApplicationServer>;
     public resolve(obj: string|number|object|ApplicationServer): ApplicationServer|null;
     public fetch(id?: number, options?:{ force?: boolean; include?: string[] }): Promise<ApplicationServer>;
+    public query(entity: string, filter?: string, sort?: 'id'|'-id'|'uuid'|'-uuid'): Promise<Dict<number, ApplicationServer>>;
     public create(
         user: number|PteroUser,
         options:{
@@ -54,13 +60,14 @@ export class ApplicationServerManager {
                 limits?: object;
                 featureLimits?: object;
             }
-        ): Promise<ApplicationServer>;
-        public delete(server: number|ApplicationServer, force?: boolean): Promise<boolean>;
+    ): Promise<ApplicationServer>;
+    public delete(server: number|ApplicationServer, force?: boolean): Promise<boolean>;
     }
 
 export class ApplicationServer {
-    constructor(client: PteroApp, data: object);
+    public constructor(client: PteroApp, data: object);
 
+    public client: PteroApp;
     public id: number;
     public externalId: string|null;
     public uuid: string;
@@ -102,6 +109,7 @@ export interface Backup {
 export class BackupManager {
     public constructor(client: PteroApp|PteroClient, server: ApplicationServer);
 
+    public client: PteroApp;
     public cache: Dict<string, Backup>;
 
     public _patch(data: object): Backup|Dict<string, Backup>;
@@ -114,6 +122,7 @@ export class BackupManager {
 export class BaseUser {
     public constructor(client: PteroApp|PteroClient, data: object);
 
+    public client: PteroApp|PteroClient;
     public id: number;
     public username: string;
     public email: string;
@@ -127,8 +136,9 @@ export class BaseUser {
 }
 
 export class ClientRequestManager {
-    constructor(client: PteroClient);
+    public constructor(client: PteroClient);
 
+    public client: PteroClient;
     public suspended: boolean;
     public headers: { [key: string]: string };
 
@@ -139,6 +149,7 @@ export class ClientRequestManager {
 export class ClientServer {
     public constructor(client: PteroClient, data: object);
 
+    public client: PteroClient;
     public isOwner: boolean;
     public identifier: string;
     public uuid: string;
@@ -177,6 +188,7 @@ export interface PageData {
 export class ClientServerManager {
     public constructor(client: PteroClient);
 
+    public client: PteroClient;
     public cache: Dict<string, ClientServer>;
     public pageData: PageData;
 
@@ -196,6 +208,7 @@ export interface APIKey {
 export class ClientUser extends BaseUser {
     public constructor(client: PteroClient, data: object);
 
+    public client: PteroClient;
     public isAdmin: boolean;
     public tokens: string[];
     public apikeys: APIKey[];
@@ -225,6 +238,7 @@ export interface Database {
 export class DatabaseManager {
     public constructor(client: PteroApp|PteroClient, server: ApplicationServer|ClientServer, data: object);
 
+    public client: PteroApp|PteroClient;
     public isClient: boolean;
     public cache: Dict<string, Database>;
 
@@ -306,6 +320,8 @@ export interface PteroFile {
 export class FileManager {
     public constructor(client: PteroApp|PteroClient, server: ApplicationServer|ClientServer, data: object);
 
+    public client: PteroApp|PteroClient;
+    public server: ApplicationServer|ClientServer;
     public isClient: boolean;
     public cache: Map<string, Map<string, PteroFile>>;
 
@@ -336,6 +352,7 @@ export interface Nest {
 export class NestManager {
     public constructor(client: PteroApp);
 
+    public client: PteroApp;
     public cache: Set<Nest>;
     // public eggs
 
@@ -346,6 +363,7 @@ export class NestManager {
 export class Node {
     public constructor(client: PteroApp, data: object);
 
+    public client: PteroApp;
     public id: number;
     public uuid: string;
     public public: boolean; // cursed
@@ -392,9 +410,9 @@ export class Node {
 }
 
 export interface NodeLocation {
-    id: number;
-    long: string;
-    short: string;
+    id:        number;
+    long:      string;
+    short:     string;
     createdAt: Date;
     updatedAt: Date|null;
 }
@@ -402,6 +420,7 @@ export interface NodeLocation {
 export class NodeLocationManager {
     public constructor(client: PteroApp);
 
+    public client: PteroApp;
     public cache: Dict<number, NodeLocation>;
 
     public _patch(data: object): NodeLocation|Dict<number, NodeLocation>;
@@ -415,6 +434,7 @@ export class NodeLocationManager {
 export class NodeManager {
     public constructor(client: PteroApp);
 
+    public client: PteroApp;
     public cache: Dict<number, Node>;
 
     public _patch(data: object): Node|Dict<number, Node>;
@@ -454,19 +474,74 @@ export class NodeManager {
 
 export type PermissionResolvable = string[]|number[]|object;
 
+export interface PermissionFlags {
+    WEBSOCKET_CONNECT: 0;
+
+    CONTROL_CONSOLE: 1;
+    CONTROL_START: 2;
+    CONTROL_STOP: 3;
+    CONTROL_RESTART: 4;
+
+    USER_CREATE: 5;
+    USER_READ: 6;
+    USER_UPDATE: 7;
+    USER_DELETE: 8;
+
+    FILE_CREATE: 9;
+    FILE_READ: 10;
+    FILE_UPDATE: 11;
+    FILE_DELETE: 12;
+    FILE_ARCHIVE: 13;
+    FILE_SFTP: 14;
+
+    BACKUP_CREATE: 15;
+    BACKUP_READ: 16;
+    BACKUP_UPDATE: 17;
+    BACKUP_DELETE: 18;
+
+    ALLOCATION_READ: 19;
+    ALLOCATION_CREATE: 20;
+    ALLOCATION_UPDATE: 21;
+    ALLOCATION_DELETE: 22;
+
+    STARTUP_READ: 23;
+    STARTUP_UPDATE: 24;
+
+    DATABASE_CREATE: 25;
+    DATABASE_READ: 26;
+    DATABASE_UPDATE: 27;
+    DATABASE_DELETE: 28;
+    DATABASE_VIEW_PASSWORD: 29;
+
+    SCHEDULE_CREATE: 30;
+    SCHEDULE_READ: 31;
+    SCHEDULE_UPDATE: 32;
+    SCHEDULE_DELETE: 33;
+
+    SETTINGS_RENAME: 34;
+    SETTINGS_REINSTALL: 35;
+
+    '*': 40;
+    ADMIN_WEBSOCKET_ERRORS: 41;
+    ADMIN_WEBSOCKET_INSTALL: 42;
+    ADMIN_WEBSOCKET_TRANSFER: 43;
+}
+
 export class Permissions {
     public constructor(data: PermissionResolvable);
 
-    public static get FLAGS(): Readonly<{ [key: string]: number }>;
-    public static get DEFAULT(): Readonly<{ [key: string]: number }>;
+    public raw: object;
+
+    public static get FLAGS(): Readonly<PermissionFlags>;
+    public static get DEFAULT(): Readonly<PermissionFlags>;
 
     public has(perms: string|number|PermissionResolvable): boolean;
     public isAdmin(): boolean;
-    public static resolve(perms: PermissionResolvable): object;
-    public serialize(): object;
+    public static resolve(perms: PermissionResolvable): { [key: string]: number };
+    public serialize(): { [key: string]: boolean };
     public toArray(): string[];
     public toStrings(): string[];
-    public static fromStrings(perms: string[]): object;
+    public static fromStrings(perms: string[]): { [key: string]: number };
 }
 
 export interface ApplicationOptions {
@@ -484,6 +559,10 @@ export interface ApplicationOptions {
 
 export class PteroApp {
     public constructor(domain: string, auth: string, options?: Partial<ApplicationOptions>);
+
+    public domain: string;
+    public auth: string;
+    public options: ApplicationOptions;
     public readyAt: Date|null;
     public ping: number|null;
     public users: UserManager;
@@ -518,9 +597,15 @@ export interface ClientEvents {
 export class PteroClient extends EventEmitter {
     public constructor(domain: string, auth: string, options?: Partial<ClientOptions>);
 
+    public domain: string;
+    public auth: string;
+    public options: ClientOptions;
     public readyAt: Date | null;
     public ping: number | null;
     public user: ClientUser|null;
+    public servers: ClientServerManager;
+    public requests: ClientRequestManager;
+    public ws: WebSocketManager;
 
     public emit<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): boolean;
     public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
@@ -531,6 +616,8 @@ export class PteroClient extends EventEmitter {
 export class PteroSubUser extends BaseUser {
     public constructor(client: PteroClient, data: object);
 
+    public client: PteroClient;
+    public readonly _server: string;
     public uuid: string;
     public image: string;
     public enabled: boolean;
@@ -545,6 +632,7 @@ export class PteroSubUser extends BaseUser {
 export class PteroUser extends BaseUser {
     public constructor(client: PteroApp|PteroClient, data: object);
 
+    public client: PteroApp|PteroClient;
     public externalId: string;
     public uuid: string;
     public isAdmin: boolean;
@@ -569,6 +657,8 @@ export class PteroUser extends BaseUser {
 export class Schedule {
     public constructor(client: unknown, server: unknown, data: object);
 
+    public client: unknown;
+    public server: unknown;
     public id: string;
     public name: string;
     public cron:{
@@ -588,6 +678,7 @@ export class Schedule {
 export class SubUserManager {
     public constructor(client: PteroClient, server: ClientServer);
 
+    public client: PteroClient;
     public cache: Dict<string, PteroSubUser>;
 
     public _patch(data: object): PteroSubUser|Dict<string, PteroSubUser>;
@@ -601,6 +692,7 @@ export class SubUserManager {
 export class UserManager {
     public constructor(client: PteroApp);
 
+    public client: PteroApp;
     public cache: Dict<number, PteroUser>;
 
     public _patch(data: object): PteroUser|Dict<number, PteroUser>;
@@ -620,4 +712,17 @@ export class UserManager {
         }
     ): Promise<PteroUser>;
     public delete(user: number|PteroUser): Promise<boolean>;
+}
+
+export class WebSocketManager {
+    public constructor(client: PteroClient);
+
+    public client: PteroClient;
+    public servers: string[];
+    public status: string;
+    public sockets: Map<string, WebSocket>;
+    public lastPing: number;
+
+    public connect(): Promise<boolean>;
+    public send(id: string, event: string, data: any): void;
 }

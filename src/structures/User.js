@@ -137,8 +137,11 @@ class PteroUser extends BaseUser {
 }
 
 class PteroSubUser extends BaseUser {
-    constructor(client, data) {
+    constructor(client, server, data) {
         super(client, data);
+
+        /** @type {string} */
+        this._server = server;
 
         /** @type {Date} */
         this.createdAt = new Date(data.created_at);
@@ -178,7 +181,7 @@ class PteroSubUser extends BaseUser {
     async setPermissions(perms) {
         perms = new Permissions(perms);
         await this.client.requests.make(
-            c_path.servers.users.get(this.id), { permissions: perms.toStrings() }, 'POST'
+            c_path.servers.users.get(this._server, this.uuid), { permissions: perms.toStrings() }, 'POST'
         );
         this.permissions = perms;
         return this;
@@ -222,7 +225,7 @@ class ClientUser extends BaseUser {
      */
     async enable2fa(code) {
         const data = await this.client.requests.make(
-            endpoints.account.tfa, { code }, 'POST'
+            c_path.account.tfa, { code }, 'POST'
         );
         this.tokens.push(...data.attributes.tokens);
         return this.tokens;
@@ -235,7 +238,7 @@ class ClientUser extends BaseUser {
      */
     async disable2fa(password) {
         await this.client.requests.make(
-            endpoints.account.tfa, { password }, 'DELETE'
+            c_path.account.tfa, { password }, 'DELETE'
         );
         this.tokens = [];
     }
@@ -248,7 +251,7 @@ class ClientUser extends BaseUser {
      */
     async updateEmail(email, password) {
         await this.client.requests.make(
-            endpoints.account.email, { email, password }, 'PUT'
+            c_path.account.email, { email, password }, 'PUT'
         );
         this.email = email;
         return this;
@@ -264,7 +267,7 @@ class ClientUser extends BaseUser {
     async updatePassword(oldpass, newpass) {
         if (oldpass === newpass) return;
         return await this.client.requests.make(
-            endpoints.account.password,
+            c_path.account.password,
             {
                 current_password: oldpass,
                 password: newpass,
@@ -279,9 +282,10 @@ class ClientUser extends BaseUser {
      * @returns {Promise<APIKey[]>} An array of APIKey objects.
      */
     async fetchKeys() {
-        const data = await this.client.requests.make(endpoints.account.apiKeys);
+        const data = await this.client.requests.make(c_path.account.apikeys);
         this.apikeys = [];
-        for (const o of data.data) {
+        for (let o of data.data) {
+            o = o.attributes;
             this.apikeys.push({
                 identifier: o.identifier,
                 description: o.description,
@@ -301,7 +305,7 @@ class ClientUser extends BaseUser {
      */
     async createKey(description, allowed = []) {
         const data = await this.client.requests.make(
-            endpoints.account.apiKeys,
+            c_path.account.apikeys,
             { description, allowed_ips: allowed },
             'POST'
         );
