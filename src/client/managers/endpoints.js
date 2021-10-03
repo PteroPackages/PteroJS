@@ -1,10 +1,10 @@
 module.exports = {
     account:{
         main: '/api/client/account',
-        tfa: '/api/client/two-factor',
-        email: '/api/client/email',
-        password: '/api/client/password',
-        apikeys: '/api/client/api-keys'
+        tfa: '/api/client/account/two-factor',
+        email: '/api/client/account/email',
+        password: '/api/client/account/password',
+        apikeys: '/api/client/account/api-keys'
     },
     servers:{
         main: '/api/client/servers',
