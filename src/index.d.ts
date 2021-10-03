@@ -65,7 +65,7 @@ export class ApplicationServerManager {
     }
 
 export class ApplicationServer {
-    constructor(client: PteroApp, data: object);
+    public constructor(client: PteroApp, data: object);
 
     public client: PteroApp;
     public id: number;
@@ -136,7 +136,7 @@ export class BaseUser {
 }
 
 export class ClientRequestManager {
-    constructor(client: PteroClient);
+    public constructor(client: PteroClient);
 
     public client: PteroClient;
     public suspended: boolean;
