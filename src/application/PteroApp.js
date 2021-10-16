@@ -4,7 +4,7 @@ const NestManager = require('./managers/NestManager');
 const NodeLocationManager = require('./managers/NodeLocationManager');
 const NodeManager = require('./managers/NodeManager');
 const UserManager = require('./managers/UserManager');
-const presets = require('../structures/Presets');
+const loader = require('../structures/configLoader');
 
 /**
  * The base class for the Pterodactyl application API.
@@ -40,7 +40,7 @@ class PteroApp {
          * Additional startup options for the application (optional).
          * @type {ApplicationOptions}
          */
-        this.options = presets.application(options);
+        this.options = loader.appConfig(null);
 
         /** @type {?Date} */
         this.readyAt = null;

@@ -1,0 +1,29 @@
+{
+    "application":{
+        "users":{
+            "fetch": true,
+            "cache": true,
+            "max": -1
+        },
+        "nodes":{
+            "fetch": true,
+            "cache": true,
+            "max": -1
+        },
+        "nests":{
+            "fetch": false,
+            "cache": true,
+            "max": -1
+        },
+        "servers":{
+            "fetch": false,
+            "cache": true,
+            "max": 10
+        },
+        "locations":{
+            "fetch": false,
+            "cache": false,
+            "max": -1
+        }
+    }
+}
