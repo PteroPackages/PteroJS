@@ -40,7 +40,8 @@ function parseAs(from, to) {
 function appConfig(options) {
     if (
         options !== null &&
-        typeof options === 'object'
+        typeof options === 'object' &&
+        Object.keys(options).length
     ) return parseAs(options, DEFAULT.application);
     try {
         options = require(join(process.cwd(), 'pterojs.json'));

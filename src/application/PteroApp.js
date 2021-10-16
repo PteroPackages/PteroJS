@@ -40,7 +40,7 @@ class PteroApp {
          * Additional startup options for the application (optional).
          * @type {ApplicationOptions}
          */
-        this.options = loader.appConfig(null);
+        this.options = loader.appConfig(options);
 
         /** @type {?Date} */
         this.readyAt = null;
