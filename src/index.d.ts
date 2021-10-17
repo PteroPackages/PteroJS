@@ -731,7 +731,7 @@ export class WebSocketManager {
 
 export interface StatusOptions {
     name:       string;
-    address:    string;
+    domain:     string;
     auth:       string;
     interval:   number;
     retryLimit: number | null;
@@ -739,19 +739,20 @@ export interface StatusOptions {
 
 export interface StatusEvents {
     debug:[message: string];
-    start:[];
-    interval:[Node];
+    connect:[];
+    interval:[node: object];
     error:[error: Error]; // also cursed
-    close:[message?: string];
+    disconnect:[message?: string];
 }
 
 export class NodeStatus extends EventEmitter {
     public constructor(options: StatusOptions);
 
     public headers: { [key: string]: string };
+    private #interval: NodeJS.Timer | null;
     public current: number;
     public name: string;
-    public address: string;
+    public domain: string;
     public auth: string;
     public interval: number;
     public retryLimit: number;
@@ -763,9 +764,9 @@ export class NodeStatus extends EventEmitter {
 
     private #debug(message: string): void;
     private #fetch(url: string, data?: object, method?: string): Promise<any>;
-    public connect(): Promise<boolean>;
-    public send(data: object): Promise<boolean>;
-    public close(): Promise<void>;
+    public connect(): Promise<void>;
+    private #request(): Promise<void>;
+    public close(): void;
 
     public emit<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): boolean;
     public on<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
