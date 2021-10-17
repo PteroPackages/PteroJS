@@ -7,12 +7,14 @@ class NodeStatus extends EventEmitter {
         'Accept': 'application/json',
         'User-Agent': 'NodeStatus PteroJS v1.0.0'
     }
-    limit = 0;
+    current = 0;
 
     /**
      * @param {StatusOptions} options
      */
     constructor(options) {
+        super()
+
         /** @type {string} */
         this.name = options.name;
         /** @type {string} */
@@ -46,8 +48,8 @@ class NodeStatus extends EventEmitter {
             headers: this.headers
         });
         if (!res.ok) {
-            if (this.limit > this.retryLimit) throw new Error('Maximum retry limit exceeded.');
-            this.limit++;
+            if (this.current > this.retryLimit) throw new Error('Maximum retry limit exceeded.');
+            this.current++;
             this.#debug('Attempting retry fetch...');
             this.#fetch(url, data, method);
             return;
@@ -71,5 +73,5 @@ module.exports = NodeStatus;
  * @property {string} address The controller address.
  * @property {string} auth The API key authorization.
  * @property {number} interval The interval to wait between node checks (between 30-6000).
- * @property {number} retryLimit The amount of times to retry fetching the API.
+ * @property {?number} retryLimit The amount of times to retry fetching the API.
  */
