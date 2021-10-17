@@ -726,3 +726,49 @@ export class WebSocketManager {
     public connect(): Promise<boolean>;
     public send(id: string, event: string, data: any): void;
 }
+
+// Extensions
+
+export interface StatusOptions {
+    name:       string;
+    address:    string;
+    auth:       string;
+    interval:   number;
+    retryLimit: number;
+}
+
+export interface StatusEvents {
+    debug:[message: string];
+    start:[];
+    interval:[Node];
+    error:[error: Error]; // also cursed
+    close:[message?: string];
+}
+
+export class NodeStatus extends EventEmitter {
+    public constructor(options: StatusOptions);
+
+    public headers: { [key: string]: string };
+    public limit: number;
+    public name: string;
+    public address: string;
+    public auth: string;
+    public interval: number;
+    public retryLimit: number;
+
+    public onConnect: Function | null;
+    public onInterval: Function | null;
+    public onError: Function | null;
+    public onDisconnect: Function | null;
+
+    private #debug(message: string): void;
+    private #fetch(url: string, data?: object, method?: string): Promise<any>;
+    public connect(): Promise<boolean>;
+    public send(data: object): Promise<boolean>;
+    public close(): Promise<void>;
+
+    public emit<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): boolean;
+    public on<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
+    public once<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
+    public off<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
+}

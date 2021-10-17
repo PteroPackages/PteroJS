@@ -26,5 +26,7 @@ module.exports = {
     PteroUser: require('./structures/User').PteroUser,
     Schedule: require('./structures/Schedule'),
     SubUserManager: require('./client/managers/SubUserManager'),
-    UserManager: require('./application/managers/UserManager')
+    UserManager: require('./application/managers/UserManager'),
+
+    NodeStatus: require('./extensions/NodeStatus')
 };
