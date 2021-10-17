@@ -734,7 +734,7 @@ export interface StatusOptions {
     address:    string;
     auth:       string;
     interval:   number;
-    retryLimit: number;
+    retryLimit: number | null;
 }
 
 export interface StatusEvents {
@@ -749,7 +749,7 @@ export class NodeStatus extends EventEmitter {
     public constructor(options: StatusOptions);
 
     public headers: { [key: string]: string };
-    public limit: number;
+    public current: number;
     public name: string;
     public address: string;
     public auth: string;
