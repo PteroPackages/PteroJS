@@ -14,17 +14,12 @@ class NodeStatus extends EventEmitter {
      * @param {StatusOptions} options
      */
     constructor(options) {
-        super()
+        super();
 
-        /** @type {string} */
-        this.name = options.name;
-        /** @type {string} */
-        this.domain = options.domain;
+        Object.assign(this, options);
         this.headers['Authorization'] = 'Bearer '+ options.auth;
-        /** @type {number} */
-        this.interval = options.interval;
-        /** @type {number} */
-        this.retryLimit = options.retryLimit ?? 0;
+        this.nextInterval ||= 5;
+        this.retryLimit ||= 0;
 
         /** @type {?Function} */
         this.onConnect = null;
@@ -38,8 +33,14 @@ class NodeStatus extends EventEmitter {
         this.current = 0;
         this.readyAt = 0;
 
-        if (this.interval < 30 || this.interval > 43200)
-            throw new RangeError('[NS] Interval must be between 30 seconds and 12 hours.');
+        if (this.nodes.some(i => typeof i !== 'number'))
+            throw new TypeError('[NS] Node IDs must be numbers only.');
+
+        if (this.callInterval < 30 || this.callInterval > 43200)
+            throw new RangeError('[NS] Call interval must be between 30 seconds and 12 hours.');
+
+        if (this.nextInterval >= this.callInterval)
+            throw new RangeError('[NS] Next interval must be lessa than the call interval.');
     }
 
     #debug(message) { this.emit('debug', '[NS] '+ message) }
@@ -55,7 +56,7 @@ class NodeStatus extends EventEmitter {
         if (!res.ok) {
             if (res.status === 401) return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
             if (res.status === 403) return this.close('[NS:403] Missing access.', true);
-            if (res.status === 404) return this.close('[NS:404] API not found.', true);
+            if (res.status === 404) return this.close('[NS:404] Endpoint not found.', true);
             if (this.current > this.retryLimit) return this.close('[NS] Maximum retry limit exceeded.');
             this.current++;
             this.#debug('Attempting retry fetch');
@@ -68,8 +69,8 @@ class NodeStatus extends EventEmitter {
 
     async connect() {
         this.#debug('Starting connection to API');
-        await this.#request();
-        this.#interval = setInterval(() => this.#request(), this.interval * 1000);
+        await this.#handleNext();
+        this.#interval = setInterval(() => this.#handleNext(), this.callInterval * 1000);
         this.readyAt = Date.now();
         process.on('SIGINT', _ => this.close());
         process.on('SIGTERM', _ => this.close());
@@ -77,10 +78,17 @@ class NodeStatus extends EventEmitter {
         if (this.onConnect !== null) this.onConnect();
     }
 
-    async #request() {
-        const { data } = await this.#fetch(endpoints.nodes.main +`?filter[name]=${encodeURIComponent(this.name)}`);
-        this.emit('interval', data[0].attributes);
-        if (this.onInterval !== null) this.onInterval(data[0].attributes);
+    async #handleNext() {
+        for (const node of this.nodes) {
+            await this.#request(node);
+            await new Promise(res => setTimeout(res, this.nextInterval * 1000));
+        }
+    }
+
+    async #request(id) {
+        const { attributes } = await this.#fetch(endpoints.nodes.get(id));
+        this.emit('interval', attributes);
+        if (this.onInterval !== null) this.onInterval(attributes);
     }
 
     close(message = null, error = false) {
@@ -96,9 +104,10 @@ module.exports = NodeStatus;
 
 /**
  * @typedef {object} StatusOptions
- * @property {string} name The name of the node.
  * @property {string} domain The domain for the API.
  * @property {string} auth The API key authorization.
- * @property {number} interval The interval to wait between node checks (between 30-6000).
+ * @property {number[]} nodes An array of node IDs to listen for.
+ * @property {number} callInterval The interval to wait between API calls (between 30-6000 seconds).
+ * @property {?number} nextInterval The interval to wait between processing checks. Must be less than the callInterval.
  * @property {?number} retryLimit The amount of times to retry fetching the API.
  */
