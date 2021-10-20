@@ -8,6 +8,7 @@ class NodeStatus extends EventEmitter {
         'User-Agent': 'NodeStatus PteroJS v1.0.0'
     }
     #interval = null;
+    #connected = new Set();
 
     /**
      * @param {StatusOptions} options
@@ -53,8 +54,6 @@ class NodeStatus extends EventEmitter {
         this.readyAt = Date.now();
         process.on('SIGINT', _ => this.close());
         process.on('SIGTERM', _ => this.close());
-        this.emit('connect');
-        if (this.onConnect !== null) this.onConnect();
     }
 
     async #ping() {
@@ -62,6 +61,9 @@ class NodeStatus extends EventEmitter {
         const res = await fetch(`${this.domain}/api/application`, {
             method: 'GET', headers: this.headers
         });
+        if (res.status === 401)
+            return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
+        if (res.status === 403) return this.close('[NS:403] Missing access.', true);
         this.ping = Date.now() - start;
         const data = await res.json().catch(()=>{});
         if (data?.errors?.length) return;
@@ -69,9 +71,9 @@ class NodeStatus extends EventEmitter {
     }
 
     async #handleNext() {
-        for (const node of this.nodes) {
-            await this.#request(node);
-            await new Promise(res => setTimeout(res, this.nextInterval * 1000));
+        for (let i=0; i<this.nodes.length; i++) {
+            await this.#request(this.nodes[i]);
+            if (this.nodes[i+1]) await new Promise(res => setTimeout(res, this.nextInterval * 1000));
         }
     }
 
@@ -86,7 +88,11 @@ class NodeStatus extends EventEmitter {
             if (res.status === 401) return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
             if (res.status === 403) return this.close('[NS:403] Missing access.', true);
             if (res.status === 404) {
-                this.emit('disconnect', id);
+                if (this.#connected.has(id)) {
+                    this.emit('disconnect', id);
+                    if (this.onDisconnect) this.onDisconnect(id);
+                    this.#connected.delete(id);
+                }
                 return;
             }
             if (this.current > this.retryLimit) return this.close('[NS] Maximum retry limit exceeded.');
@@ -97,6 +103,11 @@ class NodeStatus extends EventEmitter {
         }
 
         const { attributes } = await res.json();
+        if (!this.#connected.has(id)) {
+            this.#connected.add(id);
+            this.emit('connect', id);
+            if (this.onConnect !== null) this.onConnect();
+        }
         this.emit('interval', attributes);
         if (this.onInterval !== null) this.onInterval(attributes);
     }
@@ -104,8 +115,7 @@ class NodeStatus extends EventEmitter {
     close(message = null, error = false) {
         this.#debug('Closing connection');
         if (this.#interval) clearInterval(this.#interval);
-        this.emit('disconnect', message);
-        if (this.onDisconnect) this.onDisconnect(message);
+        this.#connected.clear();
         if (error && message) throw new Error(message);
     }
 }
