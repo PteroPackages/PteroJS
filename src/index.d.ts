@@ -739,10 +739,9 @@ export interface StatusOptions {
 
 export interface StatusEvents {
     debug:[message: string];
-    connect:[];
+    connect:[id: number];
     interval:[node: object];
-    error:[error: Error]; // also cursed
-    disconnect:[message?: string];
+    disconnect:[id: number];
 }
 
 export class NodeStatus extends EventEmitter {
@@ -750,23 +749,29 @@ export class NodeStatus extends EventEmitter {
 
     public headers: { [key: string]: string };
     private #interval: NodeJS.Timer | null;
+    private #connected: Set<number>;
     public current: number;
-    public name: string;
     public domain: string;
     public auth: string;
-    public interval: number;
+    public nodes: number[];
+    public callInterval: number;
+    public nextInterval: number;
     public retryLimit: number;
 
     public onConnect: Function | null;
     public onInterval: Function | null;
-    public onError: Function | null;
     public onDisconnect: Function | null;
 
+    public ping: number;
+    public current: number;
+    public readyAt: number;
+
     private #debug(message: string): void;
-    private #fetch(url: string, data?: object, method?: string): Promise<any>;
     public connect(): Promise<void>;
-    private #request(): Promise<void>;
-    public close(): void;
+    private #ping(): Promise<void>;
+    private #handleNext(): Promise<void>;
+    private #request(id: number): Promise<void>;
+    public close(message?: string, error?: boolean): void;
 
     public emit<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): boolean;
     public on<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
