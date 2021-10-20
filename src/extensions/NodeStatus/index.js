@@ -26,8 +26,6 @@ class NodeStatus extends EventEmitter {
         /** @type {?Function} */
         this.onInterval = null;
         /** @type {?Function} */
-        this.onError = null;
-        /** @type {?Function} */
         this.onDisconnect = null;
 
         this.ping = -1;
@@ -85,7 +83,8 @@ class NodeStatus extends EventEmitter {
         });
 
         if (!res.ok) {
-            if (res.status === 401) return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
+            if (res.status === 401)
+                return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
             if (res.status === 403) return this.close('[NS:403] Missing access.', true);
             if (res.status === 404) {
                 if (this.#connected.has(id)) {
@@ -106,7 +105,7 @@ class NodeStatus extends EventEmitter {
         if (!this.#connected.has(id)) {
             this.#connected.add(id);
             this.emit('connect', id);
-            if (this.onConnect !== null) this.onConnect();
+            if (this.onConnect !== null) this.onConnect(id);
         }
         this.emit('interval', attributes);
         if (this.onInterval !== null) this.onInterval(attributes);
