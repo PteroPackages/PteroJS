@@ -730,11 +730,12 @@ export class WebSocketManager {
 // Extensions
 
 export interface StatusOptions {
-    name:       string;
-    domain:     string;
-    auth:       string;
-    interval:   number;
-    retryLimit: number | null;
+    domain:        string;
+    auth:          string;
+    nodes:         number[];
+    callInterval:  number;
+    nextInterval?: number;
+    retryLimit?:   number;
 }
 
 export interface StatusEvents {
