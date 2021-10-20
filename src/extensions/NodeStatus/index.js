@@ -1,6 +1,5 @@
 const { EventEmitter } = require('events');
 const fetch = require('node-fetch');
-const endpoints = require('../../application/managers/endpoints');
 
 class NodeStatus extends EventEmitter {
     headers = {
@@ -30,6 +29,7 @@ class NodeStatus extends EventEmitter {
         /** @type {?Function} */
         this.onDisconnect = null;
 
+        this.ping = -1;
         this.current = 0;
         this.readyAt = 0;
 
@@ -45,30 +45,9 @@ class NodeStatus extends EventEmitter {
 
     #debug(message) { this.emit('debug', '[NS] '+ message) }
 
-    async #fetch(path, data = null, method = 'GET') {
-        data &&= JSON.stringify(data);
-        this.#debug(`Fetching: ${method} ${path}`);
-        const res = await fetch(this.domain + path, {
-            method,
-            body: data,
-            headers: this.headers
-        });
-        if (!res.ok) {
-            if (res.status === 401) return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
-            if (res.status === 403) return this.close('[NS:403] Missing access.', true);
-            if (res.status === 404) return this.close('[NS:404] Endpoint not found.', true);
-            if (this.current > this.retryLimit) return this.close('[NS] Maximum retry limit exceeded.');
-            this.current++;
-            this.#debug('Attempting retry fetch');
-            this.#fetch(path, data, method);
-            return;
-        }
-        if (res.status === 201) return;
-        return await res.json();
-    }
-
     async connect() {
         this.#debug('Starting connection to API');
+        await this.#ping();
         await this.#handleNext();
         this.#interval = setInterval(() => this.#handleNext(), this.callInterval * 1000);
         this.readyAt = Date.now();
@@ -76,6 +55,17 @@ class NodeStatus extends EventEmitter {
         process.on('SIGTERM', _ => this.close());
         this.emit('connect');
         if (this.onConnect !== null) this.onConnect();
+    }
+
+    async #ping() {
+        const start = Date.now();
+        const res = await fetch(`${this.domain}/api/application`, {
+            method: 'GET', headers: this.headers
+        });
+        this.ping = Date.now() - start;
+        const data = await res.json().catch(()=>{});
+        if (data?.errors?.length) return;
+        return this.close('[NS:404] Application API is unavailable.', true);
     }
 
     async #handleNext() {
@@ -86,7 +76,27 @@ class NodeStatus extends EventEmitter {
     }
 
     async #request(id) {
-        const { attributes } = await this.#fetch(endpoints.nodes.get(id));
+        this.#debug(`Fetching: /api/application/nodes/${id}`);
+        const res = await fetch(
+            `${this.domain}/api/application/nodes/${id}`, {
+            method: 'GET', headers: this.headers
+        });
+
+        if (!res.ok) {
+            if (res.status === 401) return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
+            if (res.status === 403) return this.close('[NS:403] Missing access.', true);
+            if (res.status === 404) {
+                this.emit('disconnect', id);
+                return;
+            }
+            if (this.current > this.retryLimit) return this.close('[NS] Maximum retry limit exceeded.');
+            this.current++;
+            this.#debug('Attempting retry fetch');
+            this.#request(id);
+            return;
+        }
+
+        const { attributes } = await res.json();
         this.emit('interval', attributes);
         if (this.onInterval !== null) this.onInterval(attributes);
     }
