@@ -111,7 +111,7 @@ class NodeStatus extends EventEmitter {
         if (this.onInterval !== null) this.onInterval(attributes);
     }
 
-    close(message = null, error = false) {
+    close(message = 'None', error = false) {
         this.#debug('Closing connection');
         if (this.#interval) clearInterval(this.#interval);
         this.#connected.clear();
