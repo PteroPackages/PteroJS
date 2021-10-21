@@ -585,13 +585,13 @@ export interface ClientOptions {
 }
 
 export interface ClientEvents {
-    debug:[message: string];
-    ready:[];
-    serverConnect:[server: ClientServer];
-    serverOutput:[data: string];
-    serverDisconnect:[server: string];
-    statusUpdate:[status: string];
-    statsUpdate:[stats: object];
+    debug:            [message: string];
+    ready:            [];
+    serverConnect:    [server: ClientServer];
+    serverOutput:     [data: string];
+    serverDisconnect: [server: string];
+    statusUpdate:     [status: string];
+    statsUpdate:      [stats: object];
 }
 
 export class PteroClient extends EventEmitter {
@@ -607,7 +607,7 @@ export class PteroClient extends EventEmitter {
     public requests: ClientRequestManager;
     public ws: WebSocketManager;
 
-    public emit<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): boolean;
+    public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
     public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
     public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
     public off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
@@ -739,19 +739,18 @@ export interface StatusOptions {
 }
 
 export interface StatusEvents {
-    debug:[message: string];
-    connect:[id: number];
-    interval:[node: object];
-    disconnect:[id: number];
+    debug:      [message: string];
+    connect:    [id: number];
+    interval:   [node: object];
+    disconnect: [id: number];
 }
 
 export class NodeStatus extends EventEmitter {
     public constructor(options: StatusOptions);
 
     public headers: { [key: string]: string };
-    private #interval: NodeJS.Timer | null;
-    private #connected: Set<number>;
-    public current: number;
+    private interval: NodeJS.Timer | null;
+    private connected: Set<number>;
     public domain: string;
     public auth: string;
     public nodes: number[];
@@ -767,14 +766,14 @@ export class NodeStatus extends EventEmitter {
     public current: number;
     public readyAt: number;
 
-    private #debug(message: string): void;
+    private debug(message: string): void;
     public connect(): Promise<void>;
-    private #ping(): Promise<void>;
-    private #handleNext(): Promise<void>;
-    private #request(id: number): Promise<void>;
+    private ping(): Promise<void>;
+    private handleNext(): Promise<void>;
+    private request(id: number): Promise<void>;
     public close(message?: string, error?: boolean): void;
 
-    public emit<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): boolean;
+    public emit<E extends keyof StatusEvents>(event: E, ...args: StatusEvents[E]): boolean;
     public on<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
     public once<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
     public off<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
