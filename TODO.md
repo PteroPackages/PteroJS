@@ -36,6 +36,6 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 
 ## Feature Plans
 - [ ] Optional webhook client
-- [ ] Python version of the library
-- [ ] Node status client
+- [ ] Python version of the library (soon?)
+- [X] Node status client
 - [ ] Data formatter interface client
