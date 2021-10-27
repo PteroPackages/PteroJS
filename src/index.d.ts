@@ -3,6 +3,8 @@
 import EventEmitter from 'events';
 import WebSocket from 'ws';
 
+export const version: string;
+
 export interface Allocation {
     id:        number;
     ip:        string;
