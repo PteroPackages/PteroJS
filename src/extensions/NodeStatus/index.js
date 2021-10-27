@@ -45,6 +45,7 @@ class NodeStatus extends EventEmitter {
     #debug(message) { this.emit('debug', '[NS] '+ message) }
 
     async connect() {
+        if (this.readyAt) throw new Error('Process already running.');
         this.#debug('Starting connection to API');
         await this.#ping();
         await this.#handleNext();
@@ -112,6 +113,7 @@ class NodeStatus extends EventEmitter {
     }
 
     close(message = 'None', error = false) {
+        if (!this.readyAt) return;
         this.#debug('Closing connection');
         if (this.#interval) clearInterval(this.#interval);
         this.#connected.clear();
