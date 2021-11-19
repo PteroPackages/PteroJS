@@ -2,7 +2,7 @@ const { PteroSubUser } = require('../../structures/User');
 const Permissions = require('../../structures/Permissions');
 const { PermissionResolvable } = require('../../structures/Permissions');
 const Dict = require('../../structures/Dict');
-const endpoints = require('./endpoints');
+const endpoints = require('../endpoints');
 
 class SubUserManager {
     constructor(client, server) {

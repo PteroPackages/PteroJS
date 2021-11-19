@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
-const { RequestError, PteroAPIError } = require('../../structures/Errors');
-const { version } = require('../../../package.json');
+const { RequestError, PteroAPIError } = require('../structures/Errors');
+const { version } = require('../../package.json');
 
 /**
  * The requests manager for the client API. This is not for public use. Using

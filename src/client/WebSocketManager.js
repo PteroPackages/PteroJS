@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const { WebSocketError } = require('../../structures/Errors');
+const { WebSocketError } = require('../structures/Errors');
 const endpoints = require('./endpoints');
 
 // const EVENTS = {
