@@ -1,9 +1,9 @@
-const SubUserManager = require('../client/managers/SubUserManager');
+const SubUserManager = require('../client/SubUserManager');
 const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const Permissions = require('./Permissions');
-const endpoints = require('../client/managers/endpoints');
+const endpoints = require('../client/endpoints');
 
 class ClientServer {
     constructor(client, data) {

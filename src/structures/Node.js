@@ -1,6 +1,6 @@
-const { NodeLocation } = require('../application/managers/NodeLocationManager');
+const { NodeLocation } = require('../application/NodeLocationManager');
 const json = require('./Jsonifier');
-const endpoints = require('../application/managers/endpoints');
+const endpoints = require('../application/endpoints');
 
 class Node {
     constructor(client, data) {

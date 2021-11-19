@@ -4,7 +4,7 @@ const FileManager = require('../managers/FileManager');
 const { PteroUser } = require('./User');
 const Node = require('./Node');
 const json = require('./Jsonifier');
-const endpoints = require('../application/managers/endpoints');
+const endpoints = require('../application/endpoints');
 
 class ApplicationServer {
     constructor(client, data) {
