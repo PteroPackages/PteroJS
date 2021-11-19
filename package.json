@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/devnote-dev/PteroJS#readme",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "ws": "^8.2.3"
   }
 }
