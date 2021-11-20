@@ -136,7 +136,7 @@ class ClientServer {
     }
 
     get schedules() {
-        return this.client.schedules.get(this.identifier);
+        return this.client.schedules.cache.get(this.identifier);
     }
 
     /** @todo */
