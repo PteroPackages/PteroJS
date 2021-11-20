@@ -39,13 +39,13 @@ class ScheduleManager {
     async fetch(server, id, force) {
         if (id) {
             if (!force) {
-                const sch = this.cache.get(server).get(id);
+                const sch = this.cache.get(server)?.get(id);
                 if (sch) return sch;
             }
             const data = await this.client.requests.make(
                 endpoints.servers.schedules.get(server, id)
             );
-            return this._patch(data);
+            return this._patch(server, data);
         }
         const data = await this.client.requests.make(
             endpoints.servers.schedules.main(server)
@@ -102,10 +102,10 @@ class ScheduleManager {
         const payload = {};
         payload.name = options.name || sch.name;
         payload.is_active = options.active ?? sch.active;
-        payload.minute = options.minute || sch.minute;
-        payload.hour = options.hour || sch.hour;
-        payload.day_of_week = options.dayOfWeek || sch.dayOfWeek;
-        payload.day_of_month = options.dayOfMonth || sch.dayOfMonth;
+        payload.minute = options.minute || sch.cron.minute;
+        payload.hour = options.hour || sch.cron.hour;
+        payload.day_of_week = options.dayOfWeek || sch.cron.week;
+        payload.day_of_month = options.dayOfMonth || sch.cron.month;
 
         const data = await this.client.requests.make(
             endpoints.servers.schedules.get(server, id), payload, 'POST'
