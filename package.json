@@ -1,6 +1,6 @@
 {
   "name": "@devnote-dev/pterojs",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "A flexibile API wrapper for Pterodactyl",
   "main": "src/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devnote-dev/PteroJS.git"
+    "url": "git+https://github.com/PteroPackages/PteroJS.git"
   },
   "keywords": [
     "pterodactyl",
@@ -19,9 +19,9 @@
   "author": "Devonte <https://github.com/devnote-dev>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/devnote-dev/PteroJS/issues"
+    "url": "https://github.com/PteroPackages/PteroJS/issues"
   },
-  "homepage": "https://github.com/devnote-dev/PteroJS#readme",
+  "homepage": "https://github.com/PteroPackages/PteroJS#readme",
   "dependencies": {
     "node-fetch": "^2.6.1",
     "ws": "^8.2.3"
