@@ -91,9 +91,16 @@ class Schedule {
              */
             this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
         }
+
+        if ('relationships' in data) {
+            for (const obj of data.relationships.tasks.data) {
+                this._resolveTask(obj);
+            }
+        }
     }
 
     _resolveTask(data) {
+        if (data.attributes) data = data.attributes;
         const obj = {
             id: data.id,
             sequenceId: data.sequence_id,
@@ -131,7 +138,7 @@ class Schedule {
      * @returns {Promise<ScheduleTask>} The new schedule task.
      */ 
     async createTask(action, payload, offset) {
-        if (!['command', 'power', 'restart'].includes(action)) throw new TypeError('Invalid task action type.');
+        if (!['command', 'power', 'backup'].includes(action)) throw new TypeError('Invalid task action type.');
         const data = await this.client.requests.make(
             endpoints.servers.schedules.tasks.main(this.serverId, this.id),
             { action, payload, time_offset: offset }, 'POST'
@@ -152,7 +159,7 @@ class Schedule {
         if (!Object.keys(options).length) throw new Error('Too few options to update.');
         if (
             options.action &&
-            !['command', 'power', 'restart'].includes(options.action)
+            !['command', 'power', 'backup'].includes(options.action)
         ) throw new TypeError('Invalid task action type.');
         const data = await this.client.requests.make(
             endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
