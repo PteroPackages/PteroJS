@@ -2,6 +2,7 @@ const { EventEmitter } = require('events');
 const ClientRequestManager = require('./ClientRequestManager');
 const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
+const ScheduleManager = require('./ScheduleManager');
 const WebSocketManager = require('./WebSocketManager');
 const endpoints = require('./endpoints');
 const presets = require('../structures/Presets');
@@ -56,6 +57,8 @@ class PteroClient extends EventEmitter {
 
         /** @type {ClientServerManager} */
         this.servers = new ClientServerManager(this);
+        /** @type {ScheduleManager} */
+        this.schedules = new ScheduleManager(this);
         /** @type {ClientRequestManager} @internal */
         this.requests = new ClientRequestManager(this);
         /** @type {WebSocketManager} @internal */
