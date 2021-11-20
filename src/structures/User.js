@@ -1,8 +1,8 @@
 const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
-const Dict = require('../structures/Dict');
-const json = require('../structures/Jsonifier');
+const Dict = require('./Dict');
+const json = require('./Jsonifier');
 const c_path = require('../client/endpoints');
 
 class BaseUser {

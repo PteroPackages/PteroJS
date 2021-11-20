@@ -1,6 +1,6 @@
-const ApplicationServer = require('../../structures/ApplicationServer');
-const Dict = require('../../structures/Dict');
-const { PteroUser } = require('../../structures/User');
+const ApplicationServer = require('../structures/ApplicationServer');
+const Dict = require('../structures/Dict');
+const { PteroUser } = require('../structures/User');
 const endpoints = require('./endpoints');
 
 class ApplicationServerManager {

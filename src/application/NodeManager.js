@@ -1,5 +1,5 @@
-const Node = require('../../structures/Node');
-const Dict = require('../../structures/Dict');
+const Node = require('../structures/Node');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class NodeManager {

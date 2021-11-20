@@ -1,5 +1,5 @@
-const { PteroUser } = require('../../structures/User');
-const Dict = require('../../structures/Dict');
+const { PteroUser } = require('../structures/User');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class UserManager {
