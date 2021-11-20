@@ -42,7 +42,7 @@ class Schedule {
                 week: data.cron.day_of_week,
 
                 /** @type {string} */
-                month: data.crong.day_of_month,
+                month: data.cron.day_of_month,
 
                 /** @type {string} */
                 hour: data.cron.hour,
@@ -150,20 +150,20 @@ class Schedule {
      * Updates an existing task for the schedule.
      * @param {number} id The ID of the schedule task.
      * @param {object} options Schedule task edit options.
-     * @param {string} [options.action] The type of action that will be executed.
-     * @param {string} [options.payload] The payload to invoke the task with.
-     * @param {string} [options.offset] The task offest (in seconds).
+     * @param {string} options.action The type of action that will be executed.
+     * @param {string} options.payload The payload to invoke the task with.
+     * @param {string} options.offset The task offest (in seconds).
      * @returns {Promise<ScheduleTask>} The updated schedule task.
      */ 
     async updateTask(id, options = {}) {
-        if (!Object.keys(options).length) throw new Error('Too few options to update.');
-        if (
-            options.action &&
-            !['command', 'power', 'backup'].includes(options.action)
-        ) throw new TypeError('Invalid task action type.');
+        if (Object.keys(options).length < 3) throw new Error('Missing required ScheduleTask update options.');
+        if (!['command', 'power', 'backup'].includes(options.action))
+            throw new TypeError('Invalid task action type.');
+
+        options.time_offset = options.offset;
         const data = await this.client.requests.make(
             endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
-            { action, payload, time_offset: offset }, 'POST'
+            options, 'POST'
         );
         return this._resolveTask(data);
     }
