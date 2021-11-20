@@ -152,6 +152,7 @@ export class ClientServer {
     public constructor(client: PteroClient, data: object);
 
     public client: PteroClient;
+
     public isOwner: boolean;
     public identifier: string;
     public uuid: string;
@@ -171,6 +172,7 @@ export class ClientServer {
     public permissions: Permissions;
     public databases: DatabaseManager;
     public files: FileManager;
+    public schedules: Dict<number, Schedule>|null;
 
     public _patch(data: object): void;
     public addWebSocket(): void;
@@ -606,6 +608,7 @@ export class PteroClient extends EventEmitter {
     public ping: number | null;
     public user: ClientUser|null;
     public servers: ClientServerManager;
+    public schedules: ScheduleManager;
     public requests: ClientRequestManager;
     public ws: WebSocketManager;
 
@@ -654,27 +657,92 @@ export class PteroUser extends BaseUser {
     public delete(): Promise<boolean>;
 }
 
-// WIP:
-// Class & its manager is very undeveloped, possibly unstable, and undocumented.
-export class Schedule {
-    public constructor(client: unknown, server: unknown, data: object);
+export type ScheduleAction =
+    | 'command'
+    | 'power'
+    | 'backup';
 
-    public client: unknown;
-    public server: unknown;
-    public id: string;
+export interface ScheduleTask {
+    id:         number;
+    sequenceId: number;
+    action:     ScheduleAction;
+    payload:    string;
+    offset:     number;
+    queued:     boolean;
+    createdAt:  Date;
+    updatedAt:  Date | null;
+}
+
+export class Schedule {
+    public constructor(client: PteroClient, serverId: string, data: object);
+
+    public client: PteroClient;
+    public serverId: string;
+    public tasks: Dict<number, ScheduleTask>;
+
+    public readonly id: number;
     public name: string;
-    public cron:{
-        week: string;
-        month: string;
-        hour: string;
-        minute: string;
-    };
+    public cron: { [key: string]: string }
     public active: boolean;
     public processing: boolean;
-    public lastRunAt: Date|null;
+    public lastRunAt: Date | null;
     public nextRunAt: Date;
-    public createdAt: Date;
-    public updatedAt: Date|null;
+    public readonly createdAt: Date;
+    public updatedAt: Date | null;
+
+    public update(options:{
+        name?: string;
+        active?: boolean;
+        minute?: string;
+        hour?: string;
+        dayOfWeek?: string;
+        dayOfMonth?: string;
+    }): Promise<this>;
+    public createTask(action: ScheduleAction, payload: string, offset: number): Promise<ScheduleTask>;
+    public updateTask(
+        id: number,
+        options:{
+            action?: ScheduleAction;
+            payload?: string;
+            offset?: number;
+        }
+    ): Promise<ScheduleTask>;
+    public deleteTask(id: number): Promise<boolean>;
+    public delete(): Promise<boolean>;
+}
+
+export class ScheduleManager {
+    public constructor(client: PteroClient);
+
+    public client: PteroClient;
+    public cache: Dict<string, Dict<number, Schedule>>;
+
+    public _patch(id: number, data: object): Schedule|Dict<number, Schedule>;
+    public fetch(server: string, id: number, force?: boolean): Promise<Schedule|Dict<number, Schedule>>;
+    public create(
+        server: string,
+        options:{
+            name: string;
+            active: boolean;
+            minute: string;
+            hour: string;
+            dayOfWeek?: string;
+            dayOfMonth?: string;
+        }
+    ): Promise<Schedule>;
+    public update(
+        server: string,
+        id: number,
+        options:{
+            name?: string;
+            active?: boolean;
+            minute?: string;
+            hour?: string;
+            dayOfWeek?: string;
+            dayOfMonth?: string;
+        }
+    ): Promise<Schedule>;
+    public delete(server: string, id: number): Promise<boolean>;
 }
 
 export class SubUserManager {
@@ -768,11 +836,11 @@ export class NodeStatus extends EventEmitter {
     public current: number;
     public readyAt: number;
 
-    private debug(message: string): void;
+    #debug(message: string): void;
     public connect(): Promise<void>;
-    private ping(): Promise<void>;
-    private handleNext(): Promise<void>;
-    private request(id: number): Promise<void>;
+    #ping(): Promise<void>;
+    #handleNext(): Promise<void>;
+    #request(id: number): Promise<void>;
     public close(message?: string, error?: boolean): void;
 
     public emit<E extends keyof StatusEvents>(event: E, ...args: StatusEvents[E]): boolean;
