@@ -210,9 +210,7 @@ class Node {
      * @returns {Promise<boolean>}
      */
     async delete() {
-        await this.client.requests.make(endpoints.nodes.get(this.id), null, 'DELETE');
-        this.client.nodes.cache.delete(this.id);
-        return true;
+        return this.client.nodes.delete(this.id);
     }
 
     /**
