@@ -73,6 +73,7 @@ class PteroClient extends EventEmitter {
      * @fires PteroClient#ready
      */
     async connect() {
+        if (this.readyAt) return;
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
@@ -109,6 +110,17 @@ class PteroClient extends EventEmitter {
      */
     removeSocketServer(id) {
         this.ws.servers.splice(id);
+    }
+
+    /**
+     * Disconnects from the Pterodactyl API and closes any existing websocket connections.
+     * @returns {void}
+     */
+    async disconnect() {
+        if (!this.readyAt) return;
+        this.ping = null;
+        this.readyAt = null;
+        // TODO: close ws instance
     }
 }
 

@@ -69,6 +69,7 @@ class PteroApp {
      * @returns {Promise<boolean>}
      */
     async connect() {
+        if (this.readyAt) return;
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
@@ -79,6 +80,16 @@ class PteroApp {
         if (this.options.fetchLocations && this.options.fetchLocations) await this.locations.fetch();
         this.readyAt = Date.now();
         return true;
+    }
+
+    /**
+     * Disconnects from the Pterodactyl API.
+     * @returns {void}
+     */
+    async disconnect() {
+        if (!this.readyAt) return;
+        this.ping = null;
+        this.readyAt = null;
     }
 }
 

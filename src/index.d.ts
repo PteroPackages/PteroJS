@@ -577,6 +577,7 @@ export class PteroApp {
     public requests: ApplicationRequestManager;
 
     public connect(): Promise<boolean>;
+    public disconnect(): void;
 }
 
 export interface ClientOptions {
@@ -616,6 +617,9 @@ export class PteroClient extends EventEmitter {
     public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
     public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
     public off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
+
+    public connect(): Promise<boolean>;
+    public disconnect(): void;
 }
 
 export class PteroSubUser extends BaseUser {
