@@ -115,7 +115,7 @@ class ClientServer {
              * The current power state of the server.
              * @type {string}
              */
-            this.state = 'unknown';
+            this.state = data.state || 'unknown';
         }
 
         if ('is_installing' in data) {
