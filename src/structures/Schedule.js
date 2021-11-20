@@ -122,12 +122,12 @@ class Schedule {
      * @param {boolean} [options.active] Whether the schedule is active.
      * @param {string} [options.minute] The minute interval (in cron syntax).
      * @param {string} [options.hour] The hour interval (in cron syntax).
-     * @param {string} [options.dayOfWeek] The day of the week (in cron syntax).
-     * @param {string} [options.dayOfMonth] The day of the month (in cron syntax).
+     * @param {string} [options.dayOfWeek] The day of the week interval (in cron syntax).
+     * @param {string} [options.dayOfMonth] The day of the month interval (in cron syntax).
      * @returns {Promise<Schedule>} The updated Schedule instance.
      */
     async update(options = {}) {
-        return this.client.schedules.get(this.serverId).update(this.id, options);
+        return this.client.schedules.update(this.serverId, this.id, options);
     }
 
     /**
@@ -187,7 +187,7 @@ class Schedule {
      * @returns {Promise<boolean>}
      */
     async delete() {
-        return this.client.schedules.get(this.serverId).delete(this.serverId, this.id);
+        return this.client.schedules.delete(this.serverId, this.id);
     }
 }
 
