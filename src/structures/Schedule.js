@@ -1,7 +1,12 @@
+const Dict = require('./Dict');
+const endpoints = require('../client/endpoints');
+
 class Schedule {
-    constructor(client, server, data) {
+    constructor(client, serverId, data) {
         this.client = client;
-        this.server = server;
+        this.serverId = serverId;
+        /** @type {Dict<number, ScheduleTask>} */
+        this.tasks = new Dict();
         data = data.attributes;
 
         /**
@@ -9,85 +14,174 @@ class Schedule {
          * @type {number}
          */
         this.id = data.id;
-
         /**
-         * The name of the schedule.
-         * @type {string}
-         */
-        this.name = data.name;
-
-        /**
-         * An object containing cronjob details.
-         * @type {object}
-         */
-        this.cron = {
-            /** @type {string} */
-            week: data.cron.day_of_week,
-
-            /** @type {string} */
-            month: data.crong.day_of_month,
-
-            /** @type {string} */
-            hour: data.cron.hour,
-
-            /** @type {string} */
-            minute: data.cron.minute
-        }
-
-        /**
-         * Whether the schedule is active.
-         * @type {boolean}
-         */
-        this.active = data.is_active;
-
-        /**
-         * Whether the schedule is currently processing tasks.
-         * @type {boolean}
-         */
-        this.processing = data.is_processing;
-
-        /**
-         * The last recorded date the schedule was ran at.
-         * @type {?Date}
-         */
-        this.lastRunAt = data.last_run_at ? new Date(data.last_run_at) : null;
-
-        /**
-         * The date of the next scheduled run.
-         * @type {Date}
-         */
-        this.nextRunAt = new Date(data.next_run_at);
-
-        /**
-         * The date the schedule was created.
-         * @type {Date}
-         */
+             * The date the schedule was created.
+             * @type {Date}
+             */
         this.createdAt = new Date(data.created_at);
 
-        /**
-         * The date the schedule was last updated.
-         * @type {?Date}
-         */
-        this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
-
-        /** @type {Set<ScheduleTask>} */
-        this.tasks = new Set();
+        this._patch(data);
     }
 
-    /** @todo */
-    async update(options = {}) {}
+    _patch(data) {
+        if ('name' in data) {
+            /**
+             * The name of the schedule.
+             * @type {string}
+             */
+            this.name = data.name;
+        }
 
-    /** @todo */
-    async createTask(action, payload, offset) {}
+        if ('cron' in data) {
+            /**
+             * An object containing cronjob details.
+             * @type {object}
+             */
+            this.cron = {
+                /** @type {string} */
+                week: data.cron.day_of_week,
 
-    /** @todo */
-    async updateTask(id, options = {}) {}
+                /** @type {string} */
+                month: data.crong.day_of_month,
 
-    /** @todo */
-    async deleteTask(id) {}
+                /** @type {string} */
+                hour: data.cron.hour,
 
-    /** @todo */
-    async delete() {}
+                /** @type {string} */
+                minute: data.cron.minute
+            }
+        }
+
+        if ('is_active' in data) {
+            /**
+             * Whether the schedule is active.
+             * @type {boolean}
+             */
+            this.active = data.is_active;
+        }
+
+        if ('is_processing' in data) {
+            /**
+             * Whether the schedule is currently processing tasks.
+             * @type {boolean}
+             */
+            this.processing = data.is_processing;
+        }
+
+        if ('last_run_at' in data) {
+            /**
+             * The last recorded date the schedule was ran at.
+             * @type {?Date}
+             */
+            this.lastRunAt = data.last_run_at ? new Date(data.last_run_at) : null;
+        }
+
+        if ('next_run_at' in data) {
+            /**
+             * The date of the next scheduled run.
+             * @type {Date}
+             */
+            this.nextRunAt = new Date(data.next_run_at);
+        }
+
+        if ('updated_at' in data) {
+            /**
+             * The date the schedule was last updated.
+             * @type {?Date}
+             */
+            this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
+        }
+    }
+
+    _resolveTask(data) {
+        const obj = {
+            id: data.id,
+            sequenceId: data.sequence_id,
+            action: data.action,
+            payload: data.payload,
+            offset: data.time_offset,
+            queued: data.is_queued,
+            createdAt: new Date(data.created_at),
+            updatedAt: data.updated_at ? new Date(data.updated_at) : null
+        }
+        this.tasks.set(obj.id, obj);
+        return obj;
+    }
+
+    /**
+     * Updates the schedule.
+     * @param {object} options Schedule update options.
+     * @param {string} [options.name] The name of the schedule.
+     * @param {boolean} [options.active] Whether the schedule is active.
+     * @param {string} [options.minute] The minute interval (in cron syntax).
+     * @param {string} [options.hour] The hour interval (in cron syntax).
+     * @param {string} [options.dayOfWeek] The day of the week (in cron syntax).
+     * @param {string} [options.dayOfMonth] The day of the month (in cron syntax).
+     * @returns {Promise<Schedule>} The updated Schedule instance.
+     */
+    async update(options = {}) {
+        return this.client.schedules.get(this.serverId).update(this.id, options);
+    }
+
+    /**
+     * Creates a new task for the schedule.
+     * @param {string} action The type of action that will be executed.
+     * @param {string} payload The payload to invoke the task with.
+     * @param {string} offset The task offest (in seconds).
+     * @returns {Promise<ScheduleTask>} The new schedule task.
+     */ 
+    async createTask(action, payload, offset) {
+        if (!['command', 'power', 'restart'].includes(action)) throw new TypeError('Invalid task action type.');
+        const data = await this.client.requests.make(
+            endpoints.servers.schedules.tasks.main(this.serverId, this.id),
+            { action, payload, time_offset: offset }, 'POST'
+        );
+        return this._resolveTask(data);
+    }
+
+    /**
+     * Updates an existing task for the schedule.
+     * @param {number} id The ID of the schedule task.
+     * @param {object} options Schedule task edit options.
+     * @param {string} [options.action] The type of action that will be executed.
+     * @param {string} [options.payload] The payload to invoke the task with.
+     * @param {string} [options.offset] The task offest (in seconds).
+     * @returns {Promise<ScheduleTask>} The updated schedule task.
+     */ 
+    async updateTask(id, options = {}) {
+        if (!Object.keys(options).length) throw new Error('Too few options to update.');
+        if (
+            options.action &&
+            !['command', 'power', 'restart'].includes(options.action)
+        ) throw new TypeError('Invalid task action type.');
+        const data = await this.client.requests.make(
+            endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
+            { action, payload, time_offset: offset }, 'POST'
+        );
+        return this._resolveTask(data);
+    }
+
+    /**
+     * Deletes a specified task from the schedule.
+     * @param {number} id The ID of the schedule task.
+     * @returns {Promise<boolean>}
+     */
+    async deleteTask(id) {
+        await this.client.requests.make(
+            endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
+            null, 'DELETE'
+        );
+        this.tasks.delete(id);
+        return true;
+    }
+
+    /**
+     * Deletes the schedule from the server.
+     * @returns {Promise<boolean>}
+     */
+    async delete() {
+        return this.client.schedules.get(this.serverId).delete(this.serverId, this.id);
+    }
 }
 
 module.exports = Schedule;
