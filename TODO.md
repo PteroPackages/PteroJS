@@ -19,13 +19,13 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Document all functions
 
 ## Global Managers
-- [ ] Implement helper functions for all the managers
-- [ ] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
+- [X] Implement helper functions for all the managers
+- [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
 - [ ] Document all functions
 - [ ] Switch `AllocationManager#cache` to maps
 
 ## Global Structures
-- [ ] Implement helper functions for all the structures
+- [X] Implement helper functions for all the structures
 - [X] Figure out and implement a consistent management system for `Permissions` ([Permissions](https://github.com/devnote-dev/PteroJS/blob/main/src/structures/Permissions.js))
 
 ## Misc.
@@ -36,6 +36,5 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 
 ## Feature Plans
 - [ ] Optional webhook client
-- [ ] Python version of the library (soon?)
 - [X] Node status client
 - [ ] Data formatter interface client
