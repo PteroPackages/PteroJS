@@ -135,6 +135,10 @@ class ClientServer {
         this.client.addSocketServer(this.identifier);
     }
 
+    get schedules() {
+        return this.client.schedules.get(this.identifier);
+    }
+
     /** @todo */
     get resources() {}
 
