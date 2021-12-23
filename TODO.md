@@ -10,7 +10,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 ## Client
 - [X] Use typed `ClientOptions` for startup ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L13))
 - [X] Setup `connect()` function ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L26))
-- [ ] Create and implement `WebsocketManager`
+- [X] Create and implement `WebsocketManager`
 - [X] Rename endpoints in endpoints structure
 - [X] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
 - [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
@@ -33,8 +33,9 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Overall testing of the package (priority)
 - [X] TypeScript support (`index.d.ts`)
 - [X] Investigate incorrectly documented endpoints
+- [ ] Implement tests in `/tests` (or move from `/test`)
 
 ## Feature Plans
 - [ ] Optional webhook client
 - [X] Node status client
-- [ ] Data formatter interface client
+- [ ] Data formatter interface client (may be updated to logging client)
