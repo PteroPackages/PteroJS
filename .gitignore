@@ -1,5 +1,5 @@
 # General directories
 node_modules/
-tests/
+test/
 
 # General / Testing files
