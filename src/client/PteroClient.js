@@ -4,7 +4,7 @@ const ClientServerManager = require('./managers/ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const WebSocketManager = require('./managers/WebSocketManager');
 const endpoints = require('./managers/endpoints');
-const presets = require('../structures/Presets');
+const loader = require('../structures/configLoader');
 
 /**
  * The base class for the Pterodactyl client API.
@@ -43,7 +43,7 @@ class PteroClient extends EventEmitter {
          * Additional startup options for the client (optional).
          * @type {ClientOptions}
          */
-        this.options = presets.client(options);
+        this.options = loader.clientConfig(options);
 
         /** @type {?Date} */
         this.readyAt = null;
