@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const endpoints = require('../client/endpoints');
+const endpoints = require('../endpoints');
 
 class Shard {
     constructor(client, id, auth) {

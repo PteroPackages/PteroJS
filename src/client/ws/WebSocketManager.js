@@ -1,5 +1,5 @@
-const Shard = require('../structures/Shard');
-const endpoints = require('./endpoints');
+const Shard = require('./Shard');
+const endpoints = require('../endpoints');
 
 // const EVENTS = {
 //     'auth success': 'serverConnect',
