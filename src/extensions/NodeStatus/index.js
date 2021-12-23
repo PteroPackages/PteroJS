@@ -133,7 +133,7 @@ module.exports = NodeStatus;
  * @property {string} domain The domain for the API.
  * @property {string} auth The API key authorization.
  * @property {number[]} nodes An array of node IDs to listen for.
- * @property {number} callInterval The interval to wait between API calls (between 30-6000 seconds).
+ * @property {number} callInterval The interval to wait between API calls (between 10-6000 seconds).
  * @property {?number} nextInterval The interval to wait between processing checks. Must be less than the callInterval.
  * @property {?number} retryLimit The amount of times to retry fetching the API.
  */
