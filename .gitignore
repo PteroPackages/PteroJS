@@ -3,3 +3,4 @@ node_modules/
 test/
 
 # General / Testing files
+auth.json
