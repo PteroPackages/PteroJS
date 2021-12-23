@@ -2,8 +2,9 @@ const { EventEmitter } = require('events');
 const ClientRequestManager = require('./ClientRequestManager');
 const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
-const WebSocketManager = require('./managers/WebSocketManager');
-const endpoints = require('./managers/endpoints');
+const ScheduleManager = require('./ScheduleManager');
+const WebSocketManager = require('./WebSocketManager');
+const endpoints = require('./endpoints');
 const loader = require('../structures/configLoader');
 
 /**

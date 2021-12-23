@@ -1,9 +1,9 @@
-const ApplicationRequestManager = require('./managers/ApplicationRequestManager');
-const ApplicationServerManager = require('./managers/ApplicationServerManager');
-const NestManager = require('./managers/NestManager');
-const NodeLocationManager = require('./managers/NodeLocationManager');
-const NodeManager = require('./managers/NodeManager');
-const UserManager = require('./managers/UserManager');
+const ApplicationRequestManager = require('./ApplicationRequestManager');
+const ApplicationServerManager = require('./ApplicationServerManager');
+const NestManager = require('./NestManager');
+const NodeLocationManager = require('./NodeLocationManager');
+const NodeManager = require('./NodeManager');
+const UserManager = require('./UserManager');
 const loader = require('../structures/configLoader');
 
 /**
