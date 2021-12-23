@@ -41,7 +41,7 @@ module.exports = {
 
     // Utils
     configLoader: require('./structures/configLoader'),
-    jsonify: require('./structures/Jsonifier'),
+    caseConv: require('./structures/caseConv'),
 
     // Extensions
     NodeStatus: require('./extensions/NodeStatus')

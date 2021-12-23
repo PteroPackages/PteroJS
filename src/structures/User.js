@@ -2,7 +2,7 @@ const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
 const Dict = require('./Dict');
-const json = require('./Jsonifier');
+const caseConv = require('./caseConv');
 const c_path = require('../client/endpoints');
 
 class BaseUser {
@@ -56,7 +56,7 @@ class BaseUser {
      * @returns {object} The JSON value.
      */
     toJSON() {
-        return json(this, ['client']);
+        return caseConv.snakeCase(this, ['client']);
     }
 }
 

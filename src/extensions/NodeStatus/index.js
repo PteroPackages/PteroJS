@@ -1,5 +1,6 @@
 const { EventEmitter } = require('events');
 const fetch = require('node-fetch');
+const caseConv = require('../../structures/caseConv');
 
 class NodeStatus extends EventEmitter {
     headers = {
@@ -102,7 +103,8 @@ class NodeStatus extends EventEmitter {
             return;
         }
 
-        const { attributes } = await res.json();
+        let { attributes } = await res.json();
+        attributes = caseConv.camelCase(attributes);
         if (!this.#connected.has(id)) {
             this.#connected.add(id);
             this.emit('connect', id);

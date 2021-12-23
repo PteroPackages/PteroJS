@@ -3,7 +3,7 @@ const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const { PteroUser } = require('./User');
 const Node = require('./Node');
-const json = require('./Jsonifier');
+const caseConv = require('./caseConv');
 const endpoints = require('../application/endpoints');
 
 class ApplicationServer {
@@ -270,7 +270,7 @@ class ApplicationServer {
      * @returns {object} The JSON value.
      */
     toJSON() {
-        return json(this, ['client']);
+        return caseConv.snakeCase(this, ['client']);
     }
 }
 

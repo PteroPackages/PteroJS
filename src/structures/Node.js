@@ -1,5 +1,5 @@
 const { NodeLocation } = require('../application/NodeLocationManager');
-const json = require('./Jsonifier');
+const caseConv = require('./caseConv');
 const endpoints = require('../application/endpoints');
 
 class Node {
@@ -218,7 +218,7 @@ class Node {
      * @returns {object} The JSON value.
      */
     toJSON() {
-        return json(this, ['client']);
+        return caseConv.snakeCase(this, ['client']);
     }
 }
 
