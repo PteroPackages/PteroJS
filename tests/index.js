@@ -13,7 +13,7 @@ function logTest(test) {
 }
 
 function assert(ops) {
-    if (ops !== true) throw new AssertionError();
+    if (Boolean(ops) !== true) throw new AssertionError();
 }
 
 function test(name, exec, returnValue = null) {
@@ -34,11 +34,14 @@ function test(name, exec, returnValue = null) {
 
 module.exports = { test, assert };
 
-(() => {
+(async () => {
     console.log('Running all tests...\n');
     const { readdirSync } = require('fs');
-    readdirSync(__dirname)
-        .filter(f => f.endsWith('.test.js'))
-        .forEach(m => require(`${__dirname}/${m}`)());
+    let count = 0;
+    for (const mod of readdirSync(__dirname)) {
+        if (!mod.endsWith('.test.js')) continue;
+        console.log(`Running Test #${count++}\n`+ '='.repeat(20));
+        await require(`${__dirname}/${mod}`)();
+    }
     console.log('Completed all tests.');
 })();
