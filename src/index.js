@@ -1,33 +1,48 @@
 module.exports = {
     version: require('../package.json').version,
 
-    AllocationManager: require('./managers/AllocationManager'),
-    ApplicationRequestManager: require('./application/ApplicationRequestManager'),
-    ApplicationServerManager: require('./application/ApplicationServerManager'),
-    ApplicationServer: require('./structures/ApplicationServer'),
-    BackupManager: require('./client/BackupManager'),
-    BaseUser: require('./structures/User').BaseUser,
-    ClientRequestManager: require('./client/ClientRequestManager'),
-    ClientServer: require('./structures/ClientServer'),
-    ClientServerManager: require('./client/ClientServerManager'),
-    ClientUser: require('./structures/User').ClientUser,
-    DatabaseManager: require('./managers/DatabaseManager'),
-    Dict: require('./structures/Dict'),
-    Errors: require('./structures/Errors'),
-    FileManager: require('./managers/FileManager'),
-    Node: require('./structures/Node'),
-    NodeLocationManager: require('./application/NodeLocationManager'),
-    NodeManager: require('./application/NestManager'),
-    Permissions: require('./structures/Permissions'),
-    Presets: require('./structures/Presets'),
+    // Application API
     PteroApp: require('./application/PteroApp'),
-    PteroClient: require('./client/PteroClient'),
-    PteroSubUser: require('./structures/User').PteroSubUser,
-    PteroUser: require('./structures/User').PteroUser,
-    Schedule: require('./structures/Schedule'),
-    ScheduleManager: require('./client/ScheduleManager'),
-    SubUserManager: require('./client/SubUserManager'),
     UserManager: require('./application/UserManager'),
+    NodeManager: require('./application/NodeManager'),
+    NestManager: require('./application/NestManager'),
+    ApplicationServerManager: require('./application/ApplicationServerManager'),
+    NodeLocationManager: require('./application/NodeLocationManager'),
+    ApplicationRequestManager: require('./application/ApplicationRequestManager'),
 
+    // Client API
+    PteroClient: require('./client/PteroClient'),
+    ClientServerManager: require('./client/ClientServerManager'),
+    ScheduleManager: require('./client/ScheduleManager'),
+    ClientRequestManager: require('./client/ClientRequestManager'),
+    BackupManager: require('./client/BackupManager'),
+    SubUserManager: require('./client/SubUserManager'),
+
+    // Websocket
+    Shard: require('./client/ws/Shard'),
+    WebSocketManager: require('./client/ws/WebSocketManager'),
+
+    // Global Managers
+    AllocationManager: require('./managers/AllocationManager'),
+    DatabaseManager: require('./managers/DatabaseManager'),
+    FileManager: require('./managers/FileManager'),
+
+    // Package Structures
+    ApplicationServer: require('./structures/ApplicationServer'),
+    ClientServer: require('./structures/ClientServer'),
+    Dict: require('./structures/Dict'),
+    Node: require('./structures/Node'),
+    Permissions: require('./structures/Permissions'),
+    /** @deprecated Use configLoader util instead. */
+    Presets: require('./structures/Presets'),
+    Schedule: require('./structures/Schedule'),
+    ...require('./structures/Errors'),
+    ...require('./structures/User'),
+
+    // Utils
+    configLoader: require('./structures/configLoader'),
+    jsonify: require('./structures/Jsonifier'),
+
+    // Extensions
     NodeStatus: require('./extensions/NodeStatus')
 };
