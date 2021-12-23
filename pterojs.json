@@ -12,8 +12,8 @@
         },
         "nests":{
             "fetch": false,
-            "cache": true,
-            "max": -1
+            "cache": false,
+            "max": 0
         },
         "servers":{
             "fetch": false,
@@ -23,11 +23,22 @@
         "locations":{
             "fetch": false,
             "cache": false,
-            "max": -1
+            "max": 0
         }
     },
     "client":{
         "ws": true,
+        "fetchClient": true,
+        "servers":{
+            "fetch": true,
+            "cache": true,
+            "max": -1
+        },
+        "subUsers":{
+            "fetch": false,
+            "cache": false,
+            "max": 0
+        },
         "disableEvents":["debug"]
     }
 }
