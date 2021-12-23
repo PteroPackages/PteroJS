@@ -6,7 +6,7 @@ class NodeStatus extends EventEmitter {
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'NodeStatus PteroJS v1.0.1'
+        'User-Agent': 'NodeStatus PteroJS v1.0.2'
     }
     #interval = null;
     #connected = new Set();
@@ -36,11 +36,11 @@ class NodeStatus extends EventEmitter {
         if (this.nodes.some(i => typeof i !== 'number'))
             throw new TypeError('[NS] Node IDs must be numbers only.');
 
-        if (this.callInterval < 30 || this.callInterval > 43200)
-            throw new RangeError('[NS] Call interval must be between 30 seconds and 12 hours.');
+        if (this.callInterval < 10_000 || this.callInterval > 43_200_000)
+            throw new RangeError('[NS] Call interval must be between 10 seconds and 12 hours.');
 
         if (this.nextInterval >= this.callInterval)
-            throw new RangeError('[NS] Next interval must be lessa than the call interval.');
+            throw new RangeError('[NS] Next interval must be less than the call interval.');
     }
 
     #debug(message) { this.emit('debug', '[NS] '+ message) }
@@ -50,7 +50,7 @@ class NodeStatus extends EventEmitter {
         this.#debug('Starting connection to API');
         await this.#ping();
         await this.#handleNext();
-        this.#interval = setInterval(() => this.#handleNext(), this.callInterval * 1000).unref();
+        this.#interval = setInterval(() => this.#handleNext(), this.callInterval).unref();
         this.readyAt = Date.now();
         process.on('SIGINT', _ => this.close());
         process.on('SIGTERM', _ => this.close());
@@ -74,7 +74,7 @@ class NodeStatus extends EventEmitter {
         for (let i=0; i<this.nodes.length; i++) {
             await this.#request(this.nodes[i]);
             if (this.nodes[i+1]) {
-                await new Promise(res => setTimeout(res, this.nextInterval * 1000).unref());
+                await new Promise(res => setTimeout(res, this.nextInterval).unref());
             }
         }
     }
