@@ -1,4 +1,4 @@
-const endpoints = require('../client/managers/endpoints');
+const endpoints = require('../client/endpoints');
 
 class AllocationManager {
     constructor(client, server, data) {

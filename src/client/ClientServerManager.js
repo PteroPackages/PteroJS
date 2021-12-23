@@ -1,5 +1,5 @@
-const ClientServer = require('../../structures/ClientServer');
-const Dict = require('../../structures/Dict');
+const ClientServer = require('../structures/ClientServer');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class ClientServerManager {

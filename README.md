@@ -2,7 +2,7 @@
 <h1 align="center">PteroJS</h1>
 <h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
 <h4 align="center"><i>Logo design by aizakkusnail#1065 (Discord)</i></h4>
-<p align="center"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/version-1.1.8-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge"> <img src="https://img.shields.io/badge/docs-coming_soon-e67e22?style=for-the-badge"></p>
+<p align="center"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/version-1.1.11-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge"> <img src="https://img.shields.io/badge/docs-coming_soon-e67e22?style=for-the-badge"></p>
 
 ## About
 PteroJS is a flexible API wrapper designed to give developers full access over the Pterodactyl API. The library uses a class-based management structure often seen in popular packages like Discord.js which keeps code clean, efficient and practical for any use-case.
@@ -55,9 +55,9 @@ client.connect();
 ```
 
 ## Contributing
-Please see the [todo list](https://github.com/devnote-dev/PteroJS/blob/main/TODO.md) or [issues](https://github.com/devnote-dev/PteroJS/issues) section for contributing ideas. New ideas are also welcome.
+Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TODO.md) or [issues](https://github.com/PteroPackages/PteroJS/issues) section for contributing ideas. New ideas are also welcome.
 
-1. [Fork this repo](https://github.com/devnote-dev/pterojs/fork)!
+1. [Fork this repo](https://github.com/PteroPackages/pterojs/fork)!
 2. Make a branch from `main` (`git branch -b <new-feature>`)
 3. Commit your changes (`git commit -am "..."`)
 4. Open a PR here (`git push origin <new-feature>`)
@@ -66,7 +66,8 @@ Please see the [todo list](https://github.com/devnote-dev/PteroJS/blob/main/TODO
 * [Devonte](https://github.com/devnote-dev) - Owner, maintainer
 * [Zumo](https://github.com/ZumoDev) - Tester
 * [Dino](https://github.com/DinoTheDevOfficial) - Tester
+* [Cain](https://github.com/cainthebest) - Code contributor
 
 This repository is managed under the MIT license.
 
-© devnote-dev
+© 2021 devnote-dev

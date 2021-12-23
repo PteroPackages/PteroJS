@@ -1,6 +1,6 @@
 const { EventEmitter } = require('events');
-const ClientRequestManager = require('./managers/ClientRequestManager');
-const ClientServerManager = require('./managers/ClientServerManager');
+const ClientRequestManager = require('./ClientRequestManager');
+const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const WebSocketManager = require('./managers/WebSocketManager');
 const endpoints = require('./managers/endpoints');
@@ -56,6 +56,8 @@ class PteroClient extends EventEmitter {
 
         /** @type {ClientServerManager} */
         this.servers = new ClientServerManager(this);
+        /** @type {ScheduleManager} */
+        this.schedules = new ScheduleManager(this);
         /** @type {ClientRequestManager} @internal */
         this.requests = new ClientRequestManager(this);
         /** @type {WebSocketManager} @internal */
@@ -70,6 +72,7 @@ class PteroClient extends EventEmitter {
      * @fires PteroClient#ready
      */
     async connect() {
+        if (this.readyAt) return;
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
@@ -106,6 +109,17 @@ class PteroClient extends EventEmitter {
      */
     removeSocketServer(id) {
         this.ws.servers.splice(id);
+    }
+
+    /**
+     * Disconnects from the Pterodactyl API and closes any existing websocket connections.
+     * @returns {void}
+     */
+    async disconnect() {
+        if (!this.readyAt) return;
+        this.ping = null;
+        this.readyAt = null;
+        // TODO: close ws instance
     }
 }
 

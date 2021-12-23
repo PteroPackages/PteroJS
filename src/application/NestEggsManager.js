@@ -1,4 +1,4 @@
-const Dict = require('../../structures/Dict');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class NestEggsManager {

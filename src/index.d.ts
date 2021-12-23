@@ -3,6 +3,8 @@
 import EventEmitter from 'events';
 import WebSocket from 'ws';
 
+export const version: string;
+
 export interface Allocation {
     id:        number;
     ip:        string;
@@ -150,6 +152,7 @@ export class ClientServer {
     public constructor(client: PteroClient, data: object);
 
     public client: PteroClient;
+
     public isOwner: boolean;
     public identifier: string;
     public uuid: string;
@@ -169,6 +172,7 @@ export class ClientServer {
     public permissions: Permissions;
     public databases: DatabaseManager;
     public files: FileManager;
+    public schedules: Dict<number, Schedule>|null;
 
     public _patch(data: object): void;
     public addWebSocket(): void;
@@ -573,6 +577,7 @@ export class PteroApp {
     public requests: ApplicationRequestManager;
 
     public connect(): Promise<boolean>;
+    public disconnect(): void;
 }
 
 export interface ClientOptions {
@@ -585,13 +590,13 @@ export interface ClientOptions {
 }
 
 export interface ClientEvents {
-    debug:[message: string];
-    ready:[];
-    serverConnect:[server: ClientServer];
-    serverOutput:[data: string];
-    serverDisconnect:[server: string];
-    statusUpdate:[status: string];
-    statsUpdate:[stats: object];
+    debug:            [message: string];
+    ready:            [];
+    serverConnect:    [server: ClientServer];
+    serverOutput:     [data: string];
+    serverDisconnect: [server: string];
+    statusUpdate:     [status: string];
+    statsUpdate:      [stats: object];
 }
 
 export class PteroClient extends EventEmitter {
@@ -604,13 +609,17 @@ export class PteroClient extends EventEmitter {
     public ping: number | null;
     public user: ClientUser|null;
     public servers: ClientServerManager;
+    public schedules: ScheduleManager;
     public requests: ClientRequestManager;
     public ws: WebSocketManager;
 
-    public emit<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): boolean;
+    public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
     public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
     public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
     public off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
+
+    public connect(): Promise<boolean>;
+    public disconnect(): void;
 }
 
 export class PteroSubUser extends BaseUser {
@@ -652,27 +661,92 @@ export class PteroUser extends BaseUser {
     public delete(): Promise<boolean>;
 }
 
-// WIP:
-// Class & its manager is very undeveloped, possibly unstable, and undocumented.
-export class Schedule {
-    public constructor(client: unknown, server: unknown, data: object);
+export type ScheduleAction =
+    | 'command'
+    | 'power'
+    | 'backup';
 
-    public client: unknown;
-    public server: unknown;
-    public id: string;
+export interface ScheduleTask {
+    id:         number;
+    sequenceId: number;
+    action:     ScheduleAction;
+    payload:    string;
+    offset:     number;
+    queued:     boolean;
+    createdAt:  Date;
+    updatedAt:  Date | null;
+}
+
+export class Schedule {
+    public constructor(client: PteroClient, serverId: string, data: object);
+
+    public client: PteroClient;
+    public serverId: string;
+    public tasks: Dict<number, ScheduleTask>;
+
+    public readonly id: number;
     public name: string;
-    public cron:{
-        week: string;
-        month: string;
-        hour: string;
-        minute: string;
-    };
+    public cron: { [key: string]: string }
     public active: boolean;
     public processing: boolean;
-    public lastRunAt: Date|null;
+    public lastRunAt: Date | null;
     public nextRunAt: Date;
-    public createdAt: Date;
-    public updatedAt: Date|null;
+    public readonly createdAt: Date;
+    public updatedAt: Date | null;
+
+    public update(options:{
+        name?: string;
+        active?: boolean;
+        minute?: string;
+        hour?: string;
+        dayOfWeek?: string;
+        dayOfMonth?: string;
+    }): Promise<this>;
+    public createTask(action: ScheduleAction, payload: string, offset: number): Promise<ScheduleTask>;
+    public updateTask(
+        id: number,
+        options:{
+            action?: ScheduleAction;
+            payload?: string;
+            offset?: number;
+        }
+    ): Promise<ScheduleTask>;
+    public deleteTask(id: number): Promise<boolean>;
+    public delete(): Promise<boolean>;
+}
+
+export class ScheduleManager {
+    public constructor(client: PteroClient);
+
+    public client: PteroClient;
+    public cache: Dict<string, Dict<number, Schedule>>;
+
+    public _patch(id: number, data: object): Schedule|Dict<number, Schedule>;
+    public fetch(server: string, id: number, force?: boolean): Promise<Schedule|Dict<number, Schedule>>;
+    public create(
+        server: string,
+        options:{
+            name: string;
+            active: boolean;
+            minute: string;
+            hour: string;
+            dayOfWeek?: string;
+            dayOfMonth?: string;
+        }
+    ): Promise<Schedule>;
+    public update(
+        server: string,
+        id: number,
+        options:{
+            name?: string;
+            active?: boolean;
+            minute?: string;
+            hour?: string;
+            dayOfWeek?: string;
+            dayOfMonth?: string;
+        }
+    ): Promise<Schedule>;
+    public delete(server: string, id: number): Promise<boolean>;
 }
 
 export class SubUserManager {
@@ -725,4 +799,56 @@ export class WebSocketManager {
 
     public connect(): Promise<boolean>;
     public send(id: string, event: string, data: any): void;
+}
+
+// Extensions
+
+export interface StatusOptions {
+    domain:        string;
+    auth:          string;
+    nodes:         number[];
+    callInterval:  number;
+    nextInterval?: number;
+    retryLimit?:   number;
+}
+
+export interface StatusEvents {
+    debug:      [message: string];
+    connect:    [id: number];
+    interval:   [node: object];
+    disconnect: [id: number];
+}
+
+export class NodeStatus extends EventEmitter {
+    public constructor(options: StatusOptions);
+
+    public headers: { [key: string]: string };
+    private interval: NodeJS.Timer | null;
+    private connected: Set<number>;
+    public domain: string;
+    public auth: string;
+    public nodes: number[];
+    public callInterval: number;
+    public nextInterval: number;
+    public retryLimit: number;
+
+    public onConnect: Function | null;
+    public onInterval: Function | null;
+    public onDisconnect: Function | null;
+
+    public ping: number;
+    public current: number;
+    public readyAt: number;
+
+    #debug(message: string): void;
+    public connect(): Promise<void>;
+    #ping(): Promise<void>;
+    #handleNext(): Promise<void>;
+    #request(id: number): Promise<void>;
+    public close(message?: string, error?: boolean): void;
+
+    public emit<E extends keyof StatusEvents>(event: E, ...args: StatusEvents[E]): boolean;
+    public on<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
+    public once<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
+    public off<E extends keyof StatusEvents>(event: E, listener: (...args: StatusEvents[E]) => any): this;
 }

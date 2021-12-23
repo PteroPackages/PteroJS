@@ -1,4 +1,4 @@
-const endpoints = require('../client/managers/endpoints');
+const endpoints = require('../client/endpoints');
 
 class FileManager {
     constructor(client, server, data) {

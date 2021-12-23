@@ -1,5 +1,5 @@
 const Dict = require('../structures/Dict');
-const endpoints = require('../client/managers/endpoints');
+const endpoints = require('../client/endpoints');
 
 class DatabaseManager {
     constructor(client, server, data) {
