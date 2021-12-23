@@ -79,7 +79,7 @@ class PteroClient extends EventEmitter {
         this.ping = Date.now() - start;
         if (this.options.fetchClient) this.user = await this.fetchClient();
         if (this.options.fetchServers && this.options.cacheServers) await this.servers.fetch();
-        // if (this.options.ws) await this.ws.connect();
+        if (this.options.ws) await this.ws.launch();
         this.readyAt = Date.now();
         return true;
     }
@@ -117,10 +117,10 @@ class PteroClient extends EventEmitter {
      * @returns {void}
      */
     async disconnect() {
-        if (!this.readyAt) return;
+        if (!this.ws.readyAt) return;
+        this.ws.destroy();
         this.ping = null;
         this.readyAt = null;
-        // TODO: close ws instance
     }
 }
 
