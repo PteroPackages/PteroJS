@@ -591,12 +591,24 @@ export interface ClientOptions {
 
 export interface ClientEvents {
     debug:            [message: string];
+    error:            [id: string, error: any];
     ready:            [];
+
     serverConnect:    [server: ClientServer];
-    serverOutput:     [data: string];
-    serverDisconnect: [server: string];
-    statusUpdate:     [status: string];
-    statsUpdate:      [stats: object];
+    serverOutput:     [id: string, output: any];
+    serverDisconnect: [id: string];
+
+    statusUpdate:     [server: ClientServer, status: string];
+    statsUpdate:      [server: ClientServer, stats: any];
+    transferUpdate:   [id: string, data: any];
+
+    installStart:     [id: string];
+    installOutput:    [id: string, output: any];
+    installComplete:  [id: string];
+
+    backupComplete:   [server: ClientServer, backup: Partial<Backup>];
+
+    daemonMessage:    [id: string, message: any];
 }
 
 export class PteroClient extends EventEmitter {
@@ -607,7 +619,7 @@ export class PteroClient extends EventEmitter {
     public options: ClientOptions;
     public readyAt: Date | null;
     public ping: number | null;
-    public user: ClientUser|null;
+    public user: ClientUser | null;
     public servers: ClientServerManager;
     public schedules: ScheduleManager;
     public requests: ClientRequestManager;
@@ -619,6 +631,9 @@ export class PteroClient extends EventEmitter {
     public off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => any): this;
 
     public connect(): Promise<boolean>;
+    public fetchClient(): Promise<ClientUser>;
+    public addSocketServer(ids: string[]): void;
+    public removeSocketServer(id: string): void;
     public disconnect(): void;
 }
 
@@ -788,17 +803,46 @@ export class UserManager {
     public delete(user: number|PteroUser): Promise<boolean>;
 }
 
+export interface Packet {
+    event: string;
+    args:  string[];
+}
+
+export class Shard {
+    public constructor(client: PteroClient, id: string, auth: { [key: string]: string });
+
+    public client: PteroClient;
+    public id: string;
+    private token: string | null;
+    private socket: WebSocket | null;
+    public status: string;
+    public readyAt: number;
+    public ping: number;
+    public lastPing: number;
+
+    private debug(message: string): void;
+    public connect({ socket }:{ socket: string }): void;
+    public reconnect(): Promise<void>;
+    public disconnect(): void;
+    public send(event: string, data: any[]): void;
+    private _onOpen(): void;
+    private _onMessage({ data }:{ data: Packet }): void;
+    private _onError({ error }:{ error: any }): void;
+    private _onClose(): void;
+}
+
 export class WebSocketManager {
     public constructor(client: PteroClient);
 
     public client: PteroClient;
     public servers: string[];
-    public status: string;
-    public sockets: Map<string, WebSocket>;
-    public lastPing: number;
+    public shards: Map<string, Shard>;
+    public totalShards: number;
+    public readyAt: number;
+    public ping: number;
 
-    public connect(): Promise<boolean>;
-    public send(id: string, event: string, data: any): void;
+    launch(): Promise<void>;
+    destroy(): void;
 }
 
 // Extensions
