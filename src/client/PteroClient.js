@@ -116,7 +116,7 @@ class PteroClient extends EventEmitter {
      * Disconnects from the Pterodactyl API and closes any existing websocket connections.
      * @returns {void}
      */
-    async disconnect() {
+    disconnect() {
         if (!this.ws.readyAt) return;
         this.ws.destroy();
         this.ping = null;
