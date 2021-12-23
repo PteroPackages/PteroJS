@@ -25,5 +25,9 @@
             "cache": false,
             "max": -1
         }
+    },
+    "client":{
+        "ws": true,
+        "disableEvents":["debug"]
     }
 }
