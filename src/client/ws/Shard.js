@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const handle = require('./packetHandler');
 const endpoints = require('../endpoints');
 
 class Shard {
@@ -72,21 +73,23 @@ class Shard {
             return this.send('auth', this.token);
         }
 
-        switch(data.event) {
+        this.client.emit('rawPayload', data);
+
+        switch (data.event) {
             case 'auth success':
                 this.ping = Date.now() - this.lastPing;
                 break;
 
             case 'token expiring':
-                break;
+                // irrelevant
+                return;
 
             case 'token expired':
-                return this.reconnect();
-
-            default:
-                // TODO: handle data parsing
-                return;
+                this.reconnect();
+                break;
         }
+
+        handle(this.client, data, this.id);
     }
 
     _onError({ error }) {
