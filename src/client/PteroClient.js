@@ -3,7 +3,7 @@ const ClientRequestManager = require('./ClientRequestManager');
 const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const ScheduleManager = require('./ScheduleManager');
-const WebSocketManager = require('./WebSocketManager');
+const WebSocketManager = require('./ws/WebSocketManager');
 const endpoints = require('./endpoints');
 const loader = require('../structures/configLoader');
 
