@@ -1,7 +1,7 @@
 const { join } = require('path');
 
 const DEFAULT = {
-    application:{
+    APPLICATION:{
         users:{
             fetch: false,
             cache: true,
@@ -27,12 +27,28 @@ const DEFAULT = {
             cache: true,
             max: -1
         }
+    },
+
+    CLIENT:{
+        ws: false,
+        fetchClient: true,
+        servers:{
+            fetch: false,
+            cache: true,
+            max: -1
+        },
+        subUsers:{
+            fetch: false,
+            cache: true,
+            max: -1
+        },
+        disableEvents:[]
     }
 }
 
 function parseAs(from, to) {
-    const res = {}
-    for (const [k, v] of Object.entries(to)) res[k] = from[k] ?? v;
+    const res = {};
+    for (const [k, v] of Object.entries(to)) res[k] = k in from ? from[k] : v;
     for (const [k, v] of Object.entries(res)) if (v.max === -1) res[k].max = Infinity;
     return res;
 }
@@ -42,17 +58,32 @@ function appConfig(options) {
         options !== null &&
         typeof options === 'object' &&
         Object.keys(options).length
-    ) return parseAs(options, DEFAULT.application);
+    ) return parseAs(options, DEFAULT.APPLICATION);
     try {
         options = require(join(process.cwd(), 'pterojs.json'));
-        return parseAs(options.application, DEFAULT.application);
+        return parseAs(options.application ?? {}, DEFAULT.APPLICATION);
     } catch {
-        return DEFAULT.application;
+        return DEFAULT.APPLICATION;
+    }
+}
+
+function clientConfig(options) {
+    if (
+        options !== null &&
+        typeof options === 'object' &&
+        Object.keys(options).length
+    ) return parseAs(options, DEFAULT.CLIENT);
+    try {
+        options = require(join(process.cwd(), 'pterojs.json'));
+        return parseAs(options.client ?? {}, DEFAULT.CLIENT);
+    } catch {
+        return DEFAULT.CLIENT;
     }
 }
 
 module.exports = {
     DEFAULT,
     parseAs,
-    appConfig
+    appConfig,
+    clientConfig
 }
