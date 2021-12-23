@@ -6,7 +6,7 @@ class NodeStatus extends EventEmitter {
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'NodeStatus PteroJS v1.0.0'
+        'User-Agent': 'NodeStatus PteroJS v1.0.1'
     }
     #interval = null;
     #connected = new Set();
