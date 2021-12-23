@@ -22,7 +22,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Implement helper functions for all the managers
 - [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
 - [ ] Document all functions
-- [ ] Switch `AllocationManager#cache` to maps
+- [X] Switch `AllocationManager#cache` to maps
 
 ## Global Structures
 - [X] Implement helper functions for all the structures
