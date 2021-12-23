@@ -50,7 +50,7 @@ class NodeStatus extends EventEmitter {
         this.#debug('Starting connection to API');
         await this.#ping();
         await this.#handleNext();
-        this.#interval = setInterval(() => this.#handleNext(), this.callInterval * 1000);
+        this.#interval = setInterval(() => this.#handleNext(), this.callInterval * 1000).unref();
         this.readyAt = Date.now();
         process.on('SIGINT', _ => this.close());
         process.on('SIGTERM', _ => this.close());
@@ -73,7 +73,9 @@ class NodeStatus extends EventEmitter {
     async #handleNext() {
         for (let i=0; i<this.nodes.length; i++) {
             await this.#request(this.nodes[i]);
-            if (this.nodes[i+1]) await new Promise(res => setTimeout(res, this.nextInterval * 1000));
+            if (this.nodes[i+1]) {
+                await new Promise(res => setTimeout(res, this.nextInterval * 1000).unref());
+            }
         }
     }
 
@@ -118,6 +120,7 @@ class NodeStatus extends EventEmitter {
         if (!this.readyAt) return;
         this.#debug('Closing connection');
         if (this.#interval) clearInterval(this.#interval);
+        this.removeAllListeners();
         this.#connected.clear();
         if (error && message) throw new Error(message);
     }
