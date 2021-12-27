@@ -6,6 +6,7 @@ module.exports = {
     UserManager: require('./application/UserManager'),
     NodeManager: require('./application/NodeManager'),
     NestManager: require('./application/NestManager'),
+    NestEggsManager: require('./application/NestEggsManager'),
     ApplicationServerManager: require('./application/ApplicationServerManager'),
     NodeLocationManager: require('./application/NodeLocationManager'),
     ApplicationRequestManager: require('./application/ApplicationRequestManager'),
