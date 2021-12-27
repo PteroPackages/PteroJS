@@ -4,7 +4,7 @@
   "description": "A flexibile API wrapper for Pterodactyl",
   "main": "src/index.js",
   "scripts": {
-    "test": "node tests/index"
+    "tests": "node tests/index"
   },
   "repository": {
     "type": "git",
