@@ -7,7 +7,7 @@ module.exports = async () => {
         domain: api_url,
         auth: api_key,
         nodes:[1],
-        callInterval: 30
+        callInterval: 30_000
     });
 
     status.on('connect', id => console.log(`Connected to node ${id}`));
