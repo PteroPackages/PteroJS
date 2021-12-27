@@ -78,7 +78,7 @@ class PteroClient extends EventEmitter {
         await this.requests.ping();
         this.ping = Date.now() - start;
         if (this.options.fetchClient) this.user = await this.fetchClient();
-        if (this.options.fetchServers && this.options.cacheServers) await this.servers.fetch();
+        if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
         if (this.options.ws) await this.ws.launch();
         this.readyAt = Date.now();
         return true;
@@ -117,33 +117,44 @@ class PteroClient extends EventEmitter {
      * @returns {void}
      */
     disconnect() {
-        if (!this.ws.readyAt) return;
-        this.ws.destroy();
         this.ping = null;
         this.readyAt = null;
+        if (!this.ws.readyAt) this.ws.destroy();
     }
 }
 
 module.exports = PteroClient;
 
 /**
+ * @typedef {object} OptionSpec
+ * @property {boolean} fetch
+ * @property {boolean} cache
+ * @property {number} max
+ */
+
+/**
  * Startup options for the client API.
  * @typedef {object} ClientOptions
  * @property {boolean} [ws] Whether to enable server websocket connections (default: `false`).
  * @property {boolean} [fetchClient] Whether to fetch the client user (default `true`).
- * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
- * @property {boolean} [cacheServers] Whether to cache servers (default `true`).
- * @property {boolean} [cacheSubUsers] Whether to cache server subusers (default `true`).
+ * @property {OptionSpec} [servers] Options for fetching and caching servers.
+ * @property {OptionSpec} [subUsers] Options for fetching and caching server subusers.
  * @property {string[]} [disableEvents] An array of events to disable (wont be emitted).
- */
-
-/**
- * Emitted when the websocket manager is ready.
- * @event PteroClient#ready
  */
 
 /**
  * Debug event emitted for websocket events.
  * @event PteroClient#debug
  * @param {string} message The message emitted with the event.
+ */
+
+/**
+ * Emitted when the websocket encounters an error.
+ * @event PteroClient#error
+ * @param {*} error The error received.
+ */
+
+/**
+ * Emitted when the websocket manager is ready.
+ * @event PteroClient#ready
  */
