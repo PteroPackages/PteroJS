@@ -73,11 +73,11 @@ class PteroApp {
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
-        if (this.options.fetchUsers && this.options.cacheUsers) await this.users.fetch();
-        if (this.options.fetchNodes && this.options.cacheNodes) await this.nodes.fetch();
-        if (this.options.fetchNests && this.options.cacheNests) await this.nests.fetch();
-        if (this.options.fetchServers && this.options.cacheServers) await this.servers.fetch();
-        if (this.options.fetchLocations && this.options.fetchLocations) await this.locations.fetch();
+        if (this.options.users.fetch && this.options.users.cache) await this.users.fetch();
+        if (this.options.nodes.fetch && this.options.nodes.cache) await this.nodes.fetch();
+        if (this.options.nests.fetch && this.options.nests.cache) await this.nests.fetch();
+        if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
+        if (this.options.locations.fetch && this.options.locations.cache) await this.locations.fetch();
         this.readyAt = Date.now();
         return true;
     }
@@ -96,18 +96,20 @@ class PteroApp {
 module.exports = PteroApp;
 
 /**
+ * @typedef {object} OptionSpec
+ * @property {boolean} fetch
+ * @property {boolean} cache
+ * @property {number} max
+ */
+
+/**
  * Startup options for the application API.
  * By default, all fetch options are `false`, and all cache options are `true`.
  * Enabling fetch and disabling cache for the same class will cancel out the request.
  * @typedef {object} ApplicationOptions
- * @property {boolean} [fetchUsers] Whether to fetch all users.
- * @property {boolean} [fetchNodes] Whether to fetch all nodes.
- * @property {boolean} [fetchNests] Whether to fetch all nests.
- * @property {boolean} [fetchServers] Whether to fetch all servers.
- * @property {boolean} [fetchLocations] Whether to fetch all node locations.
- * @property {boolean} [cacheUsers] Whether to cache users.
- * @property {boolean} [cacheNodes] Whether to cache nodes.
- * @property {boolean} [cacheNests] Whether to cache nests.
- * @property {boolean} [cacheServers] Whether to cache servers.
- * @property {boolean} [cacheLocations] Whether to cache node locations.
+ * @property {OptionSpec} [users] Options for fetching and caching users.
+ * @property {OptionSpec} [nodes] Options for fetching and caching nodes.
+ * @property {OptionSpec} [nests] Options for fetching and caching nests.
+ * @property {OptionSpec} [servers] Options for fetching and caching servers.
+ * @property {OptionSpec} [locations] Options for fetching and caching node locations.
  */

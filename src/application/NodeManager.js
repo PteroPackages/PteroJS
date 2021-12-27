@@ -17,11 +17,11 @@ class NodeManager {
                 const n = new Node(this.client, o);
                 res.set(n.id, n);
             }
-            if (this.client.options.cacheNodes) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.nodes.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         const n = new Node(this.client, data);
-        if (this.client.options.cacheNodes) this.cache.set(n.id, n);
+        if (this.client.options.nodes.cache) this.cache.set(n.id, n);
         return n;
     }
 

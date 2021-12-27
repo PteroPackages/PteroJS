@@ -18,11 +18,11 @@ class UserManager {
                 const u = new PteroUser(this.client, o);
                 res.set(u.id, u);
             }
-            if (this.client.options.cacheUsers) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.users.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         const u = new PteroUser(this.client, data.attributes);
-        if (this.client.options.cacheUsers) this.cache.set(u.id, u);
+        if (this.client.options.users.cache) this.cache.set(u.id, u);
         return u;
     }
 
