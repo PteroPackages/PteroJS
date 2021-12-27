@@ -27,6 +27,11 @@ class WebSocketManager {
     }
 
     async launch() {
+        if (!this.servers.length) {
+            this.client.emit('debug', '[WS] No shards to launch');
+            return;
+        }
+        this.client.emit('debug', `[WS] Attempting to launch ${this.servers.length} shard(s)`);
         for (const id of this.servers) {
             const data = await this.client.requests.make(endpoints.servers.ws(id));
             try {
