@@ -35,13 +35,15 @@ function test(name, exec, returnValue = null) {
 module.exports = { test, assert };
 
 (async () => {
-    console.log('Running all tests...\n');
+    console.log('Running all tests...');
     const { readdirSync } = require('fs');
-    let count = 0;
+    let count = 0, test;
     for (const mod of readdirSync(__dirname)) {
         if (!mod.endsWith('.test.js')) continue;
-        console.log(`Running Test #${count++}\n`+ '='.repeat(20));
-        await require(`${__dirname}/${mod}`)();
+        console.log(`\nRunning Test #${count++}\n`+ '='.repeat(20));
+        test = require(`${__dirname}/${mod}`);
+        console.log(test, '\n');
+        if (test) await test(); else 'Test Skipped...';
     }
     console.log('Completed all tests.');
 })();
