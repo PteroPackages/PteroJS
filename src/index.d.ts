@@ -291,7 +291,7 @@ export class ScheduleManager {
     public cache: Dict<string, Dict<number, Schedule>>;
 
     public _patch(id: number, data: object): Schedule|Dict<number, Schedule>;
-    public fetch(server: string, id: number, force?: boolean): Promise<Schedule | Dict<number, Schedule>>;
+    public fetch(server: string, id?: number, force?: boolean): Promise<Schedule | Dict<number, Schedule>>;
     public create(
         server: string,
         options:{
