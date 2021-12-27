@@ -29,6 +29,12 @@ export class PteroApp {
     public options: ApplicationOptions;
     public readyAt: number;
     public ping: number;
+    public users: UserManager;
+    public nodes: NodeManager;
+    public nests: NestManager;
+    public servers: ApplicationServerManager;
+    public locations: NodeLocationManager;
+    public requests: ApplicationRequestManager;
 
     public connect(): Promise<boolean>;
     public disconnect(): void;
