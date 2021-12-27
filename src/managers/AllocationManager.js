@@ -1,4 +1,5 @@
-const endpoints = require('../client/managers/endpoints');
+const Dict = require('../structures/Dict');
+const endpoints = require('../client/endpoints');
 
 class AllocationManager {
     constructor(client, server, data) {
@@ -11,8 +12,8 @@ class AllocationManager {
          */
         this.isClient = client.constructor.name === 'PteroClient';
 
-        /** @type {Set<Allocation>} */
-        this.cache = new Set();
+        /** @type {Dict<number, Allocation>} */
+        this.cache = new Dict();
         this._patch(data);
     }
 
@@ -20,10 +21,10 @@ class AllocationManager {
         if (!data?.allocations && !data?.data && !data?.attributes) return;
         if (data.allocations) data = data.allocations;
         if (data.data) {
-            const res = new Set();
+            const res = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
-                res.add({
+                res.set(o.id, {
                     id: o.id,
                     ip: o.ip,
                     ipAlias: o.ip_alias,
@@ -32,7 +33,7 @@ class AllocationManager {
                     isDefault: o.is_default
                 });
             }
-            res.forEach(a => this.cache.add(a));
+            res.forEach((v, k) => this.cache.set(k, v));
             return res;
         } else {
             data = data.attributes;
@@ -44,7 +45,7 @@ class AllocationManager {
                 notes: data.notes ?? null,
                 isDefault: data.is_default
             }
-            this.cache.add(o);
+            this.cache.set(data.id, o);
             return o;
         }
     }
@@ -85,9 +86,7 @@ class AllocationManager {
         await this.client.requests.make(
             endpoints.servers.network.get(this.server.identifier, id), null, 'DELETE'
         );
-        const res = this.cache;
-        this.cache.forEach(a => { if (a.id !== id) res.add(a) });
-        this.cache = a;
+        this.cache.delete(id);
     }
 }
 

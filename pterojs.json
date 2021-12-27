@@ -1,0 +1,44 @@
+{
+    "application":{
+        "users":{
+            "fetch": true,
+            "cache": true,
+            "max": -1
+        },
+        "nodes":{
+            "fetch": true,
+            "cache": true,
+            "max": -1
+        },
+        "nests":{
+            "fetch": false,
+            "cache": false,
+            "max": 0
+        },
+        "servers":{
+            "fetch": false,
+            "cache": true,
+            "max": 10
+        },
+        "locations":{
+            "fetch": false,
+            "cache": false,
+            "max": 0
+        }
+    },
+    "client":{
+        "ws": true,
+        "fetchClient": true,
+        "servers":{
+            "fetch": true,
+            "cache": true,
+            "max": -1
+        },
+        "subUsers":{
+            "fetch": false,
+            "cache": false,
+            "max": 0
+        },
+        "disableEvents":["debug"]
+    }
+}

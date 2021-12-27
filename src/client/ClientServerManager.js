@@ -1,5 +1,5 @@
-const ClientServer = require('../../structures/ClientServer');
-const Dict = require('../../structures/Dict');
+const ClientServer = require('../structures/ClientServer');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class ClientServerManager {
@@ -21,11 +21,11 @@ class ClientServerManager {
                 const s = new ClientServer(this.client, o);
                 res.set(s.identifier, s);
             }
-            if (this.client.options.cacheServers) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.servers.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         const s = new ClientServer(this.client, data);
-        if (this.client.options.cacheServers) this.cache.set(s.identifier, s);
+        if (this.client.options.servers.cache) this.cache.set(s.identifier, s);
         return s;
     }
 

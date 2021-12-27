@@ -1,6 +1,6 @@
-const ApplicationServer = require('../../structures/ApplicationServer');
-const Dict = require('../../structures/Dict');
-const { PteroUser } = require('../../structures/User');
+const ApplicationServer = require('../structures/ApplicationServer');
+const Dict = require('../structures/Dict');
+const { PteroUser } = require('../structures/User');
 const endpoints = require('./endpoints');
 
 class ApplicationServerManager {
@@ -34,11 +34,11 @@ class ApplicationServerManager {
                 const s = new ApplicationServer(this.client, o);
                 res.set(s.id, s);
             }
-            if (this.client.options.cacheServers) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.servers.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         const s = new ApplicationServer(this.client, data.attributes);
-        if (this.client.options.cacheServers) this.cache.set(s.id, s);
+        if (this.client.options.servers.cache) this.cache.set(s.id, s);
         return s;
     }
 

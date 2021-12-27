@@ -1,9 +1,9 @@
-const SubUserManager = require('../client/managers/SubUserManager');
+const SubUserManager = require('../client/SubUserManager');
 const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const Permissions = require('./Permissions');
-const endpoints = require('../client/managers/endpoints');
+const endpoints = require('../client/endpoints');
 
 class ClientServer {
     constructor(client, data) {
@@ -115,7 +115,7 @@ class ClientServer {
              * The current power state of the server.
              * @type {string}
              */
-            this.state = 'unknown';
+            this.state = data.state || 'unknown';
         }
 
         if ('is_installing' in data) {
@@ -133,6 +133,10 @@ class ClientServer {
      */
     addWebSocket() {
         this.client.addSocketServer(this.identifier);
+    }
+
+    get schedules() {
+        return this.client.schedules.cache.get(this.identifier);
     }
 
     /** @todo */

@@ -6,6 +6,7 @@ const { ClientOptions } = require('../client/PteroClient');
  * specified by the user.
  * @param {object} data Data to parse application options from.
  * @returns {ApplicationOptions}
+ * @deprecated Use configLoader util instead.
  */
 function application(data) {
     if (typeof data !== 'object') throw new TypeError('Invalid application options object.');
@@ -30,6 +31,7 @@ function application(data) {
  * specified by the user.
  * @param {object} data Data to parse client options from.
  * @returns {ClientOptions}
+ * @deprecated Use configLoader util instead.
  */
 function client(data) {
     if (typeof data !== 'object') throw new TypeError('Invalid client options object.');

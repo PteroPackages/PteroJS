@@ -1,30 +1,49 @@
 module.exports = {
     version: require('../package.json').version,
 
-    AllocationManager: require('./managers/AllocationManager'),
-    ApplicationRequestManager: require('./application/managers/ApplicationRequestManager'),
-    ApplicationServerManager: require('./application/managers/ApplicationServerManager'),
-    ApplicationServer: require('./structures/ApplicationServer'),
-    BackupManager: require('./client/managers/BackupManager'),
-    BaseUser: require('./structures/User').BaseUser,
-    ClientRequestManager: require('./client/managers/ClientRequestManager'),
-    ClientServer: require('./structures/ClientServer'),
-    ClientServerManager: require('./client/managers/ClientServerManager'),
-    ClientUser: require('./structures/User').ClientUser,
-    DatabaseManager: require('./managers/DatabaseManager'),
-    Dict: require('./structures/Dict'),
-    Errors: require('./structures/Errors'),
-    FileManager: require('./managers/FileManager'),
-    Node: require('./structures/Node'),
-    NodeLocationManager: require('./application/managers/NodeLocationManager'),
-    NodeManager: require('./application/managers/NestManager'),
-    Permissions: require('./structures/Permissions'),
-    Presets: require('./structures/Presets'),
+    // Application API
     PteroApp: require('./application/PteroApp'),
+    UserManager: require('./application/UserManager'),
+    NodeManager: require('./application/NodeManager'),
+    NestManager: require('./application/NestManager'),
+    NestEggsManager: require('./application/NestEggsManager'),
+    ApplicationServerManager: require('./application/ApplicationServerManager'),
+    NodeLocationManager: require('./application/NodeLocationManager'),
+    ApplicationRequestManager: require('./application/ApplicationRequestManager'),
+
+    // Client API
     PteroClient: require('./client/PteroClient'),
-    PteroSubUser: require('./structures/User').PteroSubUser,
-    PteroUser: require('./structures/User').PteroUser,
+    ClientServerManager: require('./client/ClientServerManager'),
+    ScheduleManager: require('./client/ScheduleManager'),
+    ClientRequestManager: require('./client/ClientRequestManager'),
+    BackupManager: require('./client/BackupManager'),
+    SubUserManager: require('./client/SubUserManager'),
+
+    // Websocket
+    Shard: require('./client/ws/Shard'),
+    WebSocketManager: require('./client/ws/WebSocketManager'),
+
+    // Global Managers
+    AllocationManager: require('./managers/AllocationManager'),
+    DatabaseManager: require('./managers/DatabaseManager'),
+    FileManager: require('./managers/FileManager'),
+
+    // Package Structures
+    ApplicationServer: require('./structures/ApplicationServer'),
+    ClientServer: require('./structures/ClientServer'),
+    Dict: require('./structures/Dict'),
+    Node: require('./structures/Node'),
+    Permissions: require('./structures/Permissions'),
+    /** @deprecated Use configLoader util instead. */
+    Presets: require('./structures/Presets'),
     Schedule: require('./structures/Schedule'),
-    SubUserManager: require('./client/managers/SubUserManager'),
-    UserManager: require('./application/managers/UserManager')
+    ...require('./structures/Errors'),
+    ...require('./structures/User'),
+
+    // Utils
+    configLoader: require('./structures/configLoader'),
+    caseConv: require('./structures/caseConv'),
+
+    // Extensions
+    NodeStatus: require('./extensions/NodeStatus')
 };

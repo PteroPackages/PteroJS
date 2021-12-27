@@ -1,6 +1,6 @@
-const { NodeLocation } = require('../application/managers/NodeLocationManager');
-const json = require('./Jsonifier');
-const endpoints = require('../application/managers/endpoints');
+const { NodeLocation } = require('../application/NodeLocationManager');
+const caseConv = require('./caseConv');
+const endpoints = require('../application/endpoints');
 
 class Node {
     constructor(client, data) {
@@ -210,9 +210,7 @@ class Node {
      * @returns {Promise<boolean>}
      */
     async delete() {
-        await this.client.requests.make(endpoints.nodes.get(this.id), null, 'DELETE');
-        this.client.nodes.cache.delete(this.id);
-        return true;
+        return this.client.nodes.delete(this.id);
     }
 
     /**
@@ -220,7 +218,7 @@ class Node {
      * @returns {object} The JSON value.
      */
     toJSON() {
-        return json(this, ['client']);
+        return caseConv.snakeCase(this, ['client']);
     }
 }
 

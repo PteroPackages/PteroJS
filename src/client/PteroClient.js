@@ -1,10 +1,11 @@
 const { EventEmitter } = require('events');
-const ClientRequestManager = require('./managers/ClientRequestManager');
-const ClientServerManager = require('./managers/ClientServerManager');
+const ClientRequestManager = require('./ClientRequestManager');
+const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
-const WebSocketManager = require('./managers/WebSocketManager');
-const endpoints = require('./managers/endpoints');
-const presets = require('../structures/Presets');
+const ScheduleManager = require('./ScheduleManager');
+const WebSocketManager = require('./ws/WebSocketManager');
+const endpoints = require('./endpoints');
+const loader = require('../structures/configLoader');
 
 /**
  * The base class for the Pterodactyl client API.
@@ -43,7 +44,7 @@ class PteroClient extends EventEmitter {
          * Additional startup options for the client (optional).
          * @type {ClientOptions}
          */
-        this.options = presets.client(options);
+        this.options = loader.clientConfig(options);
 
         /** @type {?Date} */
         this.readyAt = null;
@@ -56,6 +57,8 @@ class PteroClient extends EventEmitter {
 
         /** @type {ClientServerManager} */
         this.servers = new ClientServerManager(this);
+        /** @type {ScheduleManager} */
+        this.schedules = new ScheduleManager(this);
         /** @type {ClientRequestManager} @internal */
         this.requests = new ClientRequestManager(this);
         /** @type {WebSocketManager} @internal */
@@ -70,12 +73,13 @@ class PteroClient extends EventEmitter {
      * @fires PteroClient#ready
      */
     async connect() {
+        if (this.readyAt) return;
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
         if (this.options.fetchClient) this.user = await this.fetchClient();
-        if (this.options.fetchServers && this.options.cacheServers) await this.servers.fetch();
-        // if (this.options.ws) await this.ws.connect();
+        if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
+        if (this.options.ws) await this.ws.launch();
         this.readyAt = Date.now();
         return true;
     }
@@ -107,28 +111,50 @@ class PteroClient extends EventEmitter {
     removeSocketServer(id) {
         this.ws.servers.splice(id);
     }
+
+    /**
+     * Disconnects from the Pterodactyl API and closes any existing websocket connections.
+     * @returns {void}
+     */
+    disconnect() {
+        this.ping = null;
+        this.readyAt = null;
+        if (!this.ws.readyAt) this.ws.destroy();
+    }
 }
 
 module.exports = PteroClient;
+
+/**
+ * @typedef {object} OptionSpec
+ * @property {boolean} fetch
+ * @property {boolean} cache
+ * @property {number} max
+ */
 
 /**
  * Startup options for the client API.
  * @typedef {object} ClientOptions
  * @property {boolean} [ws] Whether to enable server websocket connections (default: `false`).
  * @property {boolean} [fetchClient] Whether to fetch the client user (default `true`).
- * @property {boolean} [fetchServers] Whether to fetch all servers (default: `false`).
- * @property {boolean} [cacheServers] Whether to cache servers (default `true`).
- * @property {boolean} [cacheSubUsers] Whether to cache server subusers (default `true`).
+ * @property {OptionSpec} [servers] Options for fetching and caching servers.
+ * @property {OptionSpec} [subUsers] Options for fetching and caching server subusers.
  * @property {string[]} [disableEvents] An array of events to disable (wont be emitted).
- */
-
-/**
- * Emitted when the websocket manager is ready.
- * @event PteroClient#ready
  */
 
 /**
  * Debug event emitted for websocket events.
  * @event PteroClient#debug
  * @param {string} message The message emitted with the event.
+ */
+
+/**
+ * Emitted when the websocket encounters an error.
+ * @event PteroClient#error
+ * @param {*} error The error received.
+ */
+
+/**
+ * Emitted when the websocket manager is ready.
+ * @event PteroClient#ready
  */

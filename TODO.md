@@ -10,7 +10,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 ## Client
 - [X] Use typed `ClientOptions` for startup ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L13))
 - [X] Setup `connect()` function ([PteroClient](https://github.com/devnote-dev/PteroJS/blob/main/src/client/PteroClient.js#L26))
-- [ ] Create and implement `WebsocketManager`
+- [X] Create and implement `WebsocketManager`
 - [X] Rename endpoints in endpoints structure
 - [X] Rewrite `ServerManager` with the correct server class ([ServerManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/ServerManager.js))
 - [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
@@ -19,13 +19,13 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Document all functions
 
 ## Global Managers
-- [ ] Implement helper functions for all the managers
-- [ ] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
+- [X] Implement helper functions for all the managers
+- [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
 - [ ] Document all functions
-- [ ] Switch `AllocationManager#cache` to maps
+- [X] Switch `AllocationManager#cache` to maps
 
 ## Global Structures
-- [ ] Implement helper functions for all the structures
+- [X] Implement helper functions for all the structures
 - [X] Figure out and implement a consistent management system for `Permissions` ([Permissions](https://github.com/devnote-dev/PteroJS/blob/main/src/structures/Permissions.js))
 
 ## Misc.
@@ -33,9 +33,9 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Overall testing of the package (priority)
 - [X] TypeScript support (`index.d.ts`)
 - [X] Investigate incorrectly documented endpoints
+- [ ] Implement tests in `/tests` (or move from `/test`)
 
 ## Feature Plans
 - [ ] Optional webhook client
-- [ ] Python version of the library
-- [ ] Node status client
-- [ ] Data formatter interface client
+- [X] Node status client
+- [ ] Data formatter interface client (may be updated to logging client)

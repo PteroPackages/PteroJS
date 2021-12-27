@@ -1,4 +1,4 @@
-const Dict = require('../../structures/Dict');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class NodeLocationManager {
@@ -22,7 +22,7 @@ class NodeLocationManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
-            if (this.client.options.cacheLocations) res.forEach((v, k) => this.cache.set(k, v));
+            if (this.client.options.locations.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
         data = data.attributes;
@@ -33,7 +33,7 @@ class NodeLocationManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         }
-        if (this.client.options.cacheLocations) this.cache.set(data.id, loc);
+        if (this.client.options.locations.cache) this.cache.set(data.id, loc);
         return loc;
     }
 

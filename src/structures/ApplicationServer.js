@@ -3,8 +3,8 @@ const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const { PteroUser } = require('./User');
 const Node = require('./Node');
-const json = require('./Jsonifier');
-const endpoints = require('../application/managers/endpoints');
+const caseConv = require('./caseConv');
+const endpoints = require('../application/endpoints');
 
 class ApplicationServer {
     constructor(client, data) {
@@ -111,11 +111,11 @@ class ApplicationServer {
 
         if ('user' in data) {
             /**
-             * The ID of the user. Use {@link ApplicationServer.fetchOwner} to return the
+             * The ID of the server owner. Use {@link ApplicationServer.fetchOwner} to return the
              * full PteroUser object via {@link ApplicationServer.owner}.
              * @type {number}
              */
-            this.user = data.user;
+            this.ownerId = data.user;
         }
 
         if (!this.owner) {
@@ -178,6 +178,18 @@ class ApplicationServer {
     }
 
     /**
+     * Fetches the PteroUser object of the server owner.
+     * The user can be accessed via {@link ApplicationServer.owner}.
+     * @returns {Promise<PteroUser>} The fetched user.
+     */
+    async fetchOwner() {
+        if (this.owner) return this.owner;
+        const user = await this.client.users.fetch(this.ownerId, { force: true });
+        this.owner = user;
+        return user;
+    }
+
+    /**
      * Updates details of the server.
      * @param {object} options Update details options.
      * @param {string} [options.name] The new name of the server.
@@ -203,13 +215,6 @@ class ApplicationServer {
         this._patch(payload);
         return this;
     }
-
-    /**
-     * Fetches the PteroUser object of the server owner.
-     * The user can be accessed via {@link ApplicationServer.owner}.
-     * @returns {Promise<PteroUser>} The fetched user.
-     */
-    async fetchOwner() {}
 
     /**
      * Updates the server's build structure.
@@ -252,11 +257,20 @@ class ApplicationServer {
     }
 
     /**
+     * Deletes the server (with force option).
+     * @param {boolean} [force] Whether to force delete the server.
+     * @returns {Promise<boolean>}
+     */
+    async delete(force = false) {
+        return this.client.servers.delete(this.id, force);
+    }
+
+    /**
      * Returns the JSON value of the server.
      * @returns {object} The JSON value.
      */
     toJSON() {
-        return json(this, ['client']);
+        return caseConv.snakeCase(this, ['client']);
     }
 }
 

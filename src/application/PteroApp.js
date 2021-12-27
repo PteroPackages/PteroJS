@@ -1,10 +1,10 @@
-const ApplicationRequestManager = require('./managers/ApplicationRequestManager');
-const ApplicationServerManager = require('./managers/ApplicationServerManager');
-const NestManager = require('./managers/NestManager');
-const NodeLocationManager = require('./managers/NodeLocationManager');
-const NodeManager = require('./managers/NodeManager');
-const UserManager = require('./managers/UserManager');
-const presets = require('../structures/Presets');
+const ApplicationRequestManager = require('./ApplicationRequestManager');
+const ApplicationServerManager = require('./ApplicationServerManager');
+const NestManager = require('./NestManager');
+const NodeLocationManager = require('./NodeLocationManager');
+const NodeManager = require('./NodeManager');
+const UserManager = require('./UserManager');
+const loader = require('../structures/configLoader');
 
 /**
  * The base class for the Pterodactyl application API.
@@ -40,7 +40,7 @@ class PteroApp {
          * Additional startup options for the application (optional).
          * @type {ApplicationOptions}
          */
-        this.options = presets.application(options);
+        this.options = loader.appConfig(options);
 
         /** @type {?Date} */
         this.readyAt = null;
@@ -69,34 +69,47 @@ class PteroApp {
      * @returns {Promise<boolean>}
      */
     async connect() {
+        if (this.readyAt) return;
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
-        if (this.options.fetchUsers && this.options.cacheUsers) await this.users.fetch();
-        if (this.options.fetchNodes && this.options.cacheNodes) await this.nodes.fetch();
-        if (this.options.fetchNests && this.options.cacheNests) await this.nests.fetch();
-        if (this.options.fetchServers && this.options.cacheServers) await this.servers.fetch();
-        if (this.options.fetchLocations && this.options.fetchLocations) await this.locations.fetch();
+        if (this.options.users.fetch && this.options.users.cache) await this.users.fetch();
+        if (this.options.nodes.fetch && this.options.nodes.cache) await this.nodes.fetch();
+        if (this.options.nests.fetch && this.options.nests.cache) await this.nests.fetch();
+        if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
+        if (this.options.locations.fetch && this.options.locations.cache) await this.locations.fetch();
         this.readyAt = Date.now();
         return true;
+    }
+
+    /**
+     * Disconnects from the Pterodactyl API.
+     * @returns {void}
+     */
+    async disconnect() {
+        if (!this.readyAt) return;
+        this.ping = null;
+        this.readyAt = null;
     }
 }
 
 module.exports = PteroApp;
 
 /**
+ * @typedef {object} OptionSpec
+ * @property {boolean} fetch
+ * @property {boolean} cache
+ * @property {number} max
+ */
+
+/**
  * Startup options for the application API.
  * By default, all fetch options are `false`, and all cache options are `true`.
  * Enabling fetch and disabling cache for the same class will cancel out the request.
  * @typedef {object} ApplicationOptions
- * @property {boolean} [fetchUsers] Whether to fetch all users.
- * @property {boolean} [fetchNodes] Whether to fetch all nodes.
- * @property {boolean} [fetchNests] Whether to fetch all nests.
- * @property {boolean} [fetchServers] Whether to fetch all servers.
- * @property {boolean} [fetchLocations] Whether to fetch all node locations.
- * @property {boolean} [cacheUsers] Whether to cache users.
- * @property {boolean} [cacheNodes] Whether to cache nodes.
- * @property {boolean} [cacheNests] Whether to cache nests.
- * @property {boolean} [cacheServers] Whether to cache servers.
- * @property {boolean} [cacheLocations] Whether to cache node locations.
+ * @property {OptionSpec} [users] Options for fetching and caching users.
+ * @property {OptionSpec} [nodes] Options for fetching and caching nodes.
+ * @property {OptionSpec} [nests] Options for fetching and caching nests.
+ * @property {OptionSpec} [servers] Options for fetching and caching servers.
+ * @property {OptionSpec} [locations] Options for fetching and caching node locations.
  */

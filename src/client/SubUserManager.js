@@ -1,7 +1,7 @@
-const { PteroSubUser } = require('../../structures/User');
-const Permissions = require('../../structures/Permissions');
-const { PermissionResolvable } = require('../../structures/Permissions');
-const Dict = require('../../structures/Dict');
+const { PteroSubUser } = require('../structures/User');
+const Permissions = require('../structures/Permissions');
+const { PermissionResolvable } = require('../structures/Permissions');
+const Dict = require('../structures/Dict');
 const endpoints = require('./endpoints');
 
 class SubUserManager {
@@ -19,13 +19,13 @@ class SubUserManager {
             for (let o of data.data) {
                 o = o.attributes;
                 const u = new PteroSubUser(this.client, this.server.identifier, o);
-                this.cache.set(u.uuid, u);
                 s.set(u.uuid, u);
             }
+            if (this.client.options.subUsers.cache) s.forEach((v, k) => this.cache.set(k, v));
             return s;
         }
         const u = new PteroSubUser(this.client, this.server.identifier, data.attributes);
-        this.cache.set(u.uuid, u);
+        if (this.client.options.subUsers.cache) this.cache.set(u.uuid, u);
         return u;
     }
 
