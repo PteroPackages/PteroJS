@@ -1,9 +1,9 @@
 const { PteroApp } = require('@devnote-dev/pterojs');
 const { assert } = require('.');
-const { api_url, api_key } = require('./auth.json');
+const { api_url, app_key } = require('./auth.json');
 
 module.exports = async () => {
-    const client = new PteroApp(api_url, api_key);
+    const client = new PteroApp(api_url, app_key);
     await client.connect();
 
     const users = await client.users.fetch();

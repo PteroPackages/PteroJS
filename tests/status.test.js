@@ -1,11 +1,11 @@
 const { NodeStatus } = require('@devnote-dev/pterojs');
 const { assert } = require('.');
-const { api_url, api_key } = require('./auth.json');
+const { api_url, app_key } = require('./auth.json');
 
 module.exports = async () => {
     const status = new NodeStatus({
         domain: api_url,
-        auth: api_key,
+        auth: app_key,
         nodes:[1],
         callInterval: 30_000
     });
