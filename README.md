@@ -69,4 +69,4 @@ Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TO
 
 This repository is managed under the MIT license.
 
-© 2021 devnote-dev
+© 2021-2022 devnote-dev
