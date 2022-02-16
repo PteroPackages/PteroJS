@@ -47,7 +47,7 @@ export class UserManager {
     public cache: Dict<number, PteroUser>;
 
     public _patch(data: object): PteroUser | Dict<number, PteroUser>;
-    public resolve(obj: string|number|object|PteroUser): PteroUser | null;
+    public resolve(obj: string | number | object | PteroUser): PteroUser | null;
     public fetch(id?: number, options?:{ force?: boolean; withServers?: boolean }): Promise<PteroUser | Dict<number, PteroUser>>;
     public fetchExternal(id: number, options?:{ force?: boolean; withServers?: boolean }): Promise<PteroUser>;
     public query(entity: string, filter?: string, sort?: string): Promise<Dict<number, PteroUser>>;
@@ -103,7 +103,7 @@ export class NodeManager {
         memory_overallocate?: number;
         disk_overallocate?: number;
     }): Promise<Node>;
-    public delete(node: number|Node): Promise<boolean>;
+    public delete(node: number | Node): Promise<boolean>;
 }
 
 export interface Nest {
@@ -153,11 +153,11 @@ export class ApplicationServerManager {
     public static get defaultFeatureLimits(): object;
 
     public _patch(data: object): ApplicationServer | Dict<number, ApplicationServer>;
-    public resolve(obj: string|number|object|ApplicationServer): ApplicationServer | null;
-    public fetch(id?: number, options?:{ force?: boolean; include?: string[] }): Promise<ApplicationServer>;
-    public query(entity: string, filter?: string, sort?: 'id'|'-id'|'uuid'|'-uuid'): Promise<Dict<number, ApplicationServer>>;
+    public resolve(obj: string | number | object | ApplicationServer): ApplicationServer | null;
+    public fetch(id?: number, options?:{ force?: boolean; include?: string[] }): Promise<ApplicationServer | Dict<number, ApplicationServer>>;
+    public query(entity: string, filter?: string, sort?: 'id' | '-id' | 'uuid' | '-uuid'): Promise<Dict<number, ApplicationServer>>;
     public create(
-        user: number|PteroUser,
+        user: number | PteroUser,
         options:{
             name: string;
             egg: string;
@@ -340,7 +340,7 @@ export interface Backup {
 }
 
 export class BackupManager {
-    constructor(client: PteroApp|PteroClient, server?: ApplicationServer);
+    constructor(client: PteroApp | PteroClient, server?: ApplicationServer);
 
     public readonly client: PteroApp | PteroClient;
     public cache: Dict<string, Backup>;
@@ -359,7 +359,7 @@ export class SubUserManager {
     public cache: Dict<string, PteroSubUser>;
 
     public _patch(data: object): PteroSubUser | Dict<string, PteroSubUser>;
-    public resolve(obj: string|number|object|PteroSubUser): PteroSubUser | null;
+    public resolve(obj: string | number | object | PteroSubUser): PteroSubUser | null;
     public fetch(id?: string, force?: boolean): Promise<PteroSubUser | Dict<string, PteroSubUser>>;
     public add(email: string, permissions: PermissionResolvable): Promise<PteroSubUser>;
     public setPermissions(uuid: string, permissions: PermissionResolvable): Promise<PteroSubUser>;
@@ -417,7 +417,7 @@ export interface Allocation {
 }
 
 export class AllocationManager {
-    constructor(client: PteroApp|PteroClient, server: ApplicationServer|ClientServer, data: object);
+    constructor(client: PteroApp | PteroClient, server: ApplicationServer | ClientServer, data: object);
 
     public readonly client: PteroApp | PteroClient;
     public readonly server: ApplicationServer | ClientServer;
@@ -445,7 +445,7 @@ export interface Database {
 }
 
 export class DatabaseManager {
-    constructor(client: PteroApp|PteroClient, server: ApplicationServer|ClientServer, data: object);
+    constructor(client: PteroApp | PteroClient, server: ApplicationServer | ClientServer, data: object);
 
     public readonly client: PteroApp | PteroClient;
     public readonly server: ApplicationServer | ClientServer;
@@ -469,11 +469,11 @@ export interface PteroFile {
     isEditable?: boolean;
     mimetype:    string;
     createdAt:   Date;
-    modifiedAt:  Date|null;
+    modifiedAt:  Date | null;
 }
 
 export class FileManager {
-    constructor(client: PteroApp|PteroClient, server: ApplicationServer|ClientServer, data: object);
+    constructor(client: PteroApp | PteroClient, server: ApplicationServer | ClientServer, data: object);
 
     public readonly client: PteroApp | PteroClient;
     public readonly server: ApplicationServer | ClientServer;
@@ -556,7 +556,7 @@ export class ClientServer {
     public _patch(data: object): void;
     public addWebSocket(): void;
     public sendCommand(command: string): Promise<void>;
-    public setPowerState(state: 'start'|'stop'|'restart'|'kill'): Promise<void>;
+    public setPowerState(state: 'start' | 'stop' | 'restart' | 'kill'): Promise<void>;
 }
 
 export interface DictConstructor {
@@ -711,7 +711,7 @@ export class Permissions {
     public static get FLAGS(): Readonly<PermissionFlags>;
     public static get DEFAULT(): Readonly<PermissionFlags>;
 
-    public has(perms: string|number|PermissionResolvable): boolean;
+    public has(perms: string | number | PermissionResolvable): boolean;
     public isAdmin(): boolean;
     public static resolve(perms: PermissionResolvable): { [key: string]: number };
     public serialize(): { [key: string]: boolean };
@@ -788,7 +788,7 @@ export class WebSocketError extends Error {
 }
 
 export class BaseUser {
-    constructor(client: PteroApp|PteroClient, data: object);
+    constructor(client: PteroApp | PteroClient, data: object);
 
     public readonly client: PteroApp | PteroClient;
     public readonly id: number;
@@ -810,7 +810,8 @@ export class PteroUser extends BaseUser {
     public externalId: string;
     public uuid: string;
     public isAdmin: boolean;
-    public tfa: string;
+    public tfa: boolean;
+    public twoFactor: boolean;
     public createdAt: Date;
     public updatedAt: Date | null;
     public relationships: Dict<number, ApplicationServer> | null;
