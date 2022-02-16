@@ -64,7 +64,7 @@ class ClientRequestManager {
             this.client.ping = -1;
             await this.make('/api/client');
         } catch (err) {
-            if (!err?.code) throw new RequestError('Pterodactyl API is unavailable.');
+            if (!err?.code) throw new RequestError(`Pterodactyl API is unavailable\nResponse: ${err}`);
             return true;
         }
     }
