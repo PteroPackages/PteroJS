@@ -18,6 +18,12 @@ class NodeStatus extends EventEmitter {
         super();
 
         Object.assign(this, options);
+        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.]{3,256})/gi.test(this.domain))
+            throw new SyntaxError(
+                "Domain URL must start with 'http://' or 'https://' and "+
+                'must be bound to a port if using localhost.'
+            );
+
         this.headers['Authorization'] = 'Bearer '+ options.auth;
         this.nextInterval ||= 5;
         this.retryLimit ||= 0;

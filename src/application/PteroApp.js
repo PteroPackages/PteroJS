@@ -21,6 +21,12 @@ class PteroApp {
      * @param {ApplicationOptions} [options] Additional application options.
      */
     constructor(domain, auth, options = {}) {
+        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.]{3,256})/gi.test(domain))
+            throw new SyntaxError(
+                "Domain URL must start with 'http://' or 'https://' and "+
+                'must be bound to a port if using localhost.'
+            );
+
         /**
          * The domain for your Pterodactyl panel. This should be the main URL only
          * (not "/api"). Any additional paths will count as the API path.
@@ -50,14 +56,19 @@ class PteroApp {
 
         /** @type {UserManager} */
         this.users = new UserManager(this);
+
         /** @type {NodeManager} */
         this.nodes = new NodeManager(this);
+
         /** @type {NestManager} */
         this.nests = new NestManager(this);
+
         /** @type {ApplicationServerManager} */
         this.servers = new ApplicationServerManager(this);
+
         /** @type {NodeLocationManager} */
         this.locations = new NodeLocationManager(this);
+
         /** @type {ApplicationRequestManager} @internal */
         this.requests = new ApplicationRequestManager(this);
     }
@@ -73,11 +84,13 @@ class PteroApp {
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
+
         if (this.options.users.fetch && this.options.users.cache) await this.users.fetch();
         if (this.options.nodes.fetch && this.options.nodes.cache) await this.nodes.fetch();
         if (this.options.nests.fetch && this.options.nests.cache) await this.nests.fetch();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
         if (this.options.locations.fetch && this.options.locations.cache) await this.locations.fetch();
+
         this.readyAt = Date.now();
         return true;
     }

@@ -25,6 +25,12 @@ class PteroClient extends EventEmitter {
     constructor(domain, auth, options = {}) {
         super();
 
+        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.]{3,256})/gi.test(domain))
+            throw new SyntaxError(
+                "Domain URL must start with 'http://' or 'https://' and "+
+                'must be bound to a port if using localhost.'
+            );
+
         /**
          * The domain for your Pterodactyl panel. This should be the main URL only
          * (not "/api"). Any additional paths will count as the API path.
@@ -57,11 +63,14 @@ class PteroClient extends EventEmitter {
 
         /** @type {ClientServerManager} */
         this.servers = new ClientServerManager(this);
+
         /** @type {ScheduleManager} */
         this.schedules = new ScheduleManager(this);
+
         /** @type {ClientRequestManager} @internal */
         this.requests = new ClientRequestManager(this);
-        /** @type {WebSocketManager} @internal */
+
+        /** @type {WebSocketManager} */
         this.ws = new WebSocketManager(this);
     }
 
@@ -77,9 +86,11 @@ class PteroClient extends EventEmitter {
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
+
         if (this.options.fetchClient) this.user = await this.fetchClient();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
         if (this.options.ws) await this.ws.launch();
+
         this.readyAt = Date.now();
         return true;
     }
