@@ -5,6 +5,8 @@ const Dict = require('./Dict');
 const caseConv = require('./caseConv');
 const c_path = require('../client/endpoints');
 
+let loggedDeprecated = false;
+
 class BaseUser {
     constructor(client, data) {
         this.client = client;
@@ -84,13 +86,28 @@ class PteroUser extends BaseUser {
         }
 
         if ('2fa' in data) {
-            /** @type {boolean} */
+            /**
+             * @type {boolean}
+             * @deprecated Use {@link PteroUser.twoFactor} instead.
+             */
             this.tfa = data['2fa'];
+
+            /** @type {boolean} */
+            this.twoFactor = data['2fa'];
+
+            if (!loggedDeprecated) {
+                process.emitWarning(
+                    "'PteroUser#tfa' is deprecated, use 'PteroUser#twoFactor' instead",
+                    'Deprecated'
+                );
+                loggedDeprecated = true;
+            }
         }
 
         if ('created_at' in data) {
             /** @type {Date} */
             this.createdAt = new Date(data.created_at);
+
             /** @type {number} */
             this.createdTimestamp = this.createdAt.getTime();
         }
@@ -145,6 +162,7 @@ class PteroSubUser extends BaseUser {
 
         /** @type {Date} */
         this.createdAt = new Date(data.created_at);
+
         /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
@@ -265,7 +283,7 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async updatePassword(oldpass, newpass) {
-        if (oldpass === newpass) return;
+        if (oldpass === newpass) return Promise.resolve();
         return await this.client.requests.make(
             c_path.account.password,
             {
