@@ -3,4 +3,5 @@ node_modules/
 test/
 
 # General / Testing files
+package-lock.json
 auth.json
