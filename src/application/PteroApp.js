@@ -74,13 +74,11 @@ class PteroApp {
     }
 
     /**
-     * Sends a ping request to the API before performing additional startup requests.
-     * Attempting to use the application without connecting to the API will result
-     * in an error.
+     * Used for performing preload requests to Pterodactyl. You should use this at
+     * the start of your program to avoid request ratelimits.
      * @returns {Promise<boolean>}
      */
     async connect() {
-        if (this.readyAt) return;
         const start = Date.now();
         await this.requests.ping();
         this.ping = Date.now() - start;
@@ -93,16 +91,6 @@ class PteroApp {
 
         this.readyAt = Date.now();
         return true;
-    }
-
-    /**
-     * Disconnects from the Pterodactyl API.
-     * @returns {void}
-     */
-    async disconnect() {
-        if (!this.readyAt) return;
-        this.ping = null;
-        this.readyAt = null;
     }
 }
 
