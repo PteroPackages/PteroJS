@@ -18,5 +18,15 @@ assert.doesNotThrow(
     (async () => await app.users.fetch()),
     'could not fetch users endpoint'
 );
-
-app.disconnect();
+assert.doesNotThrow(
+    (async () => await app.nodes.fetch()),
+    'could not fetch nodes endpoint'
+);
+assert.doesNotThrow(
+    (async () => await app.locations.fetch()),
+    'could not fetch locations endpoint'
+);
+assert.doesNotThrow(
+    (async () => await app.nests.fetch()),
+    'could not fetch nests'
+);
