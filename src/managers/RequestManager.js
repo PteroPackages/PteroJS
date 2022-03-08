@@ -42,18 +42,20 @@ class RequestManager extends EventEmitter {
     async _make(path, params, method = 'GET') {
         const body = params?.raw ?? (params ? JSON.stringify(params) : null);
         this.#debug(`sending request: ${method} ${this.domain + path}`);
-        const res = await fetch(this.client.domain + path, {
+        const res = await fetch(this.domain + path, {
             method,
             body,
-            headers: this.headers
+            headers: this.getHeaders()
         });
         this.#debug(`received status: ${res.status}`);
 
-        if (res.status === 204) return null;
-        const data = await res.json();
-        super.emit('receive', data);
-        if ([201, 204].includes(res.status)) return data;
-        if (res.status >= 400 && res.status < 500) throw new PteroAPIError(data);
+        if ([202, 204].includes(res.status)) return null;
+        const data = await res.json().catch(()=>{});
+        if (data) {
+            super.emit('receive', data);
+            if (res.ok) return data;
+            if (res.status >= 400 && res.status < 500) throw new PteroAPIError(data);
+        }
 
         throw new RequestError(
             'Pterodactyl API returned an invalid or unacceptable response '+
