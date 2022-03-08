@@ -39,5 +39,6 @@ module.exports = (args, allowed) => {
         parsed.push(`sort=${args.sort}`);
     }
 
+    if (!parsed.length) return '';
     return '?' + parsed.join('&');
 }
