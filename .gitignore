@@ -1,6 +1,7 @@
 # General directories
 node_modules/
 test/
+src/extensions/Jexactyl
 
 # General / Testing files
 package-lock.json
