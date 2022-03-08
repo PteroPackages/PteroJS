@@ -3,7 +3,7 @@ const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
 const { PteroUser } = require('./User');
 const Node = require('./Node');
-const caseConv = require('./caseConv');
+const caseConv = require('../util/caseConv');
 const endpoints = require('../application/endpoints');
 
 class ApplicationServer {

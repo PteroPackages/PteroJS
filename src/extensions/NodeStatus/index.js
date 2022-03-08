@@ -1,6 +1,6 @@
 const { EventEmitter } = require('events');
 const fetch = require('node-fetch');
-const caseConv = require('../../structures/caseConv');
+const caseConv = require('../../util/caseConv');
 
 class NodeStatus extends EventEmitter {
     headers = {

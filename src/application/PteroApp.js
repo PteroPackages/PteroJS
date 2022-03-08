@@ -4,7 +4,7 @@ const NodeLocationManager = require('./NodeLocationManager');
 const NodeManager = require('./NodeManager');
 const UserManager = require('./UserManager');
 const RequestManager = require('../managers/RequestManager');
-const loader = require('../structures/configLoader');
+const loader = require('../util/configLoader');
 
 /**
  * The base class for the Pterodactyl application API.

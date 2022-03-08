@@ -5,7 +5,7 @@ const ScheduleManager = require('./ScheduleManager');
 const WebSocketManager = require('./ws/WebSocketManager');
 const RequestManager = require('../managers/RequestManager');
 const endpoints = require('./endpoints');
-const loader = require('../structures/configLoader');
+const loader = require('../util/configLoader');
 
 /**
  * The base class for the Pterodactyl client API.

@@ -2,7 +2,7 @@ const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
 const Dict = require('./Dict');
-const caseConv = require('./caseConv');
+const caseConv = require('../util/caseConv');
 const c_path = require('../client/endpoints');
 
 let loggedDeprecated = false;

@@ -34,15 +34,13 @@ module.exports = {
     Dict: require('./structures/Dict'),
     Node: require('./structures/Node'),
     Permissions: require('./structures/Permissions'),
-    /** @deprecated Use configLoader util instead. */
-    Presets: require('./structures/Presets'),
     Schedule: require('./structures/Schedule'),
     ...require('./structures/Errors'),
     ...require('./structures/User'),
 
     // Utils
-    configLoader: require('./structures/configLoader'),
-    caseConv: require('./structures/caseConv'),
+    configLoader: require('./util/configLoader'),
+    caseConv: require('./util/caseConv'),
 
     // Extensions
     NodeStatus: require('./extensions/NodeStatus')

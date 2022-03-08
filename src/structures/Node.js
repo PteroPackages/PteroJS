@@ -1,5 +1,5 @@
 const { NodeLocation } = require('../application/NodeLocationManager');
-const caseConv = require('./caseConv');
+const caseConv = require('../util/caseConv');
 const endpoints = require('../application/endpoints');
 
 class Node {
