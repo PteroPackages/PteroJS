@@ -49,8 +49,8 @@ class NestManager {
      * @returns {Promise<Set<Nest>>} The fetched nests.
      */
     async fetch(id) {
-        if (id) return this._patch(await this.client.requests.make(endpoints.nests.get(id)));
-        return this._patch(await this.client.requests.make(endpoints.nests.main));
+        if (id) return this._patch(await this.client.requests.get(endpoints.nests.get(id)));
+        return this._patch(await this.client.requests.get(endpoints.nests.main));
     }
 }
 

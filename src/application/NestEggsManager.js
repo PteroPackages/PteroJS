@@ -24,13 +24,13 @@ class NestEggsManager {
                 const e = this.cache.get(id);
                 if (e) return Promise.resolve(e);
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.nests.eggs.get(nest, id) + joinParams(options.include)
             );
             this.cache.set(id, data.data.attributes);
             return data.data.attributes;
         }
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.nests.eggs.main(nest) + joinParams(options.include)
         );
         const res = new Dict();

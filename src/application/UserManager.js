@@ -58,12 +58,12 @@ class UserManager {
                 const u = this.cache.get(id);
                 if (u) return Promise.resolve(u);
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.users.get(id) + (options.withServers ? '?include=servers' : '')
             );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.users.main + (options.withServers ? '?include=servers' : '')
         );
         return this._patch(data);
@@ -79,7 +79,7 @@ class UserManager {
      */
     async fetchExternal(id, options = {}) {
         if (!options.force) for (const [, user] of this.cache) if (id === user.externalId) return user;
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.users.ext(id) + (options.withServers ? '?include=servers' : '')
         );
         return this._patch(data);
@@ -110,7 +110,7 @@ class UserManager {
         if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
         if (!sort && !filter) throw new Error('sort or filter is required to query');
         if (filter === 'externalId') filter = 'external_id';
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.users.main +
             (filter ? `?filter[${filter}]=${entity}` : "") +
             (sort && filter ? `&sort=${sort}` : "") +
@@ -128,10 +128,9 @@ class UserManager {
      * @returns {Promise<PteroUser>} The new user.
      */
     async create(email, username, firstname, lastname) {
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.users.main,
-            { email, username, first_name: firstname, last_name: lastname },
-            'POST'
+            { email, username, first_name: firstname, last_name: lastname }
         );
         const u = await this.query(email, 'email');
         return u.first();
@@ -162,10 +161,9 @@ class UserManager {
         if (options.lastname) lastname = options.lastname;
         if (options.language) language = options.language;
 
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.patch(
             endpoints.users.get(id),
-            { email, username, first_name: firstname, last_name: lastname, language, password },
-            'PATCH'
+            { email, username, first_name: firstname, last_name: lastname, language, password }
         );
         return this._patch(data);
     }
@@ -177,7 +175,7 @@ class UserManager {
      */
     async delete(user) {
         if (user instanceof PteroUser) user = user.id;
-        await this.client.requests.make(endpoints.users.get(user), null, 'DELETE');
+        await this.client.requests.delete(endpoints.users.get(user));
         this.cache.delete(user);
         return true;
     }

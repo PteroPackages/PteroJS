@@ -64,10 +64,10 @@ class NodeLocationManager {
                 const l = this.cache.get(id);
                 if (l) return Promise.resolve(l);
             }
-            const data = await this.client.requests.make(endpoints.locations.get(id));
+            const data = await this.client.requests.get(endpoints.locations.get(id));
             return this._patch(data);
         }
-        const data = await this.client.requests.make(endpoints.locations.main);
+        const data = await this.client.requests.get(endpoints.locations.main);
         return this._patch(data);
     }
 
@@ -79,10 +79,9 @@ class NodeLocationManager {
      */
     async create(short, long) {
         return this._patch(
-            await this.client.requests.make(
+            await this.client.requests.post(
                 endpoints.locations.main,
-                { short, long },
-                'POST'
+                { short, long }
             )
         );
     }
@@ -98,7 +97,7 @@ class NodeLocationManager {
     async update(id, options) {
         if (!options.short && !options.long) throw new Error('Either short or long option is required.');
         return this._patch(
-            await this.client.requests.make(endpoints.locations.get(id), options, 'PATCH')
+            await this.client.requests.patch(endpoints.locations.get(id), options)
         );
     }
 
@@ -108,7 +107,7 @@ class NodeLocationManager {
      * @returns {Promise<boolean>}
      */
     async delete(id) {
-        await this.client.requests.make(endpoints.locations.get(id), null, 'DELETE');
+        await this.client.requests.delete(endpoints.locations.get(id));
         this.cache.delete(id);
         return true;
     }

@@ -74,12 +74,12 @@ class ApplicationServerManager {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.servers.get(id) + joinParams(options.include)
             );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(endpoints.servers.main);
+        const data = await this.client.requests.get(endpoints.servers.main);
         return this._patch(data);
     }
 
@@ -107,7 +107,7 @@ class ApplicationServerManager {
         if (filter === 'identifier') filter = 'uuidShort';
         if (filter === 'externalId') filter = 'external_id';
 
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.main +
             (filter ? `?filter[${filter}]=${entity}` : '') +
             (sort && filter ? `&sort=${sort}` : '') +
@@ -151,7 +151,7 @@ class ApplicationServerManager {
         payload.limits = options.limits ?? this.defaultLimits;
         payload.feature_limits = options.featureLimits ?? this.defaultFeatureLimits;
 
-        await this.client.requests.make(endpoints.servers.main, payload, 'POST');
+        await this.client.requests.post(endpoints.servers.main, payload);
         const s = await this.query(payload.name, 'name');
         return s.first();
     }
@@ -164,8 +164,8 @@ class ApplicationServerManager {
      */
     async delete(server, force = false) {
         if (server instanceof ApplicationServer) server = server.id;
-        await this.client.requests.make(
-            endpoints.servers.get(server) + (force ? '/force' : ''), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.get(server) + (force ? '/force' : '')
         );
         this.cache.delete(server);
         return true;

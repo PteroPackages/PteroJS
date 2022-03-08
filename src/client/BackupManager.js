@@ -53,12 +53,12 @@ class BackupManager {
                 const b = this.cache.get(id);
                 if (b) return Promise.resolve(b);
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.servers.backups.get(this.server.identifier, id)
             );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.backups.main(this.server.identifier)
         );
         return this._patch(data);
@@ -70,9 +70,9 @@ class BackupManager {
      */
     async create() {
         return this._patch(
-            await this.client.requests.make(
+            await this.client.requests.post(
                 endpoints.servers.backups.main(this.server.identifier),
-                {}, 'POST'
+                {}
             )
         );
     }
@@ -83,7 +83,7 @@ class BackupManager {
      * @returns {Promise<string>} The download link.
      */
     async download(id) {
-        const url = await this.client.requests.make(
+        const url = await this.client.requests.get(
             endpoints.servers.backups.download(this.server.identifier, id)
         );
         return url.attributes.url;
@@ -95,8 +95,8 @@ class BackupManager {
      * @returns {Promise<boolean>}
      */
     async delete(id) {
-        await this.client.requests.make(
-            endpoints.servers.backups.get(this.server.identifier, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.backups.get(this.server.identifier, id)
         );
         this.cache.delete(id);
         return true;

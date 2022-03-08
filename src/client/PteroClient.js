@@ -1,9 +1,9 @@
 const { EventEmitter } = require('events');
-const ClientRequestManager = require('./ClientRequestManager');
 const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
 const ScheduleManager = require('./ScheduleManager');
 const WebSocketManager = require('./ws/WebSocketManager');
+const RequestManager = require('../managers/RequestManager');
 const endpoints = require('./endpoints');
 const loader = require('../structures/configLoader');
 
@@ -67,8 +67,8 @@ class PteroClient extends EventEmitter {
         /** @type {ScheduleManager} */
         this.schedules = new ScheduleManager(this);
 
-        /** @type {ClientRequestManager} @internal */
-        this.requests = new ClientRequestManager(this);
+        /** @type {RequestManager} @internal */
+        this.requests = new RequestManager('Client', this.domain, this.auth);
 
         /** @type {WebSocketManager} */
         this.ws = new WebSocketManager(this);
@@ -101,7 +101,7 @@ class PteroClient extends EventEmitter {
      * @returns {Promise<ClientUser>} The client user.
      */
     async fetchClient() {
-        const data = await this.requests.make(endpoints.account.main);
+        const data = await this.requests.get(endpoints.account.main);
         return new ClientUser(this, data.attributes);
     }
 

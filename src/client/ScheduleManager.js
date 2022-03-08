@@ -42,12 +42,12 @@ class ScheduleManager {
                 const sch = this.cache.get(server)?.get(id);
                 if (sch) return sch;
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.servers.schedules.get(server, id)
             );
             return this._patch(server, data);
         }
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.schedules.main(server)
         );
         return this._patch(server, data);
@@ -76,8 +76,8 @@ class ScheduleManager {
         payload.day_of_week = options.dayOfWeek || '*';
         payload.day_of_month = options.dayOfMonth || '*';
 
-        const data = await this.client.requests.make(
-            endpoints.servers.schedules.main(server), payload, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.servers.schedules.main(server), payload
         );
         return this._patch(data);
     }
@@ -107,8 +107,8 @@ class ScheduleManager {
         payload.day_of_week = options.dayOfWeek || sch.cron.week;
         payload.day_of_month = options.dayOfMonth || sch.cron.month;
 
-        const data = await this.client.requests.make(
-            endpoints.servers.schedules.get(server, id), payload, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.servers.schedules.get(server, id), payload
         );
         return this._patch(data);
     }
@@ -120,8 +120,8 @@ class ScheduleManager {
      * @returns {Promise<boolean>}
      */
     async delete(server, id) {
-        await this.client.requests.make(
-            endpoints.servers.schedules.get(server, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.schedules.get(server, id)
         );
         this.cache.get(server).delete(id);
         return true;

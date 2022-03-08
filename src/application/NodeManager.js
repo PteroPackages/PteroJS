@@ -39,12 +39,12 @@ class NodeManager {
                 const n = this.cache.get(id);
                 if (n) return Promise.resolve(n);
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.nodes.get(id) + joinParams(options.include)
             );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.nodes.main + joinParams(options.include)
         );
         return this._patch(data);
@@ -91,8 +91,8 @@ class NodeManager {
         payload.memory_overallocate = options.memory_overallocate ?? 0;
         payload.disk_overallocate = options.disk_overallocate ?? 0;
 
-        const data = await this.client.requests.make(
-            endpoints.nodes.main, payload, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.nodes.main, payload
         );
         return this._patch(data);
     }
@@ -125,8 +125,8 @@ class NodeManager {
         payload.memory_overallocate = payload.overallocated_memory;
         payload.disk_overallocate = payload.overallocated_disk;
 
-        const data = await this.client.requests.make(
-            endpoints.nodes.get(id), payload, 'PATCH'
+        const data = await this.client.requests.patch(
+            endpoints.nodes.get(id), payload
         );
         return this._patch(data);
     }
@@ -138,7 +138,7 @@ class NodeManager {
      */
     async delete(node) {
         if (node instanceof Node) node = node.id;
-        await this.client.requests.make(endpoints.nodes.get(node), null, 'DELETE');
+        await this.client.requests.delete(endpoints.nodes.get(node));
         this.cache.delete(node);
         return true;
     }

@@ -59,12 +59,12 @@ class SubUserManager {
                 const u = this.cache.get(id);
                 if (u) return Promise.resolve(u);
             }
-            const data = await this.client.requests.make(
+            const data = await this.client.requests.get(
                 endpoints.servers.users.get(this.server.identifier, id)
             );
             return this._patch(data);
         }
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.users.main(this.server.identifier)
         );
         return this._patch(data);
@@ -80,9 +80,9 @@ class SubUserManager {
         if (typeof email !== 'string') throw new Error('Email must be a string.');
         const perms = new Permissions(permissions).toStrings();
         if (!perms.length) throw new Error('Need at least 1 permission for the subuser.');
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             endpoints.servers.users.main(this.server.identifier),
-            { email, permissions: perms }, 'POST'
+            { email, permissions: perms }
         );
         return this._patch(data);
     }
@@ -95,9 +95,9 @@ class SubUserManager {
     async setPermissions(uuid, permissions) {
         const perms = new Permissions(permissions).toStrings();
         if (!perms.length) throw new Error('Need at least 1 permission for the subuser.');
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             endpoints.servers.users.get(this.server.identifier, uuid),
-            { permissions: perms }, 'POST'
+            { permissions: perms }
         );
         return this._patch(data);
     }
@@ -108,8 +108,8 @@ class SubUserManager {
      * @returns {Promise<boolean>}
      */
     async remove(id) {
-        await this.client.requests.make(
-            endpoints.servers.users.get(this.server.identifier, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.users.get(this.server.identifier, id)
         );
         this.cache.delete(id);
         return true;

@@ -1,9 +1,9 @@
-const ApplicationRequestManager = require('./ApplicationRequestManager');
 const ApplicationServerManager = require('./ApplicationServerManager');
 const NestManager = require('./NestManager');
 const NodeLocationManager = require('./NodeLocationManager');
 const NodeManager = require('./NodeManager');
 const UserManager = require('./UserManager');
+const RequestManager = require('../managers/RequestManager');
 const loader = require('../structures/configLoader');
 
 /**
@@ -69,8 +69,8 @@ class PteroApp {
         /** @type {NodeLocationManager} */
         this.locations = new NodeLocationManager(this);
 
-        /** @type {ApplicationRequestManager} @internal */
-        this.requests = new ApplicationRequestManager(this);
+        /** @type {RequestManager} @internal */
+        this.requests = new RequestManager('application', domain, auth);
     }
 
     /**
