@@ -54,7 +54,8 @@ class RequestManager extends EventEmitter {
         if (data) {
             super.emit('receive', data);
             if (res.ok) return data;
-            if (res.status >= 400 && res.status < 500) throw new PteroAPIError(data);
+            if (res.status >= 400 && res.status < 500) // newline for error formatting
+                throw new PteroAPIError(data);
         }
 
         throw new RequestError(
