@@ -8,7 +8,6 @@ assert.doesNotThrow(
     (async () => await app.connect()),
     'could not connect to api'
 );
-assert.ok(app.ping, 'ping not calculated');
 
 assert.doesNotThrow(
     (async () => await app.servers.fetch()),
