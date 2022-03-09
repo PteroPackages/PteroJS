@@ -66,7 +66,8 @@ class ScheduleManager {
      * @returns {Promise<Schedule>} The new schedule.
      */
     async create(server, options = {}) {
-        if (Object.keys(options).length < 4) throw new Error('Missing required Schedule creation option.');
+        if (Object.keys(options).length < 4)
+            throw new Error('Missing required Schedule creation option.');
 
         const payload = {};
         payload.name = options.name;

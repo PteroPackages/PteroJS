@@ -5,6 +5,7 @@ class Schedule {
     constructor(client, serverId, data) {
         this.client = client;
         this.serverId = serverId;
+
         /** @type {Dict<number, ScheduleTask>} */
         this.tasks = new Dict();
         data = data.attributes;
@@ -111,6 +112,7 @@ class Schedule {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         }
+
         this.tasks.set(obj.id, obj);
         return obj;
     }
@@ -138,10 +140,12 @@ class Schedule {
      * @returns {Promise<ScheduleTask>} The new schedule task.
      */ 
     async createTask(action, payload, offset) {
-        if (!['command', 'power', 'backup'].includes(action)) throw new TypeError('Invalid task action type.');
-        const data = await this.client.requests.make(
+        if (!['command', 'power', 'backup'].includes(action))
+            throw new TypeError('Invalid task action type.');
+
+        const data = await this.client.requests.post(
             endpoints.servers.schedules.tasks.main(this.serverId, this.id),
-            { action, payload, time_offset: offset }, 'POST'
+            { action, payload, time_offset: offset }
         );
         return this._resolveTask(data);
     }
@@ -156,14 +160,16 @@ class Schedule {
      * @returns {Promise<ScheduleTask>} The updated schedule task.
      */ 
     async updateTask(id, options = {}) {
-        if (Object.keys(options).length < 3) throw new Error('Missing required ScheduleTask update options.');
+        if (Object.keys(options).length < 3)
+            throw new Error('Missing required ScheduleTask update options.');
+
         if (!['command', 'power', 'backup'].includes(options.action))
             throw new TypeError('Invalid task action type.');
 
         options.time_offset = options.offset;
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
-            options, 'POST'
+            options
         );
         return this._resolveTask(data);
     }
@@ -174,9 +180,8 @@ class Schedule {
      * @returns {Promise<boolean>}
      */
     async deleteTask(id) {
-        await this.client.requests.make(
-            endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
-            null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.schedules.tasks.get(this.serverId, this.id, id)
         );
         this.tasks.delete(id);
         return true;

@@ -9,13 +9,11 @@ module.exports = {
     NestEggsManager: require('./application/NestEggsManager'),
     ApplicationServerManager: require('./application/ApplicationServerManager'),
     NodeLocationManager: require('./application/NodeLocationManager'),
-    ApplicationRequestManager: require('./application/ApplicationRequestManager'),
 
     // Client API
     PteroClient: require('./client/PteroClient'),
     ClientServerManager: require('./client/ClientServerManager'),
     ScheduleManager: require('./client/ScheduleManager'),
-    ClientRequestManager: require('./client/ClientRequestManager'),
     BackupManager: require('./client/BackupManager'),
     SubUserManager: require('./client/SubUserManager'),
 
@@ -27,6 +25,7 @@ module.exports = {
     AllocationManager: require('./managers/AllocationManager'),
     DatabaseManager: require('./managers/DatabaseManager'),
     FileManager: require('./managers/FileManager'),
+    RequestManager: require('./managers/RequestManager'),
 
     // Package Structures
     ApplicationServer: require('./structures/ApplicationServer'),

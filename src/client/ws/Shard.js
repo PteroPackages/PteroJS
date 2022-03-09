@@ -5,19 +5,12 @@ const endpoints = require('../endpoints');
 class Shard {
     constructor(client, id, auth) {
         this.client = client;
-
         this.id = id;
-
         this.token = auth.token;
-
         this.socket = null;
-
         this.status = 'CLOSED';
-
         this.readyAt = 0;
-
         this.ping = -1;
-
         this.lastPing = 0;
 
         this.connect(auth);

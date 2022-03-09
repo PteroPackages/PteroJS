@@ -21,6 +21,7 @@ class FileManager {
         if (!data?.files && !data?.data && !data?.attributes) return;
         if (data.files) data = data.files.data;
         const dir = decodeURIComponent(data._dir);
+
         if (data.data) {
             const res = new Map();
             for (let o of data.data) {
@@ -38,11 +39,13 @@ class FileManager {
                     modifiedAt: o.modified_at ? new Date(o.modified_at) : null
                 });
             }
+
             let hold = this.cache.get(dir);
             if (!hold) {
                 this.cache.set(dir, new Map());
                 hold = new Map();
             }
+
             res.forEach((v, k) => hold.set(k, v));
             this.cache.set(dir, hold);
             return res;
@@ -60,11 +63,13 @@ class FileManager {
                 createdAt: new Date(data.created_at),
                 modifiedAt: data.modified_at ? new Date(data.modified_at) : null
             }
+
             let hold = this.cache.get(dir);
             if (!hold) {
                 this.cache.set(dir, new Map());
                 hold = new Map();
             }
+
             hold.set(data.name, o);
             this.cache.set(dir, hold);
             return o;
@@ -72,7 +77,8 @@ class FileManager {
     }
 
     /**
-     * Fetches all files from a specified directory (default is the root folder: `/home/container`).
+     * Fetches all files from a specified directory
+     * (default is the root folder: `/home/container`).
      * @param {string} [dir] The directory (folder) to fetch from.
      * @returns {Promise<Map<string, PteroFile>>}
      */
@@ -80,7 +86,7 @@ class FileManager {
         if (!this.isClient) return Promise.resolve();
         dir &&= dir.startsWith('.') ? dir.slice(1) : dir;
         dir &&= encodeURIComponent(dir);
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.files.main(this.server.identifier) + (dir ? `?directory=${dir}` : '')
         );
         data._dir = dir ?? '/';
@@ -96,7 +102,7 @@ class FileManager {
         if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.files.contents(this.server.identifier, filePath)
         );
         return data.toString();
@@ -111,7 +117,7 @@ class FileManager {
         if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.files.download(this.server.identifier, filePath)
         );
         return data.attributes.url;
@@ -123,14 +129,13 @@ class FileManager {
      * @param {string} filePath The path to the file in the server.
      * @param {string} name The new name of the file.
      * @returns {Promise<void>}
-     * @protected
      */
     async rename(filePath, name) {
         if (!this.isClient) return Promise.resolve();
         filePath ??= '/';
         filePath = filePath.startsWith('.') ? filePath.slice(1) : filePath;
         const sub = filePath.split('/');
-        await this.client.requests.make(
+        await this.client.requests.put(
             endpoints.servers.files.rename(this.server.identifier),
             {
                 root: filePath,
@@ -138,8 +143,7 @@ class FileManager {
                     from: sub.pop(),
                     to: name
                 }]
-            },
-            'PUT'
+            }
         );
     }
 
@@ -151,9 +155,9 @@ class FileManager {
     async copy(filePath) {
         if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.servers.files.copy(this.server.identifier),
-            { location: filePath }, 'POST'
+            { location: filePath }
         );
     }
 
@@ -168,9 +172,9 @@ class FileManager {
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
         if (content instanceof Buffer) content = content.toString();
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.servers.files.write(this.server.identifier, filePath),
-            { raw: content }, 'POST'
+            { raw: content }
         );
     }
 
@@ -183,11 +187,13 @@ class FileManager {
     async compress(dir, files) {
         if (!this.isClient) return Promise.resolve();
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
-        if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
+        if (!files.every(n => typeof n === 'string'))
+            throw new Error('File names must be type string.');
+
         if (dir.startsWith('.')) dir = dir.slice(1);
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             endpoints.servers.files.compress(this.server.identifier),
-            { root: dir, files }, 'POST'
+            { root: dir, files }
         );
         return this._patch(data);
     }
@@ -202,9 +208,9 @@ class FileManager {
         if (!this.isClient) return Promise.resolve();
         if (dir.startsWith('.')) dir = dir.slice(1);
         if (file.startsWith('.')) file = file.slice(1);
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.servers.files.decompress(this.server.identifier),
-            { root: dir, file }, 'POST'
+            { root: dir, file }
         );
     }
 
@@ -217,11 +223,13 @@ class FileManager {
     async delete(dir, files) {
         if (!this.isClient) return Promise.resolve();
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
-        if (!files.every(n => typeof n === 'string')) throw new Error('File names must be type string.');
+        if (!files.every(n => typeof n === 'string'))
+            throw new Error('File names must be type string.');
+
         if (dir.startsWith('.')) dir = dir.slice(1);
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.servers.files.delete(this.server.identifier),
-            { root: dir, files }, 'POST'
+            { root: dir, files }
         );
     }
 
@@ -233,9 +241,9 @@ class FileManager {
      */
     async createFolder(dir, name) {
         if (!this.isClient) return Promise.resolve();
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.servers.files.create(this.server.identifier),
-            { root: dir, name }, 'POST'
+            { root: dir, name }
         );
     }
 
@@ -245,7 +253,7 @@ class FileManager {
      */
     async getUploadURL() {
         if (!this.isClient) return Promise.resolve();
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             endpoints.servers.files.upload(this.server.identifier)
         );
         return data.attributes.url;

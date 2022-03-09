@@ -12,7 +12,6 @@ const endpoints = require('../endpoints');
 class WebSocketManager {
     constructor(client) {
         this.client = client;
-
         this.servers = [];
 
         /**
@@ -20,9 +19,7 @@ class WebSocketManager {
          * @type {Map<string, Shard>}
          */
         this.shards = new Map();
-
         this.totalShards = 0;
-
         this.readyAt = 0;
     }
 
@@ -31,6 +28,7 @@ class WebSocketManager {
             this.client.emit('debug', '[WS] No shards to launch');
             return;
         }
+
         this.client.emit('debug', `[WS] Attempting to launch ${this.servers.length} shard(s)`);
         for (const id of this.servers) {
             const data = await this.client.requests.make(endpoints.servers.ws(id));
@@ -42,6 +40,7 @@ class WebSocketManager {
                 this.client.emit('debug', `[WS] Shard ${id} failed to launch`);
             }
         }
+
         this.readyAt = Date.now();
         this.client.emit('ready');
     }

@@ -198,8 +198,9 @@ class PteroSubUser extends BaseUser {
      */
     async setPermissions(perms) {
         perms = new Permissions(perms);
-        await this.client.requests.make(
-            c_path.servers.users.get(this._server, this.uuid), { permissions: perms.toStrings() }, 'POST'
+        await this.client.requests.post(
+            c_path.servers.users.get(this._server, this.uuid),
+            { permissions: perms.toStrings() }
         );
         this.permissions = perms;
         return this;
@@ -242,8 +243,8 @@ class ClientUser extends BaseUser {
      * @returns {Promise<string[]>} The auth tokens.
      */
     async enable2fa(code) {
-        const data = await this.client.requests.make(
-            c_path.account.tfa, { code }, 'POST'
+        const data = await this.client.requests.post(
+            c_path.account.tfa, { code }
         );
         this.tokens.push(...data.attributes.tokens);
         return this.tokens;
@@ -255,8 +256,8 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async disable2fa(password) {
-        await this.client.requests.make(
-            c_path.account.tfa, { password }, 'DELETE'
+        await this.client.requests.delete(
+            c_path.account.tfa, { password }
         );
         this.tokens = [];
     }
@@ -268,8 +269,8 @@ class ClientUser extends BaseUser {
      * @returns {Promise<ClientUser>} The updated client user instance.
      */
     async updateEmail(email, password) {
-        await this.client.requests.make(
-            c_path.account.email, { email, password }, 'PUT'
+        await this.client.requests.put(
+            c_path.account.email, { email, password }
         );
         this.email = email;
         return this;
@@ -284,14 +285,13 @@ class ClientUser extends BaseUser {
      */
     async updatePassword(oldpass, newpass) {
         if (oldpass === newpass) return Promise.resolve();
-        return await this.client.requests.make(
+        return await this.client.requests.put(
             c_path.account.password,
             {
                 current_password: oldpass,
                 password: newpass,
                 password_confirmation: newpass
-            },
-            'PUT'
+            }
         );
     }
 
@@ -302,6 +302,7 @@ class ClientUser extends BaseUser {
     async fetchKeys() {
         const data = await this.client.requests.make(c_path.account.apikeys);
         this.apikeys = [];
+
         for (let o of data.data) {
             o = o.attributes;
             this.apikeys.push({
@@ -312,6 +313,7 @@ class ClientUser extends BaseUser {
                 createdAt: new Date(o.created_at)
             });
         }
+
         return this.apikeys;
     }
 
@@ -322,11 +324,11 @@ class ClientUser extends BaseUser {
      * @returns {Promise<APIKey>} The new API key.
      */
     async createKey(description, allowed = []) {
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             c_path.account.apikeys,
-            { description, allowed_ips: allowed },
-            'POST'
+            { description, allowed_ips: allowed }
         );
+
         const att = data.attributes;
         this.apikeys.push({
             identifier: att.identifier,
@@ -335,6 +337,7 @@ class ClientUser extends BaseUser {
             lastUsedAt: att.last_used_at ? new Date(att.last_used_at) : null,
             createdAt: new Date(att.created_at)
         });
+
         return this.apikeys.find(k => k.identifier === att.identifier);
     }
 
@@ -344,7 +347,9 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async deleteKey(id) {
-        await this.client.requests.make(c_path.account.apikeys +`/${id}`, null, 'DELETE');
+        await this.client.requests.delete(
+            c_path.account.apikeys +`/${id}`
+        );
         this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 }

@@ -179,7 +179,9 @@ class Node {
      * @returns {Promise<object>} The node config.
      */
     async getConfig() {
-        return await this.client.requests.make(endpoints.nodes.config(this.id));
+        return await this.client.requests.get(
+            endpoints.nodes.config(this.id)
+        );
     }
 
     /**

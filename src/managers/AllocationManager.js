@@ -33,6 +33,7 @@ class AllocationManager {
                     isDefault: o.is_default
                 });
             }
+
             res.forEach((v, k) => this.cache.set(k, v));
             return res;
         } else {
@@ -45,6 +46,7 @@ class AllocationManager {
                 notes: data.notes ?? null,
                 isDefault: data.is_default
             }
+
             this.cache.set(data.id, o);
             return o;
         }
@@ -52,7 +54,7 @@ class AllocationManager {
 
     async fetch() {
         return this._patch(
-            await this.client.requests.make(
+            await this.client.requests.get(
                 endpoints.servers.network.main(this.server.identifier)
             )
         );
@@ -60,31 +62,31 @@ class AllocationManager {
 
     async assign() {
         return this._patch(
-            await this.client.requests.make(
-                endpoints.servers.network.main(this.server.identifier), null, 'POST'
+            await this.client.requests.post(
+                endpoints.servers.network.main(this.server.identifier), null
             )
         );
     }
 
     async setNote(id, note) {
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             endpoints.servers.network.get(this.server.identifier, id),
-            { notes: note }, 'POST'
+            { notes: note }
         );
         return this._patch(data);
     }
 
     async setPrimary(id) {
         return this._patch(
-            await this.client.requests.make(
-                endpoints.servers.network.primary(this.server.identifier, id), null, 'POST'
+            await this.client.requests.post(
+                endpoints.servers.network.primary(this.server.identifier, id), null
             )
         );
     }
 
     async unassign(id) {
-        await this.client.requests.make(
-            endpoints.servers.network.get(this.server.identifier, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.network.get(this.server.identifier, id)
         );
         this.cache.delete(id);
     }

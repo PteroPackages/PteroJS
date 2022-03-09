@@ -4,9 +4,12 @@ exports.RequestError = class RequestError extends Error {
 
 exports.PteroAPIError = class PteroAPIError extends Error {
     constructor(data) {
-        data = data.errors[0];
-        super(`[${data.status}] ${data.detail}`);
-        this.code = data.code;
+        const fmt = data.errors.map(
+            e => `- ${e.status}: ${e.detail || 'No details provided'}`
+        ).join('\n');
+
+        super('\n'+ fmt);
+        this.code = data.errors[0].code;
     }
 }
 

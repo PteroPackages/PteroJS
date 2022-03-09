@@ -34,6 +34,7 @@ class DatabaseManager {
                     maxConnections: db.max_connections
                 });
             }
+
             res.forEach((v, k) => this.cache.set(k, v));
             return res;
         } else {
@@ -47,6 +48,7 @@ class DatabaseManager {
                 connections: data.connections,
                 maxConnections: data.max_connections
             }
+
             this.cache.set(data.id, o);
             return o;
         }
@@ -54,33 +56,34 @@ class DatabaseManager {
 
     async fetch(withPass = false) {
         if (!this.isClient) return Promise.resolve();
-        const data = await this.client.requests.make(
-            endpoints.servers.databases.main(this.server.identifier) + (withPass ? '?include=password' : '')
+        const data = await this.client.requests.get(
+            endpoints.servers.databases.main(this.server.identifier) +
+            (withPass ? '?include=password' : '')
         );
         return this._patch(data);
     }
 
     async create(database, remote) {
         if (!this.isClient) return Promise.resolve();
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             endpoints.servers.databases.get(this.server.identifier),
-            { database, remote }, 'POST'
+            { database, remote }
         );
         return this._patch(data);
     }
 
     async rotate(id) {
         if (!this.isClient) return Promise.resolve();
-        const data = await this.client.requests.make(
-            endpoints.servers.databases.rotate(this.server.identifier, id), null, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.servers.databases.rotate(this.server.identifier, id), null
         );
         return this._patch(data);
     }
 
     async delete(id) {
         if (!this.isClient) return Promise.resolve();
-        await this.client.requests.make(
-            endpoints.servers.databases.delete(this.server.identifier, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.databases.delete(this.server.identifier, id)
         );
         this.cache.delete(id);
         return true;

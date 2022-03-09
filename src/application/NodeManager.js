@@ -1,8 +1,13 @@
 const Node = require('../structures/Node');
 const Dict = require('../structures/Dict');
+const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class NodeManager {
+    static get INCLUDES() {
+        return Object.freeze(['allocations', 'location', 'servers']);
+    }
+
     constructor(client) {
         this.client = client;
 
@@ -17,9 +22,11 @@ class NodeManager {
                 const n = new Node(this.client, o);
                 res.set(n.id, n);
             }
+
             if (this.client.options.nodes.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
+
         const n = new Node(this.client, data);
         if (this.client.options.nodes.cache) this.cache.set(n.id, n);
         return n;
@@ -37,15 +44,13 @@ class NodeManager {
         if (id) {
             if (!options.force) {
                 const n = this.cache.get(id);
-                if (n) return Promise.resolve(n);
+                if (n) return n;
             }
-            const data = await this.client.requests.get(
-                endpoints.nodes.get(id) + joinParams(options.include)
-            );
-            return this._patch(data);
         }
+
+        const query = build(options, { include: NodeManager.INCLUDES });
         const data = await this.client.requests.get(
-            endpoints.nodes.main + joinParams(options.include)
+            (id ? endpoints.nodes.get(id) : endpoints.nodes.main) + query
         );
         return this._patch(data);
     }
@@ -145,9 +150,3 @@ class NodeManager {
 }
 
 module.exports = NodeManager;
-
-function joinParams(params) {
-    if (!params || !params.length) return '';
-    params = params.filter(p => ['allocations', 'location', 'servers'].includes(p));
-    return '?include='+ params.toString();
-}

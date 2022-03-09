@@ -7,6 +7,7 @@ class NestManager {
 
         /**  @type {Set<Nest>} */
         this.cache = new Set();
+
         /** @type {NestEggsManager} */
         this.eggs = new NestEggsManager(this.client);
     }
@@ -66,5 +67,4 @@ module.exports = NestManager;
  * @property {string} description The description of the nest.
  * @property {Date} createdAt The date the nest was created.
  * @property {?Date} updatedAt The date the nest was last updated.
- * @readonly
  */

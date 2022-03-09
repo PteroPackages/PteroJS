@@ -12,12 +12,16 @@ class ClientServer {
 
         /** @type {SubUserManager} */
         this.users = new SubUserManager(client, this);
+
         /** @type {AllocationManager} */
         this.allocations = new AllocationManager(client, this, attr.relationships);
+
         /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
+
         /** @type {DatabaseManager} */
         this.databases = new DatabaseManager(client, this, attr.relationships);
+
         /** @type {FileManager} */
         this.files = new FileManager(client, this, attr.relationships);
 
@@ -148,8 +152,8 @@ class ClientServer {
      * @returns {Promise<void>}
      */
     async sendCommand(command) {
-        await this.client.requests.make(
-            endpoints.servers.command(this.identifier), { command }, 'POST'
+        await this.client.requests.post(
+            endpoints.servers.command(this.identifier), { command }
         );
     }
 
@@ -163,9 +167,10 @@ class ClientServer {
      * @returns {Promise<void>}
      */
     async setPowerState(state) {
-        if (!['start', 'stop', 'restart', 'kill'].includes(state)) throw new Error('Invalid power state.');
-        await this.client.requests.make(
-            endpoints.servers.power(this.identifier), { signal: state }, 'POST'
+        if (!['start', 'stop', 'restart', 'kill'].includes(state))
+            throw new Error('Invalid power state.');
+        await this.client.requests.post(
+            endpoints.servers.power(this.identifier), { signal: state }
         );
         this.state = state;
     }

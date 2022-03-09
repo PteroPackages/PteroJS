@@ -7,7 +7,7 @@ module.exports = {
         apikeys: '/api/client/account/api-keys'
     },
     servers:{
-        main: '/api/client/servers',
+        main: '/api/client',
         get: s => `/api/client/servers/${s}`,
         databases:{
             main: s => `/api/client/servers/${s}/databases`,

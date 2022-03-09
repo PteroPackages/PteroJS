@@ -208,8 +208,8 @@ class ApplicationServer {
         payload.external_id = options.externalId ?? this.externalId;
         payload.description = options.description ?? this.description;
 
-        await this.client.requests.make(
-            endpoints.servers.details(this.id), payload, 'PATCH'
+        await this.client.requests.patch(
+            endpoints.servers.details(this.id), payload
         );
 
         this._patch(payload);
@@ -235,7 +235,9 @@ class ApplicationServer {
      * @returns {Promise<void>}
      */
     async suspend() {
-        await this.client.requests.make(endpoints.servers.suspend(this.id), null, 'POST');
+        await this.client.requests.post(
+            endpoints.servers.suspend(this.id), null
+        );
         this.suspended = true;
     }
 
@@ -244,7 +246,9 @@ class ApplicationServer {
      * @returns {Promise<void>}
      */
     async unsuspend() {
-        await this.client.requests.make(endpoints.servers.unsuspend(this.id), null, 'POST');
+        await this.client.requests.post(
+            endpoints.servers.unsuspend(this.id), null
+        );
         this.suspended = false;
     }
 
@@ -253,7 +257,9 @@ class ApplicationServer {
      * @returns {Promise<void>}
      */
     async reinstall() {
-        await this.client.requests.make(endpoints.servers.reinstall(this.id), null, 'POST');
+        await this.client.requests.post(
+            endpoints.servers.reinstall(this.id), null
+        );
     }
 
     /**

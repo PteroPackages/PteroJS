@@ -22,9 +22,11 @@ class NodeLocationManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
+
             if (this.client.options.locations.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
+
         data = data.attributes;
         const loc = {
             id: data.id,
@@ -33,6 +35,7 @@ class NodeLocationManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         }
+
         if (this.client.options.locations.cache) this.cache.set(data.id, loc);
         return loc;
     }
@@ -47,9 +50,11 @@ class NodeLocationManager {
      * @returns {?NodeLocation} The resolved node location.
      */
     resolve(obj) {
-        if (typeof obj == 'number') return this.cache.get(obj) || null;
-        if (obj.relationships?.location?.attributes) return this._patch(obj.relationships.location);
-        return null;
+        if (typeof obj == 'number') return this.cache.get(obj);
+        if (obj.relationships?.location?.attributes)
+            return this._patch(obj.relationships.location);
+
+        return undefined;
     }
 
     /**
@@ -61,14 +66,15 @@ class NodeLocationManager {
     async fetch(id, force = false) {
         if (id) {
             if (!force) {
-                const l = this.cache.get(id);
-                if (l) return Promise.resolve(l);
+                const loc = this.cache.get(id);
+                if (loc) return Promise.resolve(loc);
             }
-            const data = await this.client.requests.get(endpoints.locations.get(id));
-            return this._patch(data);
         }
-        const data = await this.client.requests.get(endpoints.locations.main);
-        return this._patch(data);
+
+        const data = await this.client.requests.make(
+            id ? endpoints.locations.get(id) : endpoints.locations.main
+        );
+        return this.patch(data);
     }
 
     /**
@@ -95,7 +101,9 @@ class NodeLocationManager {
      * @returns {Promise<NodeLocation>} The updated node location instance.
      */
     async update(id, options) {
-        if (!options.short && !options.long) throw new Error('Either short or long option is required.');
+        if (!options.short && !options.long)
+            throw new Error('Either short or long option is required.');
+
         return this._patch(
             await this.client.requests.patch(endpoints.locations.get(id), options)
         );
@@ -124,5 +132,4 @@ module.exports = NodeLocationManager;
  * @property {string} short The short location code (or country code).
  * @property {Date} createdAt The date the location was created.
  * @property {?Date} updatedAt The date the location was last updated.
- * @readonly
  */

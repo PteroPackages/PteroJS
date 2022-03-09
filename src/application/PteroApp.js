@@ -87,7 +87,8 @@ class PteroApp {
         if (this.options.nodes.fetch && this.options.nodes.cache) await this.nodes.fetch();
         if (this.options.nests.fetch && this.options.nests.cache) await this.nests.fetch();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
-        if (this.options.locations.fetch && this.options.locations.cache) await this.locations.fetch();
+        if (this.options.locations.fetch && this.options.locations.cache)
+            await this.locations.fetch();
 
         this.readyAt = Date.now();
         return true;
