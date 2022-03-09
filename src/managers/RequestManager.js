@@ -13,10 +13,6 @@ class RequestManager extends EventEmitter {
         this.type = type;
         this.domain = domain;
         this.auth = auth;
-
-        Object.defineProperty(this, 'delete', {
-            get: path => this.#delete(path)
-        });
     }
 
     getHeaders() {
@@ -104,13 +100,12 @@ class RequestManager extends EventEmitter {
     }
 
     /**
-     * **INDIRECT** - used for `RequestManager#delete`.
      * Shorthand method for performing a DELETE request to the Pterodactyl API.
      * @param {string} path The path to request.
      * @returns {Promise<object|void>}
      */
-    async #delete(path) {
-        return await this._make(path, null, 'DELETE');
+    async delete(path, params = null) {
+        return await this._make(path, params, 'DELETE');
     }
 
     /**
