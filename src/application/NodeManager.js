@@ -4,8 +4,25 @@ const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class NodeManager {
+    /**
+     * Allowed include arguments for nodes.
+     */
     static get INCLUDES() {
         return Object.freeze(['allocations', 'location', 'servers']);
+    }
+
+    /**
+     * Allowed filter arguments for nodes.
+     */
+    static get FILTERS() {
+        return Object.freeze(['uuid', 'name', 'fqdn', 'daemon_token_id']);
+    }
+
+    /**
+     * Allowed sort arguments for nodes.
+     */
+    static get SORTS() {
+        return Object.freeze(['id', 'uuid', 'memory', 'disk']);
     }
 
     constructor(client) {
@@ -52,6 +69,44 @@ class NodeManager {
         const data = await this.client.requests.get(
             (id ? endpoints.nodes.get(id) : endpoints.nodes.main) + query
         );
+        return this._patch(data);
+    }
+
+    /**
+     * Queries the API for a node (or nodes) that match the specified query filter/sort.
+     * This does NOT check the cache first, it is a direct fetch from the API.
+     * Available filters:
+     * * uuid
+     * * name
+     * * fqdn
+     * * daemonTokenId
+     * 
+     * Available sort options:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * * memory
+     * * -memory
+     * * disk
+     * * -disk
+     * 
+     * @param {string} entity The entity to query.
+     * @param {string} filter The filter to use for the query.
+     * @param {string} sort The order to sort the results in.
+     * @returns {Promise<Dict<number, Node>>} A dict of the quiried nodes.
+     */
+    async query(entity, filter, sort) {
+        if (!sort && !filter) throw new Error('Sort or filter is required.');
+        if (filter === 'daemonTokenId') filter = 'daemon_token_id';
+
+        const { FILTERS, SORTS } = NodeManager;
+        const query = build(
+            { filter:[filter, entity], sort },
+            { filters: FILTERS, sorts: SORTS }
+        );
+
+        const data = await this.client.requests.get(endpoints.nodes.main + query);
         return this._patch(data);
     }
 
