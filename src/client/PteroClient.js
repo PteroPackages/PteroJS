@@ -52,12 +52,6 @@ class PteroClient extends EventEmitter {
          */
         this.options = loader.clientConfig(options);
 
-        /** @type {?Date} */
-        this.readyAt = null;
-
-        /** @type {?number} */
-        this.ping = null;
-
         /** @type {?ClientUser} */
         this.user = null;
 
@@ -75,24 +69,20 @@ class PteroClient extends EventEmitter {
     }
 
     /**
-     * Sends a ping request to the API before performing additional startup requests
-     * as well as any websocket connections. Attempting to use the application without
-     * connecting to the API will result in an error.
+     * Performs preload requests to Pterodactyl and launches websocket connections.
      * @returns {Promise<boolean>}
      * @fires PteroClient#ready
      */
     async connect() {
-        if (this.readyAt) return;
-        const start = Date.now();
-        await this.requests.ping();
-        this.ping = Date.now() - start;
-
-        if (this.options.fetchClient) this.user = await this.fetchClient();
+        if (this.options.fetchClient) await this.fetchClient();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
         if (this.options.ws) await this.ws.launch();
 
-        this.readyAt = Date.now();
         return true;
+    }
+
+    get ping() {
+        return this.requests.ping;
     }
 
     /**
@@ -102,7 +92,8 @@ class PteroClient extends EventEmitter {
      */
     async fetchClient() {
         const data = await this.requests.get(endpoints.account.main);
-        return new ClientUser(this, data.attributes);
+        this.user = new ClientUser(this, data.attributes);
+        return this.user;
     }
 
     /**
@@ -124,12 +115,10 @@ class PteroClient extends EventEmitter {
     }
 
     /**
-     * Disconnects from the Pterodactyl API and closes any existing websocket connections.
+     * Closes any existing websocket connections.
      * @returns {void}
      */
     disconnect() {
-        this.ping = null;
-        this.readyAt = null;
         if (!this.ws.readyAt) this.ws.destroy();
     }
 }
