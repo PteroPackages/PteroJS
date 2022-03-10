@@ -101,7 +101,7 @@ class ApplicationServerManager {
     async fetch(id, options = {}) {
         if (id && !options.force) {
             const s = this.cache.get(id);
-            if (s) return s;
+            if (s) return Promise.resolve(s);
         }
 
         const query = build(options, { includes: ApplicationServerManager.INCLUDES });

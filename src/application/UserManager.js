@@ -75,7 +75,7 @@ class UserManager {
     async fetch(id, options = {}) {
         if (id && !options.force) {
             const u = this.cache.get(id);
-            if (u) return u;
+            if (u) return Promise.resolve(u);
         }
 
         const data = await this.client.requests.get(

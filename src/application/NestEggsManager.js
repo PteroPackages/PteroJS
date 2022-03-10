@@ -32,7 +32,7 @@ class NestEggsManager {
     async fetch(nest, id, options = {}) {
         if (id && !options.force) {
             const e = this.cache.get(id);
-            if (e) return e;
+            if (e) return Promise.resolve(e);
         }
 
         const query = build(options, { include: NestEggsManager.INCLUDES });

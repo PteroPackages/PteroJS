@@ -78,7 +78,7 @@ class NodeManager {
     async fetch(id, options = {}) {
         if (id && !options.force) {
             const n = this.cache.get(id);
-            if (n) return n;
+            if (n) return Promise.resolve(s);
         }
 
         const query = build(options, { include: NodeManager.INCLUDES });
