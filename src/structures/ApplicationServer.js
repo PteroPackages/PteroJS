@@ -15,6 +15,7 @@ class ApplicationServer {
              * @type {Date}
              */
         this.createdAt = new Date(data.created_at);
+
         /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
@@ -23,13 +24,16 @@ class ApplicationServer {
              * @type {?Date}
              */
         this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
+
         /** @type {?number} */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
 
         /** @type {DatabaseManager} */
         this.databases = new DatabaseManager(client, data);
+
         /** @type {FileManager} */
         this.files = new FileManager(client, data);
+
         /** @type {AllocationManager} */
         this.allocations = new AllocationManager(client, this, data);
 
@@ -136,13 +140,13 @@ class ApplicationServer {
             this.nodeId = data.node;
         }
 
-        if ('-' in data) {
+        if (!this.node) {
             /**
              * The node object that the server is part of. This can be fetched by including
              * 'node' in the ApplicationServerManager.fetch.
              * @type {?Node}
              */
-            this.node = null;
+            this.node = this.client.nodes.resolve(data);
         }
 
         if ('allocation' in data) {

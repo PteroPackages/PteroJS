@@ -50,6 +50,24 @@ class NodeManager {
     }
 
     /**
+     * Resolves a node from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * Returns `undefined` if not found.
+     * @param {string|number|object|Node} obj The object to resolve from.
+     * @returns {?Node} The resolved node.
+     */
+    resolve(obj) {
+        if (obj instanceof Node) return obj;
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(n => n.name === obj);
+        if (obj.relationships?.nodes) return this._patch(obj.relationships.nodes);
+        return undefined;
+    }
+
+    /**
      * Fetches a node from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the node.
      * @param {object} [options] Additional fetch options.
