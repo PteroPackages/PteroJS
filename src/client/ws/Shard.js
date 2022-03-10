@@ -47,7 +47,7 @@ class Shard {
     }
 
     send(event, args) {
-        if (!this.socket) return; // throw error
+        if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         if (!Array.isArray(args)) args = [args];
         this.socket.send({ event, args });
     }
