@@ -13,6 +13,7 @@ class RequestManager extends EventEmitter {
         this.type = type;
         this.domain = domain;
         this.auth = auth;
+        this.ping = -1;
     }
 
     getHeaders() {
@@ -38,12 +39,16 @@ class RequestManager extends EventEmitter {
     async _make(path, params, method = 'GET') {
         const body = params?.raw ?? (params ? JSON.stringify(params) : null);
         this.#debug(`sending request: ${method} ${this.domain + path}`);
+
+        const start = Date.now();
         const res = await fetch(this.domain + path, {
             method,
             body,
             headers: this.getHeaders()
         });
-        this.#debug(`received status: ${res.status}`);
+        this.ping = Date.now() - start;
+
+        this.#debug(`received status: ${res.status} (${this.ping}ms)`);
 
         if ([202, 204].includes(res.status)) return null;
         const data = await res.json().catch(()=>{});

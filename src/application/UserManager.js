@@ -9,8 +9,8 @@ class UserManager {
      */
     static get FILTERS() {
         return Object.freeze([
-            'uuid', 'uuidShort', 'name',
-            'image', 'external_id'
+            'email', 'uuid', 'uuidShort',
+            'name', 'image', 'external_id'
         ]);
     }
 
@@ -141,7 +141,7 @@ class UserManager {
             { filters: FILTERS, sorts: SORTS }
         );
 
-        const data = await this.client.requests.get(endpoints.servers.main + query);
+        const data = await this.client.requests.get(endpoints.users.main + query);
         return this._patch(data);
     }
 

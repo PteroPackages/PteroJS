@@ -48,12 +48,6 @@ class PteroApp {
          */
         this.options = loader.appConfig(options);
 
-        /** @type {?Date} */
-        this.readyAt = null;
-
-        /** @type {?number} */
-        this.ping = null;
-
         /** @type {UserManager} */
         this.users = new UserManager(this);
 
@@ -74,15 +68,10 @@ class PteroApp {
     }
 
     /**
-     * Used for performing preload requests to Pterodactyl. You should use this at
-     * the start of your program to avoid request ratelimits.
+     * Used for performing preload requests to Pterodactyl.
      * @returns {Promise<boolean>}
      */
     async connect() {
-        const start = Date.now();
-        await this.requests.ping();
-        this.ping = Date.now() - start;
-
         if (this.options.users.fetch && this.options.users.cache) await this.users.fetch();
         if (this.options.nodes.fetch && this.options.nodes.cache) await this.nodes.fetch();
         if (this.options.nests.fetch && this.options.nests.cache) await this.nests.fetch();
@@ -90,8 +79,11 @@ class PteroApp {
         if (this.options.locations.fetch && this.options.locations.cache)
             await this.locations.fetch();
 
-        this.readyAt = Date.now();
         return true;
+    }
+
+    get ping() {
+        return this.requests.ping;
     }
 }
 
