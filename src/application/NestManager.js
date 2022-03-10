@@ -1,7 +1,15 @@
 const NestEggsManager = require('./NestEggsManager');
+const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class NestManager {
+    /**
+     * Allowed include arguments for nests.
+     */
+    static get INCLUDES() {
+        return Object.freeze(['eggs', 'servers']);
+    }
+
     constructor(client) {
         this.client = client;
 
@@ -45,13 +53,17 @@ class NestManager {
     }
 
     /**
-     * Fetches a nest from the Pterodactyl API with an optional cache check.
+     * Fetches a nest from the Pterodactyl API.
      * @param {number} [id] The ID of the nest.
+     * @param {string[]} [include] Additional data to include about the nest.
      * @returns {Promise<Set<Nest>>} The fetched nests.
      */
-    async fetch(id) {
-        if (id) return this._patch(await this.client.requests.get(endpoints.nests.get(id)));
-        return this._patch(await this.client.requests.get(endpoints.nests.main));
+    async fetch(id, include = []) {
+        const query = build({ include }, { include: NestManager.INCLUDES });
+        const data = await this.client.requests.get(
+            (id ? endpoints.nests.get(id) : endpoints.nests.main) + query
+        );
+        return this._patch(data);
     }
 }
 
