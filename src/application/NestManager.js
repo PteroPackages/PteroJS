@@ -35,9 +35,11 @@ class NestManager {
                     updatedAt: o.updated_at ? new Date(o.updated_at) : null
                 });
             }
+
             if (this.client.options.nests.cache) res.forEach(n => this.cache.add(n));
             return res;
         }
+
         data = data.attributes;
         res.add({
             id: data.id,
@@ -48,6 +50,7 @@ class NestManager {
             createdAt: new Date(data.created_at),
             updatedAt: data.updated_at ? new Date(data.updated_at) : null
         });
+
         if (this.client.options.nests.cache) res.forEach(n => this.cache.add(n));
         return res;
     }

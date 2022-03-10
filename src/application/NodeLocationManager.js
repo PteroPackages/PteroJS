@@ -58,14 +58,18 @@ class NodeLocationManager {
     /**
      * Resolves a node location from an object. This can be:
      * * a number
+     * * a string
      * * an object
      * 
-     * Returns `null` if not found.
-     * @param {number|object} obj The object to resolve from.
+     * Returns `undefined` if not found.
+     * @param {string|number|object} obj The object to resolve from.
      * @returns {?NodeLocation} The resolved node location.
      */
     resolve(obj) {
-        if (typeof obj == 'number') return this.cache.get(obj);
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(
+            o => (o.short === obj) || (o.long === obj)
+        );
         if (obj.relationships?.location?.attributes)
             return this._patch(obj.relationships.location);
 
@@ -81,11 +85,9 @@ class NodeLocationManager {
      * @returns {Promise<NodeLocation|Dict<number, NodeLocation>>} The fetched node location(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const loc = this.cache.get(id);
-                if (loc) return Promise.resolve(loc);
-            }
+        if (id && !options.force) {
+            const loc = this.cache.get(id);
+            if (loc) return Promise.resolve(loc);
         }
 
         const query = build(options, { include: NodeLocationManager.INCLUDES });
@@ -121,7 +123,6 @@ class NodeLocationManager {
         const data = await this.client.requests.get(
             endpoints.locations.main + query
         );
-
         return this._patch(data);
     }
 

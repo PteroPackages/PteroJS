@@ -17,11 +17,13 @@ class ScheduleManager {
                 const s = new Schedule(this.client, id, o);
                 res.set(s.id, s);
             }
+
             let c = this.cache.get(id);
             if (c) res.forEach((v, k) => c.set(k, v)); else c = res;
             this.cache.set(id, c);
             return res;
         }
+
         const s = new Schedule(this.client, id, data);
         let c = this.cache.get(id);
         if (c) c.set(s.id, s); else c = new Dict().set(s.id, s);
@@ -37,18 +39,15 @@ class ScheduleManager {
      * @returns {Promise<Schedule|Dict<number, Schedule>>} The fetched schedule(s).
      */
     async fetch(server, id, force) {
-        if (id) {
-            if (!force) {
-                const sch = this.cache.get(server)?.get(id);
-                if (sch) return sch;
-            }
-            const data = await this.client.requests.get(
-                endpoints.servers.schedules.get(server, id)
-            );
-            return this._patch(server, data);
+        if (id && !force) {
+            const s = this.cache.get(server)?.get(id);
+            if (s) return s;
         }
+
         const data = await this.client.requests.get(
-            endpoints.servers.schedules.main(server)
+            id
+            ? endpoints.servers.schedules.get(id)
+            : endpoints.servers.schedules.main
         );
         return this._patch(server, data);
     }

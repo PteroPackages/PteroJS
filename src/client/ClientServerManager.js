@@ -4,6 +4,9 @@ const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class ClientServerManager {
+    /**
+     * Allowed include arguments for client servers.
+     */
     static get INCLUDES() {
         return Object.freeze(['egg', 'subusers']);
     }

@@ -3,6 +3,9 @@ const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class NestEggsManager {
+    /**
+     * Allowed include arguments for nest eggs.
+     */
     static get INCLUDES() {
         return Object.freeze([
             'nest', 'servers', 'config',
@@ -27,11 +30,9 @@ class NestEggsManager {
      * @returns {Promise<object|Dict<number, object>>} The fetched egg(s).
      */
     async fetch(nest, id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const e = this.cache.get(id);
-                if (e) return e;
-            }
+        if (id && !options.force) {
+            const e = this.cache.get(id);
+            if (e) return e;
         }
 
         const query = build(options, { include: NestEggsManager.INCLUDES });

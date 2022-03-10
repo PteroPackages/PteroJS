@@ -15,7 +15,7 @@ class UserManager {
     }
 
     /**
-     * Allowed filter arguments for users.
+     * Allowed sort arguments for users.
      */
     static get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
@@ -73,11 +73,9 @@ class UserManager {
      * @returns {Promise<PteroUser|Dict<number, PteroUser>>} The fetched user(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const u = this.cache.get(id);
-                if (u) return u;
-            }
+        if (id && !options.force) {
+            const u = this.cache.get(id);
+            if (u) return u;
         }
 
         const data = await this.client.requests.get(

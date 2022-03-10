@@ -6,23 +6,23 @@ const endpoints = require('./endpoints');
 
 class ApplicationServerManager {
     /**
-     * Allowed include arguments for application servers.
-     */
-    static get INCLUDES() {
-        return Object.freeze([
-            'allocations', 'user', 'subusers',
-            'pack', 'nest', 'egg', 'variables',
-            'location', 'node', 'databases'
-        ]);
-    }
-
-    /**
      * Allowed filter arguments for application servers.
      */
     static get FILTERS() {
         return Object.freeze([
             'name', 'uuid', 'uuidShort',
             'externalId', 'image'
+        ]);
+    }
+
+    /**
+     * Allowed include arguments for application servers.
+     */
+    static get INCLUDES() {
+        return Object.freeze([
+            'allocations', 'user', 'subusers',
+            'nest', 'egg', 'variables',
+            'location', 'node', 'databases'
         ]);
     }
 
@@ -78,16 +78,16 @@ class ApplicationServerManager {
      * * a number
      * * an object
      * 
-     * Returns `null` if not found.
+     * Returns `undefined` if not found.
      * @param {string|number|object|ApplicationServer} obj The object to resolve from.
      * @returns {?ApplicationServer} The resolved server.
      */
     resolve(obj) {
         if (obj instanceof ApplicationServer) return obj;
-        if (typeof obj === 'number') return this.cache.get(obj) || null;
-        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
         if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
-        return null;
+        return undefined;
     }
 
     /**
@@ -99,16 +99,14 @@ class ApplicationServerManager {
      * @returns {Promise<ApplicationServer|Dict<number, ApplicationServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const s = this.cache.get(id);
-                if (s) return s;
-            }
+        if (id && !options.force) {
+            const s = this.cache.get(id);
+            if (s) return s;
         }
 
+        const query = build(options, { includes: ApplicationServerManager.INCLUDES });
         const data = await this.client.requests.get(
-            (id ? endpoints.servers.get(id) : endpoints.servers.main) +
-            build(options, { includes: ApplicationServerManager.INCLUDES })
+            (id ? endpoints.servers.get(id) : endpoints.servers.main) + query
         );
         return this._patch(data);
     }
@@ -146,7 +144,9 @@ class ApplicationServerManager {
             { filters: FILTERS, sorts: SORTS }
         );
 
-        const data = await this.client.requests.get(endpoints.servers.main + query);
+        const data = await this.client.requests.get(
+            endpoints.servers.main + query
+        );
         return this._patch(data);
     }
 

@@ -5,17 +5,17 @@ const endpoints = require('./endpoints');
 
 class NodeManager {
     /**
-     * Allowed include arguments for nodes.
-     */
-    static get INCLUDES() {
-        return Object.freeze(['allocations', 'location', 'servers']);
-    }
-
-    /**
      * Allowed filter arguments for nodes.
      */
     static get FILTERS() {
         return Object.freeze(['uuid', 'name', 'fqdn', 'daemon_token_id']);
+    }
+
+    /**
+     * Allowed include arguments for nodes.
+     */
+    static get INCLUDES() {
+        return Object.freeze(['allocations', 'location', 'servers']);
     }
 
     /**
@@ -76,11 +76,9 @@ class NodeManager {
      * @returns {Promise<Node|Dict<number, Node>>} The fetched node(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const n = this.cache.get(id);
-                if (n) return n;
-            }
+        if (id && !options.force) {
+            const n = this.cache.get(id);
+            if (n) return n;
         }
 
         const query = build(options, { include: NodeManager.INCLUDES });

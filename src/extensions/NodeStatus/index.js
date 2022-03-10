@@ -6,7 +6,7 @@ class NodeStatus extends EventEmitter {
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'NodeStatus PteroJS v1.0.2'
+        'User-Agent': 'NodeStatus PteroJS v1.0.3'
     }
     #interval = null;
     #connected = new Set();
@@ -18,7 +18,7 @@ class NodeStatus extends EventEmitter {
         super();
 
         Object.assign(this, options);
-        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.]{3,256})/gi.test(this.domain))
+        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(this.domain))
             throw new SyntaxError(
                 "Domain URL must start with 'http://' or 'https://' and "+
                 'must be bound to a port if using localhost.'
@@ -28,11 +28,13 @@ class NodeStatus extends EventEmitter {
         this.nextInterval ||= 5;
         this.retryLimit ||= 0;
 
-        /** @type {?Function} */
+        /** @type {null | (id: number) => void} */
         this.onConnect = null;
-        /** @type {?Function} */
+
+        /** @type {null | (d: object) => void} */
         this.onInterval = null;
-        /** @type {?Function} */
+
+        /** @type {null | (id: number) => void} */
         this.onDisconnect = null;
 
         this.ping = -1;
@@ -56,6 +58,7 @@ class NodeStatus extends EventEmitter {
         this.#debug('Starting connection to API');
         await this.#ping();
         await this.#handleNext();
+
         this.#interval = setInterval(() => this.#handleNext(), this.callInterval).unref();
         this.readyAt = Date.now();
         process.on('SIGINT', _ => this.close());
@@ -67,9 +70,15 @@ class NodeStatus extends EventEmitter {
         const res = await fetch(`${this.domain}/api/application`, {
             method: 'GET', headers: this.headers
         });
+
         if (res.status === 401)
-            return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
+            return this.close(
+                '[NS:401] Invalid API credentials. Contact your panel administrator.',
+                true
+            );
+
         if (res.status === 403) return this.close('[NS:403] Missing access.', true);
+
         this.ping = Date.now() - start;
         const data = await res.json().catch(()=>{});
         if (data?.errors?.length) return;
@@ -94,7 +103,11 @@ class NodeStatus extends EventEmitter {
 
         if (!res.ok) {
             if (res.status === 401)
-                return this.close('[NS:401] Invalid API credentials. Contact your panel administrator.', true);
+                return this.close(
+                    '[NS:401] Invalid API credentials. Contact your panel administrator.',
+                    true
+                );
+
             if (res.status === 403) return this.close('[NS:403] Missing access.', true);
             if (res.status === 404) {
                 if (this.#connected.has(id)) {
@@ -104,7 +117,10 @@ class NodeStatus extends EventEmitter {
                 }
                 return;
             }
-            if (this.current > this.retryLimit) return this.close('[NS] Maximum retry limit exceeded.');
+
+            if (this.current > this.retryLimit)
+                return this.close('[NS] Maximum retry limit exceeded.');
+
             this.current++;
             this.#debug('Attempting retry fetch');
             this.#request(id);
@@ -118,14 +134,17 @@ class NodeStatus extends EventEmitter {
             this.emit('connect', id);
             if (this.onConnect !== null) this.onConnect(id);
         }
+
         this.emit('interval', attributes);
         if (this.onInterval !== null) this.onInterval(attributes);
     }
 
     close(message = 'None', error = false) {
         if (!this.readyAt) return;
+
         this.#debug('Closing connection');
         if (this.#interval) clearInterval(this.#interval);
+
         this.removeAllListeners();
         this.#connected.clear();
         if (error && message) throw new Error(message);
