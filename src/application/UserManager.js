@@ -10,7 +10,7 @@ class UserManager {
     static get FILTERS() {
         return Object.freeze([
             'email', 'uuid', 'uuidShort',
-            'name', 'image', 'external_id'
+            'username', 'image', 'external_id'
         ]);
     }
 
