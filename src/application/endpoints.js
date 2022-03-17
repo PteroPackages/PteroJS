@@ -7,7 +7,11 @@ module.exports = {
     nodes:{
         main: '/api/application/nodes',
         get: n => `/api/application/nodes/${n}`,
-        config: n => `/api/application/nodes/${n}/configuration`
+        config: n => `/api/application/nodes/${n}/configuration`,
+        allocations:{
+            main: n => `/api/application/nodes/${n}/allocations`,
+            get: (n, a) => `/api/application/nodes/${n}/allocations/${a}`
+        }
     },
     servers:{
         main: '/api/application/servers',
