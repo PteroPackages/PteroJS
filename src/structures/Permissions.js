@@ -45,7 +45,6 @@ const FLAGS = {
     SETTINGS_RENAME: 34,
     SETTINGS_REINSTALL: 35,
 
-    '*': 40,
     ADMIN_WEBSOCKET_ERRORS: 41,
     ADMIN_WEBSOCKET_INSTALL: 42,
     ADMIN_WEBSOCKET_TRANSFER: 43
@@ -163,6 +162,7 @@ class Permissions {
      */
     static fromStrings(perms) {
         const res = {};
+        if (perms.includes('*')) return Object.assign({}, Permissions.FLAGS);
         for (let p of perms) {
             p = p.toUpperCase().replace(/\./g, '_');
             if (Permissions.FLAGS[p] === undefined) throw new Error(`Unknown permission '${p}'.`);
