@@ -95,8 +95,8 @@ class UserManager {
      */
     async fetchExternal(id, options = {}) {
         if (!options.force) {
-            for (const [, user] of this.cache)
-                if (id === user.externalId) return user;
+            const u = this.cache.filter(u => u.externalId === id);
+            if (u) return Promise.resolve(u);
         }
 
         const data = await this.client.requests.get(
