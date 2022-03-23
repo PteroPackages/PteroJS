@@ -1,29 +1,21 @@
-const endpoints = require('../client/endpoints');
+const Dict = require('../structures/Dict');
+const endpoints = require('./endpoints');
 
 class FileManager {
-    constructor(client, server, data) {
+    constructor(client, server) {
         this.client = client;
         this.server = server;
 
-        /**
-         * Whether the client using this manager is the PteroClient or PteroApp.
-         * @type {boolean}
-         */
-        this.isClient = client.constructor.name === 'PteroClient';
-
-        /** @type {Map<string, Map<string, PteroFile>>} */
-        this.cache = new Map();
-        this.cache.set('/', new Map());
-        this._patch(data);
+        /** @type {Dict<string, Dict<string, PteroFile>>} */
+        this.cache = new Dict();
+        this.cache.set('/', new Dict());
     }
 
     _patch(data) {
-        if (!data?.files && !data?.data && !data?.attributes) return;
-        if (data.files) data = data.files.data;
         const dir = decodeURIComponent(data._dir);
 
         if (data.data) {
-            const res = new Map();
+            const res = new Dict();
             for (let o of data.data) {
                 o = o.attributes;
                 res.set(o.name, {
@@ -42,8 +34,8 @@ class FileManager {
 
             let hold = this.cache.get(dir);
             if (!hold) {
-                this.cache.set(dir, new Map());
-                hold = new Map();
+                this.cache.set(dir, new Dict());
+                hold = new Dict();
             }
 
             res.forEach((v, k) => hold.set(k, v));
@@ -66,8 +58,8 @@ class FileManager {
 
             let hold = this.cache.get(dir);
             if (!hold) {
-                this.cache.set(dir, new Map());
-                hold = new Map();
+                this.cache.set(dir, new Dict());
+                hold = new Dict();
             }
 
             hold.set(data.name, o);
@@ -83,12 +75,12 @@ class FileManager {
      * @returns {Promise<Map<string, PteroFile>>}
      */
     async fetch(dir) {
-        if (!this.isClient) return Promise.resolve();
         dir &&= dir.startsWith('.') ? dir.slice(1) : dir;
         dir &&= encodeURIComponent(dir);
         const data = await this.client.requests.get(
             endpoints.servers.files.main(this.server.identifier) + (dir ? `?directory=${dir}` : '')
         );
+
         data._dir = dir ?? '/';
         return this._patch(data);
     }
@@ -99,9 +91,9 @@ class FileManager {
      * @returns {Promise<string>}
      */
     async getContents(filePath) {
-        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
+
         const data = await this.client.requests.get(
             endpoints.servers.files.contents(this.server.identifier, filePath)
         );
@@ -114,9 +106,9 @@ class FileManager {
      * @returns {Promise<string>}
      */
     async download(filePath) {
-        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
+
         const data = await this.client.requests.get(
             endpoints.servers.files.download(this.server.identifier, filePath)
         );
@@ -125,16 +117,15 @@ class FileManager {
 
     /**
      * Renames the specified file.
-     * EXPERIMENTAL: may not be working properly.
      * @param {string} filePath The path to the file in the server.
      * @param {string} name The new name of the file.
      * @returns {Promise<void>}
      */
     async rename(filePath, name) {
-        if (!this.isClient) return Promise.resolve();
         filePath ??= '/';
         filePath = filePath.startsWith('.') ? filePath.slice(1) : filePath;
         const sub = filePath.split('/');
+
         await this.client.requests.put(
             endpoints.servers.files.rename(this.server.identifier),
             {
@@ -153,7 +144,6 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async copy(filePath) {
-        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         await this.client.requests.post(
             endpoints.servers.files.copy(this.server.identifier),
@@ -168,10 +158,10 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async write(filePath, content) {
-        if (!this.isClient) return Promise.resolve();
         if (filePath.startsWith('.')) filePath = filePath.slice(1);
         filePath = encodeURIComponent(filePath);
         if (content instanceof Buffer) content = content.toString();
+
         await this.client.requests.post(
             endpoints.servers.files.write(this.server.identifier, filePath),
             { raw: content }
@@ -185,7 +175,6 @@ class FileManager {
      * @returns {Promise<PteroFile>} The compressed file.
      */
     async compress(dir, files) {
-        if (!this.isClient) return Promise.resolve();
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
         if (!files.every(n => typeof n === 'string'))
             throw new Error('File names must be type string.');
@@ -205,7 +194,6 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async decompress(dir, file) {
-        if (!this.isClient) return Promise.resolve();
         if (dir.startsWith('.')) dir = dir.slice(1);
         if (file.startsWith('.')) file = file.slice(1);
         await this.client.requests.post(
@@ -221,7 +209,6 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async delete(dir, files) {
-        if (!this.isClient) return Promise.resolve();
         if (!Array.isArray(files)) throw new TypeError('Files must be an array.');
         if (!files.every(n => typeof n === 'string'))
             throw new Error('File names must be type string.');
@@ -240,7 +227,6 @@ class FileManager {
      * @returns {Promise<void>}
      */
     async createFolder(dir, name) {
-        if (!this.isClient) return Promise.resolve();
         await this.client.requests.post(
             endpoints.servers.files.create(this.server.identifier),
             { root: dir, name }
@@ -252,7 +238,6 @@ class FileManager {
      * @returns {Promise<string>} The upload URL.
      */
     async getUploadURL() {
-        if (!this.isClient) return Promise.resolve();
         const data = await this.client.requests.get(
             endpoints.servers.files.upload(this.server.identifier)
         );

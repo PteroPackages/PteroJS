@@ -22,9 +22,8 @@ module.exports = {
     WebSocketManager: require('./client/ws/WebSocketManager'),
 
     // Global Managers
-    AllocationManager: require('./managers/AllocationManager'),
     DatabaseManager: require('./managers/DatabaseManager'),
-    FileManager: require('./managers/FileManager'),
+    FileManager: require('./client/FileManager'),
     RequestManager: require('./managers/RequestManager'),
 
     // Package Structures

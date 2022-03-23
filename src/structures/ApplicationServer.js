@@ -1,6 +1,3 @@
-const AllocationManager = require('../managers/AllocationManager');
-const DatabaseManager = require('../managers/DatabaseManager');
-const FileManager = require('../managers/FileManager');
 const { PteroUser } = require('./User');
 const Node = require('./Node');
 const caseConv = require('../util/caseConv');
@@ -45,15 +42,6 @@ class ApplicationServer {
 
         /** @type {?number} */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
-
-        /** @type {DatabaseManager} */
-        this.databases = new DatabaseManager(client, data);
-
-        /** @type {FileManager} */
-        this.files = new FileManager(client, data);
-
-        /** @type {AllocationManager} */
-        this.allocations = new AllocationManager(client, this, data);
 
         this._patch(data);
     }

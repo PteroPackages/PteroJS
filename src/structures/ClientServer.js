@@ -1,5 +1,5 @@
 const DatabaseManager = require('../managers/DatabaseManager');
-const FileManager = require('../managers/FileManager');
+const FileManager = require('../client/FileManager');
 const NetworkAllocationManager = require('../client/NetworkAllocationManager');
 const Permissions = require('./Permissions');
 const SubUserManager = require('../client/SubUserManager');
