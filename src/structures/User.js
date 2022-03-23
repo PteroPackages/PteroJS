@@ -10,14 +10,15 @@ let loggedDeprecated = false;
 class BaseUser {
     constructor(client, data) {
         this.client = client;
-
-        /** @type {number} */
-        this.id = data.id;
-
         this._patch(data);
     }
 
     _patch(data) {
+        if ('id' in data) {
+            /** @type {number} */
+            this.id = data.id;
+        }
+
         if ('username' in data) {
             /** @type {string} */
             this.username = data.username;
