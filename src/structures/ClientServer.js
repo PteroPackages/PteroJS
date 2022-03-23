@@ -1,8 +1,8 @@
-const SubUserManager = require('../client/SubUserManager');
-const AllocationManager = require('../managers/AllocationManager');
 const DatabaseManager = require('../managers/DatabaseManager');
 const FileManager = require('../managers/FileManager');
+const NetworkAllocationManager = require('../client/NetworkAllocationManager');
 const Permissions = require('./Permissions');
+const SubUserManager = require('../client/SubUserManager');
 const endpoints = require('../client/endpoints');
 
 class ClientServer {
@@ -25,8 +25,8 @@ class ClientServer {
         /** @type {SubUserManager} */
         this.users = new SubUserManager(client, this);
 
-        /** @type {AllocationManager} */
-        this.allocations = new AllocationManager(client, this, attr.relationships);
+        /** @type {NetworkAllocationManager} */
+        this.allocations = new NetworkAllocationManager(client, this);
 
         /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
