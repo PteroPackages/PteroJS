@@ -8,6 +8,18 @@ class Node {
         data = data.attributes;
 
         /**
+         * The ID of the node.
+         * @type {number}
+         */
+        this.id = data.id;
+
+        /**
+         * The internal UUID of the node.
+         * @type {string}
+         */
+        this.uuid = data.uuid;
+
+        /**
          * The date the node was created.
          * @type {Date}
          */
@@ -23,22 +35,6 @@ class Node {
     }
 
     _patch(data) {
-        if ('id' in data) {
-            /**
-             * The ID of the node.
-             * @type {number}
-             */
-            this.id = data.id;
-        }
-
-        if ('uuid' in data) {
-            /**
-             * The internal UUID of the node.
-             * @type {string}
-             */
-            this.uuid = data.uuid;
-        }
-
         if ('public' in data) {
             /**
              * Whether the node is public to other users.

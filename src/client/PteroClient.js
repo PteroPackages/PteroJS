@@ -98,20 +98,22 @@ class PteroClient extends EventEmitter {
 
     /**
      * Adds a server or an array of servers to be connected to websockets.
-     * @param {string|string[]} ids The identifier of the server, or an array of server identifiers.
-     * @returns {void}
+     * @param {string[]} ids The identifier of the server, or an array of server identifiers.
+     * @returns {this}
      */
-    addSocketServer(ids) {
-        Array.isArray(ids) ? this.ws.servers.push(...ids) : this.ws.servers.push(ids);
+    addSocketServer(...ids) {
+        this.ws.servers.concat(ids);
+        return this;
     }
 
     /**
      * Removes a server from websocket connections.
      * @param {string} id The identifier of the server.
-     * @returns {void}
+     * @returns {this}
      */
     removeSocketServer(id) {
-        this.ws.servers.splice(id);
+        this.ws.servers = this.ws.servers.filter(i => i === id);
+        return this;
     }
 
     /**
@@ -119,7 +121,7 @@ class PteroClient extends EventEmitter {
      * @returns {void}
      */
     disconnect() {
-        if (!this.ws.readyAt) this.ws.destroy();
+        if (this.ws.readyAt) this.ws.destroy();
     }
 }
 

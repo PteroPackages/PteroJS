@@ -71,7 +71,6 @@ class ClientServerManager {
         const data = await this.client.requests.get(
             (id ? endpoints.servers.get(id) : endpoints.servers.main) + query
         );
-        this._resolveMeta(data);
         return this._patch(data);
     }
 }

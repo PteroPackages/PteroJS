@@ -50,11 +50,9 @@ class BackupManager {
      * @returns {Promise<Backup|Dict<string, Backup>>} The fetched backup(s).
      */
     async fetch(id, force = false) {
-        if (id) {
-            if (!force) {
-                const b = this.cache.get(id);
-                if (b) return Promise.resolve(b);
-            }
+        if (id && !force) {
+            const b = this.cache.get(id);
+            if (b) return Promise.resolve(b);
         }
 
         const data = await this.client.requests.get(

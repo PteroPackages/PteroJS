@@ -10,6 +10,18 @@ class ClientServer {
         this.client = client;
         const attr = data.attributes;
 
+        /**
+         * The internal UUID of the server.
+         * @type {string}
+         */
+        this.uuid = attr.uuid;
+
+        /**
+         * A substring of the server's UUID to easily identify it.
+         * @type {string}
+         */
+        this.identifier = attr.identifier;
+
         /** @type {SubUserManager} */
         this.users = new SubUserManager(client, this);
 
@@ -35,22 +47,6 @@ class ClientServer {
              * @type {boolean}
              */
             this.isOwner = data.server_owner;
-        }
-
-        if ('identifier' in data) {
-            /**
-             * A substring of the server's UUID to easily identify it.
-             * @type {string}
-             */
-            this.identifier = data.identifier;
-        }
-
-        if ('uuid' in data) {
-            /**
-             * The internal UUID of the server.
-             * @type {string}
-             */
-            this.uuid = data.uuid;
         }
 
         if ('name' in data) {
@@ -144,7 +140,7 @@ class ClientServer {
     }
 
     /** @todo */
-    get resources() {}
+    async fetchResources() {}
 
     /**
      * Sends a command to the server terminal.
@@ -169,6 +165,7 @@ class ClientServer {
     async setPowerState(state) {
         if (!['start', 'stop', 'restart', 'kill'].includes(state))
             throw new Error('Invalid power state.');
+
         await this.client.requests.post(
             endpoints.servers.power(this.identifier), { signal: state }
         );

@@ -11,6 +11,24 @@ class ApplicationServer {
         this.client = client;
 
         /**
+         * The of the server (separate from UUID).
+         * @type {number}
+         */
+        this.id = data.id;
+
+        /**
+         * The internal UUID of the server.
+         * @type {string}
+         */
+        this.uuid = data.uuid;
+
+        /**
+         * A substring of the server's UUID to easily identify it.
+         * @type {string}
+         */
+        this.identifier = data.identifier;
+
+        /**
              * The date the server was created.
              * @type {Date}
              */
@@ -41,36 +59,12 @@ class ApplicationServer {
     }
 
     _patch(data) {
-        if ('id' in data) {
-            /**
-             * The of the server (separate from UUID).
-             * @type {number}
-             */
-            this.id = data.id;
-        }
-
         if ('external_id' in data) {
             /**
              * The external ID of the server (if set).
              * @type {?string}
              */
             this.externalId = data.external_id ?? null;
-        }
-
-        if ('uuid' in data) {
-            /**
-             * The internal UUID of the server.
-             * @type {string}
-             */
-            this.uuid = data.uuid;
-        }
-
-        if ('identifier' in data) {
-            /**
-             * A substring of the server's UUID to easily identify it.
-             * @type {string}
-             */
-            this.identifier = data.identifier;
         }
 
         if ('name' in data) {

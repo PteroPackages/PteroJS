@@ -123,7 +123,7 @@ class ScheduleManager {
         await this.client.requests.delete(
             endpoints.servers.schedules.get(server, id)
         );
-        this.cache.get(server).delete(id);
+        this.cache.get(server)?.delete(id);
         return true;
     }
 }

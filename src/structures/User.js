@@ -10,15 +10,14 @@ let loggedDeprecated = false;
 class BaseUser {
     constructor(client, data) {
         this.client = client;
+
+        /** @type {number} */
+        this.id = data.id;
+
         this._patch(data);
     }
 
     _patch(data) {
-        if ('id' in data) {
-            /** @type {number} */
-            this.id = data.id;
-        }
-
         if ('username' in data) {
             /** @type {string} */
             this.username = data.username;
@@ -65,6 +64,11 @@ class BaseUser {
 class PteroUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
+
+        /** @type {string} */
+        this.uuid = data.uuid;
+
+        this._patch(data);
     }
 
     _patch(data) {
@@ -73,11 +77,6 @@ class PteroUser extends BaseUser {
         if ('external_id' in data) {
             /** @type {string} */
             this.externalId = data.external_id;
-        }
-
-        if ('uuid' in data) {
-            /** @type {string} */
-            this.uuid = data.uuid;
         }
 
         if ('root_admin' in data) {
@@ -115,6 +114,7 @@ class PteroUser extends BaseUser {
         if ('updated_at' in data) {
             /** @type {?Date} */
             this.updatedAt = data['updated_at'] ? new Date(data['updated_at']) : null;
+
             /** @type {?number} */
             this.updatedTimestamp = this.updatedAt?.getTime() || null;
         }
@@ -158,6 +158,9 @@ class PteroSubUser extends BaseUser {
         super(client, data);
 
         /** @type {string} */
+        this.uuid = data.uuid;
+
+        /** @type {string} */
         this._server = server;
 
         /** @type {Date} */
@@ -174,11 +177,6 @@ class PteroSubUser extends BaseUser {
 
     _patch(data) {
         super._patch(data);
-
-        if ('uuid' in data) {
-            /** @type {string} */
-            this.uuid = data.uuid;
-        }
 
         if ('image' in data) {
             /** @type {string} */
