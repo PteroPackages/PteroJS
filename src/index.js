@@ -22,7 +22,7 @@ module.exports = {
     WebSocketManager: require('./client/ws/WebSocketManager'),
 
     // Global Managers
-    DatabaseManager: require('./managers/DatabaseManager'),
+    DatabaseManager: require('./client/ClientDatabaseManager'),
     FileManager: require('./client/FileManager'),
     RequestManager: require('./managers/RequestManager'),
 

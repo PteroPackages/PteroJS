@@ -1,4 +1,4 @@
-const DatabaseManager = require('../managers/DatabaseManager');
+const ClientDatabaseManager = require('../client/ClientDatabaseManager');
 const FileManager = require('../client/FileManager');
 const NetworkAllocationManager = require('../client/NetworkAllocationManager');
 const Permissions = require('./Permissions');
@@ -31,8 +31,8 @@ class ClientServer {
         /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
 
-        /** @type {DatabaseManager} */
-        this.databases = new DatabaseManager(client, this, attr.relationships);
+        /** @type {ClientDatabaseManager} */
+        this.databases = new ClientDatabaseManager(client, this, attr.relationships);
 
         /** @type {FileManager} */
         this.files = new FileManager(client, this, attr.relationships);
