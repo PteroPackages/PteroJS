@@ -51,7 +51,13 @@ class RequestManager extends EventEmitter {
         this.#debug(`received status: ${res.status} (${this.ping}ms)`);
 
         if ([202, 204].includes(res.status)) return null;
-        const data = await res.json().catch(()=>{});
+        let data;
+        if (res.headers.get('content-type') === 'application/json') {
+            data = await res.json().catch(null);
+        } else {
+            data = await res.buffer().catch(null);
+        }
+
         if (data) {
             super.emit('receive', data);
             if (res.ok) return data;
