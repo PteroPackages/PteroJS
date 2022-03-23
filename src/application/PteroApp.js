@@ -4,7 +4,7 @@ const NodeAllocationManager = require('./NodeAllocationManager');
 const NodeLocationManager = require('./NodeLocationManager');
 const NodeManager = require('./NodeManager');
 const UserManager = require('./UserManager');
-const RequestManager = require('../managers/RequestManager');
+const RequestManager = require('../http/RequestManager');
 const loader = require('../util/configLoader');
 
 /**

@@ -118,23 +118,6 @@ class RequestManager extends EventEmitter {
     async delete(path, params = null) {
         return await this._make(path, params, 'DELETE');
     }
-
-    /**
-     * Sends a ping request to the Pterodactyl API.
-     * Because the API has no "ping" endpoint, we use a forced error to receive a 404 response
-     * then check that it is a valid 404 error by the API and not a timeout response.
-     * @returns {Promise<boolean>}
-     */
-    async ping() {
-        try {
-            await this.get(`/api/${this.type}`);
-        } catch (err) {
-            if (err instanceof PteroAPIError) return true;
-            throw new RequestError(
-                `Pterodactyl API is unavailable\nResponse: ${err}`
-            );
-        }
-    }
 }
 
 module.exports = RequestManager;

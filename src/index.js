@@ -24,7 +24,7 @@ module.exports = {
     // Global Managers
     DatabaseManager: require('./client/ClientDatabaseManager'),
     FileManager: require('./client/FileManager'),
-    RequestManager: require('./managers/RequestManager'),
+    RequestManager: require('./http/RequestManager'),
 
     // Package Structures
     ApplicationServer: require('./structures/ApplicationServer'),
