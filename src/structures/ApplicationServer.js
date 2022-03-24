@@ -1,9 +1,6 @@
-const AllocationManager = require('../managers/AllocationManager');
-const DatabaseManager = require('../managers/DatabaseManager');
-const FileManager = require('../managers/FileManager');
 const { PteroUser } = require('./User');
 const Node = require('./Node');
-const caseConv = require('./caseConv');
+const caseConv = require('../util/caseConv');
 const endpoints = require('../application/endpoints');
 
 class ApplicationServer {
@@ -11,10 +8,29 @@ class ApplicationServer {
         this.client = client;
 
         /**
+         * The of the server (separate from UUID).
+         * @type {number}
+         */
+        this.id = data.id;
+
+        /**
+         * The internal UUID of the server.
+         * @type {string}
+         */
+        this.uuid = data.uuid;
+
+        /**
+         * A substring of the server's UUID to easily identify it.
+         * @type {string}
+         */
+        this.identifier = data.identifier;
+
+        /**
              * The date the server was created.
              * @type {Date}
              */
         this.createdAt = new Date(data.created_at);
+
         /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
@@ -23,50 +39,20 @@ class ApplicationServer {
              * @type {?Date}
              */
         this.updatedAt = data.updated_at ? new Date(data.updated_at) : null;
+
         /** @type {?number} */
         this.updatedTimestamp = this.updatedAt?.getTime() || null;
-
-        /** @type {DatabaseManager} */
-        this.databases = new DatabaseManager(client, data);
-        /** @type {FileManager} */
-        this.files = new FileManager(client, data);
-        /** @type {AllocationManager} */
-        this.allocations = new AllocationManager(client, this, data);
 
         this._patch(data);
     }
 
     _patch(data) {
-        if ('id' in data) {
-            /**
-             * The of the server (separate from UUID).
-             * @type {number}
-             */
-            this.id = data.id;
-        }
-
         if ('external_id' in data) {
             /**
              * The external ID of the server (if set).
              * @type {?string}
              */
             this.externalId = data.external_id ?? null;
-        }
-
-        if ('uuid' in data) {
-            /**
-             * The internal UUID of the server.
-             * @type {string}
-             */
-            this.uuid = data.uuid;
-        }
-
-        if ('identifier' in data) {
-            /**
-             * A substring of the server's UUID to easily identify it.
-             * @type {string}
-             */
-            this.identifier = data.identifier;
         }
 
         if ('name' in data) {
@@ -136,13 +122,13 @@ class ApplicationServer {
             this.nodeId = data.node;
         }
 
-        if ('-' in data) {
+        if (!this.node) {
             /**
              * The node object that the server is part of. This can be fetched by including
              * 'node' in the ApplicationServerManager.fetch.
              * @type {?Node}
              */
-            this.node = null;
+            this.node = this.client.nodes.resolve(data);
         }
 
         if ('allocation' in data) {
@@ -208,8 +194,8 @@ class ApplicationServer {
         payload.external_id = options.externalId ?? this.externalId;
         payload.description = options.description ?? this.description;
 
-        await this.client.requests.make(
-            endpoints.servers.details(this.id), payload, 'PATCH'
+        await this.client.requests.patch(
+            endpoints.servers.details(this.id), payload
         );
 
         this._patch(payload);
@@ -235,7 +221,9 @@ class ApplicationServer {
      * @returns {Promise<void>}
      */
     async suspend() {
-        await this.client.requests.make(endpoints.servers.suspend(this.id), null, 'POST');
+        await this.client.requests.post(
+            endpoints.servers.suspend(this.id), null
+        );
         this.suspended = true;
     }
 
@@ -244,7 +232,9 @@ class ApplicationServer {
      * @returns {Promise<void>}
      */
     async unsuspend() {
-        await this.client.requests.make(endpoints.servers.unsuspend(this.id), null, 'POST');
+        await this.client.requests.post(
+            endpoints.servers.unsuspend(this.id), null
+        );
         this.suspended = false;
     }
 
@@ -253,7 +243,9 @@ class ApplicationServer {
      * @returns {Promise<void>}
      */
     async reinstall() {
-        await this.client.requests.make(endpoints.servers.reinstall(this.id), null, 'POST');
+        await this.client.requests.post(
+            endpoints.servers.reinstall(this.id), null
+        );
     }
 
     /**

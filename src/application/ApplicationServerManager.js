@@ -1,9 +1,38 @@
 const ApplicationServer = require('../structures/ApplicationServer');
 const Dict = require('../structures/Dict');
 const { PteroUser } = require('../structures/User');
+const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class ApplicationServerManager {
+    /**
+     * Allowed filter arguments for application servers.
+     */
+    static get FILTERS() {
+        return Object.freeze([
+            'name', 'uuid', 'uuidShort',
+            'externalId', 'image'
+        ]);
+    }
+
+    /**
+     * Allowed include arguments for application servers.
+     */
+    static get INCLUDES() {
+        return Object.freeze([
+            'allocations', 'user', 'subusers',
+            'nest', 'egg', 'variables',
+            'location', 'node', 'databases'
+        ]);
+    }
+
+    /**
+     * Allowed sort arguments for application servers.
+     */
+    static get SORTS() {
+        return Object.freeze(['id', '-id', 'uuid', '-uuid']);
+    }
+
     constructor(client) {
         this.client = client;
         this.cache = new Dict();
@@ -37,6 +66,7 @@ class ApplicationServerManager {
             if (this.client.options.servers.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
+
         const s = new ApplicationServer(this.client, data.attributes);
         if (this.client.options.servers.cache) this.cache.set(s.id, s);
         return s;
@@ -48,16 +78,16 @@ class ApplicationServerManager {
      * * a number
      * * an object
      * 
-     * Returns `null` if not found.
+     * Returns `undefined` if not found.
      * @param {string|number|object|ApplicationServer} obj The object to resolve from.
      * @returns {?ApplicationServer} The resolved server.
      */
     resolve(obj) {
         if (obj instanceof ApplicationServer) return obj;
-        if (typeof obj === 'number') return this.cache.get(obj) || null;
-        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
         if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
-        return null;
+        return undefined;
     }
 
     /**
@@ -69,17 +99,15 @@ class ApplicationServerManager {
      * @returns {Promise<ApplicationServer|Dict<number, ApplicationServer>>} The fetched server(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (options.force) {
-                const s = this.cache.get(id);
-                if (s) return Promise.resolve(s);
-            }
-            const data = await this.client.requests.make(
-                endpoints.servers.get(id) + joinParams(options.include)
-            );
-            return this._patch(data);
+        if (id && !options.force) {
+            const s = this.cache.get(id);
+            if (s) return Promise.resolve(s);
         }
-        const data = await this.client.requests.make(endpoints.servers.main);
+
+        const query = build(options, { includes: ApplicationServerManager.INCLUDES });
+        const data = await this.client.requests.get(
+            (id ? endpoints.servers.get(id) : endpoints.servers.main) + query
+        );
         return this._patch(data);
     }
 
@@ -89,7 +117,8 @@ class ApplicationServerManager {
      * Available query filters are:
      * * name
      * * uuid
-     * * identifier
+     * * uuidShort
+     * * identifier (alias for uuidShort)
      * * externalId
      * * image
      * 
@@ -98,20 +127,25 @@ class ApplicationServerManager {
      * * -id
      * * uuid
      * * -uuid
+     * 
+     * @param {string} entity The entity (string) to query.
+     * @param {string} filter The filter to use for the query.
+     * @param {string} sort The order to sort the results in.
+     * @returns {Promise<Dict<number, ApplicationServer>>} A dict of the quiried servers.
      */
     async query(entity, filter, sort) {
-        if (filter && !['name', 'uuid', 'identifier', 'externalId', 'image'].includes(filter)) throw new Error('Invalid query filter.');
-        if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
         if (!sort && !filter) throw new Error('Sort or filter is required.');
-
         if (filter === 'identifier') filter = 'uuidShort';
         if (filter === 'externalId') filter = 'external_id';
 
-        const data = await this.client.requests.make(
-            endpoints.servers.main +
-            (filter ? `?filter[${filter}]=${entity}` : '') +
-            (sort && filter ? `&sort=${sort}` : '') +
-            (sort && !filter ? `?sort=${sort}` : '')
+        const { FILTERS, SORTS } = ApplicationServerManager;
+        const query = build(
+            { filter:[filter, entity], sort },
+            { filters: FILTERS, sorts: SORTS }
+        );
+
+        const data = await this.client.requests.get(
+            endpoints.servers.main + query
         );
         return this._patch(data);
     }
@@ -151,9 +185,9 @@ class ApplicationServerManager {
         payload.limits = options.limits ?? this.defaultLimits;
         payload.feature_limits = options.featureLimits ?? this.defaultFeatureLimits;
 
-        await this.client.requests.make(endpoints.servers.main, payload, 'POST');
-        const s = await this.query(payload.name, 'name');
-        return s.first();
+        await this.client.requests.post(endpoints.servers.main, payload);
+        const data = await this.query(payload.name, 'name', '-id');
+        return data.find(s => s.name === payload.name);
     }
 
     /**
@@ -164,8 +198,8 @@ class ApplicationServerManager {
      */
     async delete(server, force = false) {
         if (server instanceof ApplicationServer) server = server.id;
-        await this.client.requests.make(
-            endpoints.servers.get(server) + (force ? '/force' : ''), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.get(server) + (force ? '/force' : '')
         );
         this.cache.delete(server);
         return true;
@@ -173,14 +207,3 @@ class ApplicationServerManager {
 }
 
 module.exports = ApplicationServerManager;
-
-function joinParams(params) {
-    if (!params || !params.length) return '';
-    const valid = [
-        'allocations', 'user', 'subusers',
-        'pack', 'nest', 'egg', 'variables',
-        'location', 'node', 'databases'
-    ];
-    params = params.filter(p => valid.includes(p));
-    return '?include='+ params.toString();
-}

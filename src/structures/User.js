@@ -2,8 +2,10 @@ const ApplicationServer = require('./ApplicationServer');
 const Permissions = require('./Permissions');
 const { PermissionResolvable } = require('./Permissions');
 const Dict = require('./Dict');
-const caseConv = require('./caseConv');
+const caseConv = require('../util/caseConv');
 const c_path = require('../client/endpoints');
+
+let loggedDeprecated = false;
 
 class BaseUser {
     constructor(client, data) {
@@ -63,6 +65,11 @@ class BaseUser {
 class PteroUser extends BaseUser {
     constructor(client, data) {
         super(client, data);
+
+        /** @type {string} */
+        this.uuid = data.uuid;
+
+        this._patch(data);
     }
 
     _patch(data) {
@@ -73,24 +80,34 @@ class PteroUser extends BaseUser {
             this.externalId = data.external_id;
         }
 
-        if ('uuid' in data) {
-            /** @type {string} */
-            this.uuid = data.uuid;
-        }
-
         if ('root_admin' in data) {
             /** @type {boolean} */
             this.isAdmin = data.root_admin ?? false;
         }
 
         if ('2fa' in data) {
-            /** @type {boolean} */
+            /**
+             * @type {boolean}
+             * @deprecated Use {@link PteroUser.twoFactor} instead.
+             */
             this.tfa = data['2fa'];
+
+            /** @type {boolean} */
+            this.twoFactor = data['2fa'];
+
+            if (!loggedDeprecated) {
+                process.emitWarning(
+                    "'PteroUser#tfa' is deprecated, use 'PteroUser#twoFactor' instead",
+                    'Deprecated'
+                );
+                loggedDeprecated = true;
+            }
         }
 
         if ('created_at' in data) {
             /** @type {Date} */
             this.createdAt = new Date(data.created_at);
+
             /** @type {number} */
             this.createdTimestamp = this.createdAt.getTime();
         }
@@ -98,6 +115,7 @@ class PteroUser extends BaseUser {
         if ('updated_at' in data) {
             /** @type {?Date} */
             this.updatedAt = data['updated_at'] ? new Date(data['updated_at']) : null;
+
             /** @type {?number} */
             this.updatedTimestamp = this.updatedAt?.getTime() || null;
         }
@@ -141,10 +159,14 @@ class PteroSubUser extends BaseUser {
         super(client, data);
 
         /** @type {string} */
+        this.uuid = data.uuid;
+
+        /** @type {string} */
         this._server = server;
 
         /** @type {Date} */
         this.createdAt = new Date(data.created_at);
+
         /** @type {number} */
         this.createdTimestamp = this.createdAt.getTime();
 
@@ -156,11 +178,6 @@ class PteroSubUser extends BaseUser {
 
     _patch(data) {
         super._patch(data);
-
-        if ('uuid' in data) {
-            /** @type {string} */
-            this.uuid = data.uuid;
-        }
 
         if ('image' in data) {
             /** @type {string} */
@@ -180,8 +197,9 @@ class PteroSubUser extends BaseUser {
      */
     async setPermissions(perms) {
         perms = new Permissions(perms);
-        await this.client.requests.make(
-            c_path.servers.users.get(this._server, this.uuid), { permissions: perms.toStrings() }, 'POST'
+        await this.client.requests.post(
+            c_path.servers.users.get(this._server, this.uuid),
+            { permissions: perms.toStrings() }
         );
         this.permissions = perms;
         return this;
@@ -224,8 +242,8 @@ class ClientUser extends BaseUser {
      * @returns {Promise<string[]>} The auth tokens.
      */
     async enable2fa(code) {
-        const data = await this.client.requests.make(
-            c_path.account.tfa, { code }, 'POST'
+        const data = await this.client.requests.post(
+            c_path.account.tfa, { code }
         );
         this.tokens.push(...data.attributes.tokens);
         return this.tokens;
@@ -237,8 +255,8 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async disable2fa(password) {
-        await this.client.requests.make(
-            c_path.account.tfa, { password }, 'DELETE'
+        await this.client.requests.delete(
+            c_path.account.tfa, { password }
         );
         this.tokens = [];
     }
@@ -250,8 +268,8 @@ class ClientUser extends BaseUser {
      * @returns {Promise<ClientUser>} The updated client user instance.
      */
     async updateEmail(email, password) {
-        await this.client.requests.make(
-            c_path.account.email, { email, password }, 'PUT'
+        await this.client.requests.put(
+            c_path.account.email, { email, password }
         );
         this.email = email;
         return this;
@@ -265,15 +283,14 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async updatePassword(oldpass, newpass) {
-        if (oldpass === newpass) return;
-        return await this.client.requests.make(
+        if (oldpass === newpass) return Promise.resolve();
+        return await this.client.requests.put(
             c_path.account.password,
             {
                 current_password: oldpass,
                 password: newpass,
                 password_confirmation: newpass
-            },
-            'PUT'
+            }
         );
     }
 
@@ -284,6 +301,7 @@ class ClientUser extends BaseUser {
     async fetchKeys() {
         const data = await this.client.requests.make(c_path.account.apikeys);
         this.apikeys = [];
+
         for (let o of data.data) {
             o = o.attributes;
             this.apikeys.push({
@@ -294,6 +312,7 @@ class ClientUser extends BaseUser {
                 createdAt: new Date(o.created_at)
             });
         }
+
         return this.apikeys;
     }
 
@@ -304,11 +323,11 @@ class ClientUser extends BaseUser {
      * @returns {Promise<APIKey>} The new API key.
      */
     async createKey(description, allowed = []) {
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.post(
             c_path.account.apikeys,
-            { description, allowed_ips: allowed },
-            'POST'
+            { description, allowed_ips: allowed }
         );
+
         const att = data.attributes;
         this.apikeys.push({
             identifier: att.identifier,
@@ -317,6 +336,7 @@ class ClientUser extends BaseUser {
             lastUsedAt: att.last_used_at ? new Date(att.last_used_at) : null,
             createdAt: new Date(att.created_at)
         });
+
         return this.apikeys.find(k => k.identifier === att.identifier);
     }
 
@@ -326,7 +346,9 @@ class ClientUser extends BaseUser {
      * @returns {Promise<void>}
      */
     async deleteKey(id) {
-        await this.client.requests.make(c_path.account.apikeys +`/${id}`, null, 'DELETE');
+        await this.client.requests.delete(
+            c_path.account.apikeys +`/${id}`
+        );
         this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 }

@@ -1,11 +1,23 @@
 const { NodeLocation } = require('../application/NodeLocationManager');
-const caseConv = require('./caseConv');
+const caseConv = require('../util/caseConv');
 const endpoints = require('../application/endpoints');
 
 class Node {
     constructor(client, data) {
         this.client = client;
         data = data.attributes;
+
+        /**
+         * The ID of the node.
+         * @type {number}
+         */
+        this.id = data.id;
+
+        /**
+         * The internal UUID of the node.
+         * @type {string}
+         */
+        this.uuid = data.uuid;
 
         /**
          * The date the node was created.
@@ -23,22 +35,6 @@ class Node {
     }
 
     _patch(data) {
-        if ('id' in data) {
-            /**
-             * The ID of the node.
-             * @type {number}
-             */
-            this.id = data.id;
-        }
-
-        if ('uuid' in data) {
-            /**
-             * The internal UUID of the node.
-             * @type {string}
-             */
-            this.uuid = data.uuid;
-        }
-
         if ('public' in data) {
             /**
              * Whether the node is public to other users.
@@ -179,7 +175,9 @@ class Node {
      * @returns {Promise<object>} The node config.
      */
     async getConfig() {
-        return await this.client.requests.make(endpoints.nodes.config(this.id));
+        return await this.client.requests.get(
+            endpoints.nodes.config(this.id)
+        );
     }
 
     /**

@@ -30,10 +30,12 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 
 ## Misc.
 - [X] Add proper notes and annotations to JSDocs
-- [ ] Overall testing of the package (priority)
+- [X] Overall testing of the package (priority)
 - [X] TypeScript support (`index.d.ts`)
 - [X] Investigate incorrectly documented endpoints
-- [ ] Implement tests in `/tests` (or move from `/test`)
+- [X] Implement tests in `/tests` (or move from `/test`)
+- [ ] Remove deprecated `PteroUser#tfa`
+- [X] Remove deprecated `Presets` util
 
 ## Feature Plans
 - [ ] Optional webhook client

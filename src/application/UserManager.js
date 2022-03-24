@@ -1,8 +1,26 @@
 const { PteroUser } = require('../structures/User');
 const Dict = require('../structures/Dict');
+const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class UserManager {
+    /**
+     * Allowed filter arguments for users.
+     */
+    static get FILTERS() {
+        return Object.freeze([
+            'email', 'uuid', 'uuidShort',
+            'username', 'image', 'external_id'
+        ]);
+    }
+
+    /**
+     * Allowed sort arguments for users.
+     */
+    static get SORTS() {
+        return Object.freeze(['id', '-id', 'uuid', '-uuid']);
+    }
+
     constructor(client) {
         this.client = client;
 
@@ -18,9 +36,11 @@ class UserManager {
                 const u = new PteroUser(this.client, o);
                 res.set(u.id, u);
             }
+
             if (this.client.options.users.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
+
         const u = new PteroUser(this.client, data.attributes);
         if (this.client.options.users.cache) this.cache.set(u.id, u);
         return u;
@@ -32,16 +52,16 @@ class UserManager {
      * * a number
      * * an object
      * 
-     * Returns `null` if not found.
+     * Returns `undefined` if not found.
      * @param {string|number|object|PteroUser} obj The object to resolve from.
      * @returns {?PteroUser} The resolved user.
      */
     resolve(obj) {
         if (obj instanceof PteroUser) return obj;
-        if (typeof obj === 'number') return this.cache.get(obj) || null;
-        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
         if (obj.relationships?.user) return this._patch(obj.relationships.user);
-        return null;
+        return undefined;
     }
 
     /**
@@ -53,18 +73,14 @@ class UserManager {
      * @returns {Promise<PteroUser|Dict<number, PteroUser>>} The fetched user(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const u = this.cache.get(id);
-                if (u) return Promise.resolve(u);
-            }
-            const data = await this.client.requests.make(
-                endpoints.users.get(id) + (options.withServers ? '?include=servers' : '')
-            );
-            return this._patch(data);
+        if (id && !options.force) {
+            const u = this.cache.get(id);
+            if (u) return Promise.resolve(u);
         }
-        const data = await this.client.requests.make(
-            endpoints.users.main + (options.withServers ? '?include=servers' : '')
+
+        const data = await this.client.requests.get(
+            (id ? endpoints.users.get(id) : endpoints.users.main) +
+            (options.withServers ? '?include=servers' : '')
         );
         return this._patch(data);
     }
@@ -78,8 +94,12 @@ class UserManager {
      * @returns {Promise<PteroUser>} The fetched user.
      */
     async fetchExternal(id, options = {}) {
-        if (!options.force) for (const [, user] of this.cache) if (id === user.externalId) return user;
-        const data = await this.client.requests.make(
+        if (!options.force) {
+            const u = this.cache.filter(u => u.externalId === id);
+            if (u) return Promise.resolve(u);
+        }
+
+        const data = await this.client.requests.get(
             endpoints.users.ext(id) + (options.withServers ? '?include=servers' : '')
         );
         return this._patch(data);
@@ -90,9 +110,12 @@ class UserManager {
      * Keep in mind this does NOT check the cache first, it will fetch from the API directly.
      * Available query filters are:
      * * email
+     * * name
      * * uuid
-     * * username
+     * * uuidShort
+     * * identifier (alias for uuidShort)
      * * externalId
+     * * image
      * 
      * Available sort options are:
      * * id
@@ -101,21 +124,22 @@ class UserManager {
      * * -uuid
      * 
      * @param {string} entity The entity (string) to query.
-     * @param {string} [filter] The filter to use for the query (see above).
-     * @param {string} [sort] The order to sort the results in (see above).
-     * @returns {Promise<Dict<number, PteroUser>>} A dict of the queried user(s).
+     * @param {string} [filter] The filter to use for the query.
+     * @param {string} [sort] The order to sort the results in.
+     * @returns {Promise<Dict<number, PteroUser>>} A dict of the queried users.
      */
     async query(entity, filter, sort) {
-        if (filter && !['email', 'uuid', 'username', 'externalId'].includes(filter)) throw new Error('Invalid query filter.');
-        if (sort && !['id', '-id', 'uuid', '-uuid'].includes(sort)) throw new Error('Invalid sort type.');
-        if (!sort && !filter) throw new Error('sort or filter is required to query');
+        if (!sort && !filter) throw new Error('Sort or filter is required.');
+        if (filter === 'identifier') filter = 'uuidShort';
         if (filter === 'externalId') filter = 'external_id';
-        const data = await this.client.requests.make(
-            endpoints.users.main +
-            (filter ? `?filter[${filter}]=${entity}` : "") +
-            (sort && filter ? `&sort=${sort}` : "") +
-            (sort && !filter ? `?sort=${sort}` : "")
+
+        const { FILTERS, SORTS } = UserManager;
+        const query = build(
+            { filter:[filter, entity], sort },
+            { filters: FILTERS, sorts: SORTS }
         );
+
+        const data = await this.client.requests.get(endpoints.users.main + query);
         return this._patch(data);
     }
 
@@ -128,13 +152,12 @@ class UserManager {
      * @returns {Promise<PteroUser>} The new user.
      */
     async create(email, username, firstname, lastname) {
-        await this.client.requests.make(
+        await this.client.requests.post(
             endpoints.users.main,
-            { email, username, first_name: firstname, last_name: lastname },
-            'POST'
+            { email, username, first_name: firstname, last_name: lastname }
         );
-        const u = await this.query(email, 'email');
-        return u.first();
+        const data = await this.query(email, 'email', '-id');
+        return data.find(u => u.email === email);
     }
 
     /**
@@ -162,10 +185,16 @@ class UserManager {
         if (options.lastname) lastname = options.lastname;
         if (options.language) language = options.language;
 
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.patch(
             endpoints.users.get(id),
-            { email, username, first_name: firstname, last_name: lastname, language, password },
-            'PATCH'
+            {
+                email,
+                username,
+                first_name: firstname,
+                last_name: lastname,
+                language,
+                password
+            }
         );
         return this._patch(data);
     }
@@ -177,7 +206,7 @@ class UserManager {
      */
     async delete(user) {
         if (user instanceof PteroUser) user = user.id;
-        await this.client.requests.make(endpoints.users.get(user), null, 'DELETE');
+        await this.client.requests.delete(endpoints.users.get(user));
         this.cache.delete(user);
         return true;
     }

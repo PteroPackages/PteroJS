@@ -5,19 +5,12 @@ const endpoints = require('../endpoints');
 class Shard {
     constructor(client, id, auth) {
         this.client = client;
-
         this.id = id;
-
         this.token = auth.token;
-
         this.socket = null;
-
         this.status = 'CLOSED';
-
         this.readyAt = 0;
-
         this.ping = -1;
-
         this.lastPing = 0;
 
         this.connect(auth);
@@ -54,7 +47,7 @@ class Shard {
     }
 
     send(event, args) {
-        if (!this.socket) return; // throw error
+        if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         if (!Array.isArray(args)) args = [args];
         this.socket.send({ event, args });
     }

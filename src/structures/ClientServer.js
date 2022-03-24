@@ -1,8 +1,8 @@
-const SubUserManager = require('../client/SubUserManager');
-const AllocationManager = require('../managers/AllocationManager');
-const DatabaseManager = require('../managers/DatabaseManager');
-const FileManager = require('../managers/FileManager');
+const ClientDatabaseManager = require('../client/ClientDatabaseManager');
+const FileManager = require('../client/FileManager');
+const NetworkAllocationManager = require('../client/NetworkAllocationManager');
 const Permissions = require('./Permissions');
+const SubUserManager = require('../client/SubUserManager');
 const endpoints = require('../client/endpoints');
 
 class ClientServer {
@@ -10,14 +10,30 @@ class ClientServer {
         this.client = client;
         const attr = data.attributes;
 
+        /**
+         * The internal UUID of the server.
+         * @type {string}
+         */
+        this.uuid = attr.uuid;
+
+        /**
+         * A substring of the server's UUID to easily identify it.
+         * @type {string}
+         */
+        this.identifier = attr.identifier;
+
         /** @type {SubUserManager} */
         this.users = new SubUserManager(client, this);
-        /** @type {AllocationManager} */
-        this.allocations = new AllocationManager(client, this, attr.relationships);
+
+        /** @type {NetworkAllocationManager} */
+        this.allocations = new NetworkAllocationManager(client, this);
+
         /** @type {Permissions} */
         this.permissions = new Permissions(data.meta?.user_permissions ?? {});
-        /** @type {DatabaseManager} */
-        this.databases = new DatabaseManager(client, this, attr.relationships);
+
+        /** @type {ClientDatabaseManager} */
+        this.databases = new ClientDatabaseManager(client, this, attr.relationships);
+
         /** @type {FileManager} */
         this.files = new FileManager(client, this, attr.relationships);
 
@@ -31,22 +47,6 @@ class ClientServer {
              * @type {boolean}
              */
             this.isOwner = data.server_owner;
-        }
-
-        if ('identifier' in data) {
-            /**
-             * A substring of the server's UUID to easily identify it.
-             * @type {string}
-             */
-            this.identifier = data.identifier;
-        }
-
-        if ('uuid' in data) {
-            /**
-             * The internal UUID of the server.
-             * @type {string}
-             */
-            this.uuid = data.uuid;
         }
 
         if ('name' in data) {
@@ -140,7 +140,7 @@ class ClientServer {
     }
 
     /** @todo */
-    get resources() {}
+    async fetchResources() {}
 
     /**
      * Sends a command to the server terminal.
@@ -148,8 +148,8 @@ class ClientServer {
      * @returns {Promise<void>}
      */
     async sendCommand(command) {
-        await this.client.requests.make(
-            endpoints.servers.command(this.identifier), { command }, 'POST'
+        await this.client.requests.post(
+            endpoints.servers.command(this.identifier), { command }
         );
     }
 
@@ -163,9 +163,11 @@ class ClientServer {
      * @returns {Promise<void>}
      */
     async setPowerState(state) {
-        if (!['start', 'stop', 'restart', 'kill'].includes(state)) throw new Error('Invalid power state.');
-        await this.client.requests.make(
-            endpoints.servers.power(this.identifier), { signal: state }, 'POST'
+        if (!['start', 'stop', 'restart', 'kill'].includes(state))
+            throw new Error('Invalid power state.');
+
+        await this.client.requests.post(
+            endpoints.servers.power(this.identifier), { signal: state }
         );
         this.state = state;
     }

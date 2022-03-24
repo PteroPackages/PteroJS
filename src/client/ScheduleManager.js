@@ -17,11 +17,13 @@ class ScheduleManager {
                 const s = new Schedule(this.client, id, o);
                 res.set(s.id, s);
             }
+
             let c = this.cache.get(id);
             if (c) res.forEach((v, k) => c.set(k, v)); else c = res;
             this.cache.set(id, c);
             return res;
         }
+
         const s = new Schedule(this.client, id, data);
         let c = this.cache.get(id);
         if (c) c.set(s.id, s); else c = new Dict().set(s.id, s);
@@ -37,18 +39,15 @@ class ScheduleManager {
      * @returns {Promise<Schedule|Dict<number, Schedule>>} The fetched schedule(s).
      */
     async fetch(server, id, force) {
-        if (id) {
-            if (!force) {
-                const sch = this.cache.get(server)?.get(id);
-                if (sch) return sch;
-            }
-            const data = await this.client.requests.make(
-                endpoints.servers.schedules.get(server, id)
-            );
-            return this._patch(server, data);
+        if (id && !force) {
+            const s = this.cache.get(server)?.get(id);
+            if (s) return s;
         }
-        const data = await this.client.requests.make(
-            endpoints.servers.schedules.main(server)
+
+        const data = await this.client.requests.get(
+            id
+            ? endpoints.servers.schedules.get(id)
+            : endpoints.servers.schedules.main
         );
         return this._patch(server, data);
     }
@@ -66,7 +65,8 @@ class ScheduleManager {
      * @returns {Promise<Schedule>} The new schedule.
      */
     async create(server, options = {}) {
-        if (Object.keys(options).length < 4) throw new Error('Missing required Schedule creation option.');
+        if (Object.keys(options).length < 4)
+            throw new Error('Missing required Schedule creation option.');
 
         const payload = {};
         payload.name = options.name;
@@ -76,8 +76,8 @@ class ScheduleManager {
         payload.day_of_week = options.dayOfWeek || '*';
         payload.day_of_month = options.dayOfMonth || '*';
 
-        const data = await this.client.requests.make(
-            endpoints.servers.schedules.main(server), payload, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.servers.schedules.main(server), payload
         );
         return this._patch(data);
     }
@@ -107,8 +107,8 @@ class ScheduleManager {
         payload.day_of_week = options.dayOfWeek || sch.cron.week;
         payload.day_of_month = options.dayOfMonth || sch.cron.month;
 
-        const data = await this.client.requests.make(
-            endpoints.servers.schedules.get(server, id), payload, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.servers.schedules.get(server, id), payload
         );
         return this._patch(data);
     }
@@ -120,10 +120,10 @@ class ScheduleManager {
      * @returns {Promise<boolean>}
      */
     async delete(server, id) {
-        await this.client.requests.make(
-            endpoints.servers.schedules.get(server, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.schedules.get(server, id)
         );
-        this.cache.get(server).delete(id);
+        this.cache.get(server)?.delete(id);
         return true;
     }
 }

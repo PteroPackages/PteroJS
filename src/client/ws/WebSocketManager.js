@@ -1,18 +1,9 @@
 const Shard = require('./Shard');
 const endpoints = require('../endpoints');
 
-// const EVENTS = {
-//     'auth success': 'serverConnect',
-//     'console output': 'serverOutput',
-//     'token expired': 'serverDisconnect',
-//     'status': 'statusUpdate',
-//     'stats': 'statsUpdate'
-// }
-
 class WebSocketManager {
     constructor(client) {
         this.client = client;
-
         this.servers = [];
 
         /**
@@ -20,9 +11,7 @@ class WebSocketManager {
          * @type {Map<string, Shard>}
          */
         this.shards = new Map();
-
         this.totalShards = 0;
-
         this.readyAt = 0;
     }
 
@@ -31,17 +20,22 @@ class WebSocketManager {
             this.client.emit('debug', '[WS] No shards to launch');
             return;
         }
+
         this.client.emit('debug', `[WS] Attempting to launch ${this.servers.length} shard(s)`);
         for (const id of this.servers) {
-            const data = await this.client.requests.make(endpoints.servers.ws(id));
+            const { data } = await this.client.requests.get(endpoints.servers.ws(id));
             try {
                 const shard = new Shard(this.client, id, data);
                 this.shards.set(id, shard);
                 this.totalShards++;
-            } catch {
-                this.client.emit('debug', `[WS] Shard ${id} failed to launch`);
+            } catch (err) {
+                this.client.emit(
+                    'debug',
+                    `[WS] Shard '${id}' failed to launch\n[WS] ${err.message}`
+                );
             }
         }
+
         this.readyAt = Date.now();
         this.client.emit('ready');
     }

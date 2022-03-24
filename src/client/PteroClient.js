@@ -1,11 +1,11 @@
 const { EventEmitter } = require('events');
-const ClientRequestManager = require('./ClientRequestManager');
 const ClientServerManager = require('./ClientServerManager');
 const { ClientUser } = require('../structures/User');
+const RequestManager = require('../http/RequestManager');
 const ScheduleManager = require('./ScheduleManager');
 const WebSocketManager = require('./ws/WebSocketManager');
 const endpoints = require('./endpoints');
-const loader = require('../structures/configLoader');
+const loader = require('../util/configLoader');
 
 /**
  * The base class for the Pterodactyl client API.
@@ -24,6 +24,12 @@ class PteroClient extends EventEmitter {
      */
     constructor(domain, auth, options = {}) {
         super();
+
+        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
+            throw new SyntaxError(
+                "Domain URL must start with 'http://' or 'https://' and "+
+                'must be bound to a port if using localhost.'
+            );
 
         /**
          * The domain for your Pterodactyl panel. This should be the main URL only
@@ -46,42 +52,37 @@ class PteroClient extends EventEmitter {
          */
         this.options = loader.clientConfig(options);
 
-        /** @type {?Date} */
-        this.readyAt = null;
-
-        /** @type {?number} */
-        this.ping = null;
-
         /** @type {?ClientUser} */
         this.user = null;
 
         /** @type {ClientServerManager} */
         this.servers = new ClientServerManager(this);
+
         /** @type {ScheduleManager} */
         this.schedules = new ScheduleManager(this);
-        /** @type {ClientRequestManager} @internal */
-        this.requests = new ClientRequestManager(this);
-        /** @type {WebSocketManager} @internal */
+
+        /** @type {RequestManager} @internal */
+        this.requests = new RequestManager('Client', this.domain, this.auth);
+
+        /** @type {WebSocketManager} */
         this.ws = new WebSocketManager(this);
     }
 
     /**
-     * Sends a ping request to the API before performing additional startup requests
-     * as well as any websocket connections. Attempting to use the application without
-     * connecting to the API will result in an error.
+     * Performs preload requests to Pterodactyl and launches websocket connections.
      * @returns {Promise<boolean>}
      * @fires PteroClient#ready
      */
     async connect() {
-        if (this.readyAt) return;
-        const start = Date.now();
-        await this.requests.ping();
-        this.ping = Date.now() - start;
-        if (this.options.fetchClient) this.user = await this.fetchClient();
+        if (this.options.fetchClient) await this.fetchClient();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
         if (this.options.ws) await this.ws.launch();
-        this.readyAt = Date.now();
+
         return true;
+    }
+
+    get ping() {
+        return this.requests.ping;
     }
 
     /**
@@ -90,36 +91,37 @@ class PteroClient extends EventEmitter {
      * @returns {Promise<ClientUser>} The client user.
      */
     async fetchClient() {
-        const data = await this.requests.make(endpoints.account.main);
-        return new ClientUser(this, data.attributes);
+        const data = await this.requests.get(endpoints.account.main);
+        this.user = new ClientUser(this, data.attributes);
+        return this.user;
     }
 
     /**
      * Adds a server or an array of servers to be connected to websockets.
-     * @param {string|string[]} ids The identifier of the server, or an array of server identifiers.
-     * @returns {void}
+     * @param {string[]} ids The identifier of the server, or an array of server identifiers.
+     * @returns {this}
      */
-    addSocketServer(ids) {
-        Array.isArray(ids) ? this.ws.servers.push(...ids) : this.ws.servers.push(ids);
+    addSocketServer(...ids) {
+        this.ws.servers.concat(ids);
+        return this;
     }
 
     /**
      * Removes a server from websocket connections.
      * @param {string} id The identifier of the server.
-     * @returns {void}
+     * @returns {this}
      */
     removeSocketServer(id) {
-        this.ws.servers.splice(id);
+        this.ws.servers = this.ws.servers.filter(i => i === id);
+        return this;
     }
 
     /**
-     * Disconnects from the Pterodactyl API and closes any existing websocket connections.
+     * Closes any existing websocket connections.
      * @returns {void}
      */
     disconnect() {
-        this.ping = null;
-        this.readyAt = null;
-        if (!this.ws.readyAt) this.ws.destroy();
+        if (this.ws.readyAt) this.ws.destroy();
     }
 }
 

@@ -1,8 +1,30 @@
 const Node = require('../structures/Node');
 const Dict = require('../structures/Dict');
+const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class NodeManager {
+    /**
+     * Allowed filter arguments for nodes.
+     */
+    static get FILTERS() {
+        return Object.freeze(['uuid', 'name', 'fqdn', 'daemon_token_id']);
+    }
+
+    /**
+     * Allowed include arguments for nodes.
+     */
+    static get INCLUDES() {
+        return Object.freeze(['allocations', 'location', 'servers']);
+    }
+
+    /**
+     * Allowed sort arguments for nodes.
+     */
+    static get SORTS() {
+        return Object.freeze(['id', 'uuid', 'memory', 'disk']);
+    }
+
     constructor(client) {
         this.client = client;
 
@@ -17,12 +39,32 @@ class NodeManager {
                 const n = new Node(this.client, o);
                 res.set(n.id, n);
             }
+
             if (this.client.options.nodes.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
+
         const n = new Node(this.client, data);
         if (this.client.options.nodes.cache) this.cache.set(n.id, n);
         return n;
+    }
+
+    /**
+     * Resolves a node from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * Returns `undefined` if not found.
+     * @param {string|number|object|Node} obj The object to resolve from.
+     * @returns {?Node} The resolved node.
+     */
+    resolve(obj) {
+        if (obj instanceof Node) return obj;
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(n => n.name === obj);
+        if (obj.relationships?.nodes) return this._patch(obj.relationships.nodes);
+        return undefined;
     }
 
     /**
@@ -34,19 +76,53 @@ class NodeManager {
      * @returns {Promise<Node|Dict<number, Node>>} The fetched node(s).
      */
     async fetch(id, options = {}) {
-        if (id) {
-            if (!options.force) {
-                const n = this.cache.get(id);
-                if (n) return Promise.resolve(n);
-            }
-            const data = await this.client.requests.make(
-                endpoints.nodes.get(id) + joinParams(options.include)
-            );
-            return this._patch(data);
+        if (id && !options.force) {
+            const n = this.cache.get(id);
+            if (n) return Promise.resolve(s);
         }
-        const data = await this.client.requests.make(
-            endpoints.nodes.main + joinParams(options.include)
+
+        const query = build(options, { include: NodeManager.INCLUDES });
+        const data = await this.client.requests.get(
+            (id ? endpoints.nodes.get(id) : endpoints.nodes.main) + query
         );
+        return this._patch(data);
+    }
+
+    /**
+     * Queries the API for a node (or nodes) that match the specified query filter/sort.
+     * This does NOT check the cache first, it is a direct fetch from the API.
+     * Available filters:
+     * * uuid
+     * * name
+     * * fqdn
+     * * daemonTokenId
+     * 
+     * Available sort options:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * * memory
+     * * -memory
+     * * disk
+     * * -disk
+     * 
+     * @param {string} entity The entity to query.
+     * @param {string} filter The filter to use for the query.
+     * @param {string} sort The order to sort the results in.
+     * @returns {Promise<Dict<number, Node>>} A dict of the quiried nodes.
+     */
+    async query(entity, filter, sort) {
+        if (!sort && !filter) throw new Error('Sort or filter is required.');
+        if (filter === 'daemonTokenId') filter = 'daemon_token_id';
+
+        const { FILTERS, SORTS } = NodeManager;
+        const query = build(
+            { filter:[filter, entity], sort },
+            { filters: FILTERS, sorts: SORTS }
+        );
+
+        const data = await this.client.requests.get(endpoints.nodes.main + query);
         return this._patch(data);
     }
 
@@ -91,8 +167,8 @@ class NodeManager {
         payload.memory_overallocate = options.memory_overallocate ?? 0;
         payload.disk_overallocate = options.disk_overallocate ?? 0;
 
-        const data = await this.client.requests.make(
-            endpoints.nodes.main, payload, 'POST'
+        const data = await this.client.requests.post(
+            endpoints.nodes.main, payload
         );
         return this._patch(data);
     }
@@ -125,8 +201,8 @@ class NodeManager {
         payload.memory_overallocate = payload.overallocated_memory;
         payload.disk_overallocate = payload.overallocated_disk;
 
-        const data = await this.client.requests.make(
-            endpoints.nodes.get(id), payload, 'PATCH'
+        const data = await this.client.requests.patch(
+            endpoints.nodes.get(id), payload
         );
         return this._patch(data);
     }
@@ -138,16 +214,10 @@ class NodeManager {
      */
     async delete(node) {
         if (node instanceof Node) node = node.id;
-        await this.client.requests.make(endpoints.nodes.get(node), null, 'DELETE');
+        await this.client.requests.delete(endpoints.nodes.get(node));
         this.cache.delete(node);
         return true;
     }
 }
 
 module.exports = NodeManager;
-
-function joinParams(params) {
-    if (!params || !params.length) return '';
-    params = params.filter(p => ['allocations', 'location', 'servers'].includes(p));
-    return '?include='+ params.toString();
-}

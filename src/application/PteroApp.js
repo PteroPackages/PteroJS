@@ -1,10 +1,11 @@
-const ApplicationRequestManager = require('./ApplicationRequestManager');
 const ApplicationServerManager = require('./ApplicationServerManager');
 const NestManager = require('./NestManager');
+const NodeAllocationManager = require('./NodeAllocationManager');
 const NodeLocationManager = require('./NodeLocationManager');
 const NodeManager = require('./NodeManager');
 const UserManager = require('./UserManager');
-const loader = require('../structures/configLoader');
+const RequestManager = require('../http/RequestManager');
+const loader = require('../util/configLoader');
 
 /**
  * The base class for the Pterodactyl application API.
@@ -21,6 +22,12 @@ class PteroApp {
      * @param {ApplicationOptions} [options] Additional application options.
      */
     constructor(domain, auth, options = {}) {
+        if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
+            throw new SyntaxError(
+                "Domain URL must start with 'http://' or 'https://' and "+
+                'must be bound to a port if using localhost.'
+            );
+
         /**
          * The domain for your Pterodactyl panel. This should be the main URL only
          * (not "/api"). Any additional paths will count as the API path.
@@ -42,54 +49,45 @@ class PteroApp {
          */
         this.options = loader.appConfig(options);
 
-        /** @type {?Date} */
-        this.readyAt = null;
-
-        /** @type {?number} */
-        this.ping = null;
-
         /** @type {UserManager} */
         this.users = new UserManager(this);
+
         /** @type {NodeManager} */
         this.nodes = new NodeManager(this);
+
         /** @type {NestManager} */
         this.nests = new NestManager(this);
+
         /** @type {ApplicationServerManager} */
         this.servers = new ApplicationServerManager(this);
+
         /** @type {NodeLocationManager} */
         this.locations = new NodeLocationManager(this);
-        /** @type {ApplicationRequestManager} @internal */
-        this.requests = new ApplicationRequestManager(this);
+
+        /** @type {NodeAllocationManager} */
+        this.allocations = new NodeAllocationManager(this);
+
+        /** @type {RequestManager} @internal */
+        this.requests = new RequestManager('application', domain, auth);
     }
 
     /**
-     * Sends a ping request to the API before performing additional startup requests.
-     * Attempting to use the application without connecting to the API will result
-     * in an error.
+     * Used for performing preload requests to Pterodactyl.
      * @returns {Promise<boolean>}
      */
     async connect() {
-        if (this.readyAt) return;
-        const start = Date.now();
-        await this.requests.ping();
-        this.ping = Date.now() - start;
         if (this.options.users.fetch && this.options.users.cache) await this.users.fetch();
         if (this.options.nodes.fetch && this.options.nodes.cache) await this.nodes.fetch();
         if (this.options.nests.fetch && this.options.nests.cache) await this.nests.fetch();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
-        if (this.options.locations.fetch && this.options.locations.cache) await this.locations.fetch();
-        this.readyAt = Date.now();
+        if (this.options.locations.fetch && this.options.locations.cache)
+            await this.locations.fetch();
+
         return true;
     }
 
-    /**
-     * Disconnects from the Pterodactyl API.
-     * @returns {void}
-     */
-    async disconnect() {
-        if (!this.readyAt) return;
-        this.ping = null;
-        this.readyAt = null;
+    get ping() {
+        return this.requests.ping;
     }
 }
 

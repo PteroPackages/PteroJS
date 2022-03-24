@@ -21,9 +21,11 @@ class SubUserManager {
                 const u = new PteroSubUser(this.client, this.server.identifier, o);
                 s.set(u.uuid, u);
             }
+
             if (this.client.options.subUsers.cache) s.forEach((v, k) => this.cache.set(k, v));
             return s;
         }
+
         const u = new PteroSubUser(this.client, this.server.identifier, data.attributes);
         if (this.client.options.subUsers.cache) this.cache.set(u.uuid, u);
         return u;
@@ -35,16 +37,16 @@ class SubUserManager {
      * * a number
      * * an object
      * 
-     * Returns `null` if not found.
+     * Returns `undefined` if not found.
      * @param {string|number|object|PteroSubUser} obj The object to resolve from.
      * @returns {?PteroSubUser} The resolved subuser.
      */
     resolve(obj) {
         if (obj instanceof PteroSubUser) return obj;
-        if (typeof obj === 'number') return this.cache.get(obj) || null;
-        if (typeof obj === 'string') return this.cache.find(s => s.name === obj) || null;
+        if (typeof obj === 'number') return this.cache.get(obj);
+        if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
         if (obj.relationships?.user) return this._patch(obj.relationships.user);
-        return null;
+        return undefined;
     }
 
     /**
@@ -54,18 +56,15 @@ class SubUserManager {
      * @returns {Promise<PteroSubUser|Dict<string, PteroSubUser>>} The fetched user(s).
      */
     async fetch(id, force = false) {
-        if (id) {
-            if (!force) {
-                const u = this.cache.get(id);
-                if (u) return Promise.resolve(u);
-            }
-            const data = await this.client.requests.make(
-                endpoints.servers.users.get(this.server.identifier, id)
-            );
-            return this._patch(data);
+        if (id && !force) {
+            const u = this.cache.get(id);
+            if (u) return Promise.resolve(u);
         }
-        const data = await this.client.requests.make(
-            endpoints.servers.users.main(this.server.identifier)
+
+        const data = await this.client.requests.get(
+            id
+            ? endpoints.servers.users.get(this.server.identifier, id)
+            : endpoints.servers.users.main(this.server.identifier)
         );
         return this._patch(data);
     }
@@ -78,11 +77,13 @@ class SubUserManager {
      */
     async add(email, permissions) {
         if (typeof email !== 'string') throw new Error('Email must be a string.');
+
         const perms = new Permissions(permissions).toStrings();
         if (!perms.length) throw new Error('Need at least 1 permission for the subuser.');
-        const data = await this.client.requests.make(
+
+        const data = await this.client.requests.post(
             endpoints.servers.users.main(this.server.identifier),
-            { email, permissions: perms }, 'POST'
+            { email, permissions: perms }
         );
         return this._patch(data);
     }
@@ -95,9 +96,10 @@ class SubUserManager {
     async setPermissions(uuid, permissions) {
         const perms = new Permissions(permissions).toStrings();
         if (!perms.length) throw new Error('Need at least 1 permission for the subuser.');
-        const data = await this.client.requests.make(
+
+        const data = await this.client.requests.post(
             endpoints.servers.users.get(this.server.identifier, uuid),
-            { permissions: perms }, 'POST'
+            { permissions: perms }
         );
         return this._patch(data);
     }
@@ -108,8 +110,8 @@ class SubUserManager {
      * @returns {Promise<boolean>}
      */
     async remove(id) {
-        await this.client.requests.make(
-            endpoints.servers.users.get(this.server.identifier, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.users.get(this.server.identifier, id)
         );
         this.cache.delete(id);
         return true;

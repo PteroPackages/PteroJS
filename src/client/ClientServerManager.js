@@ -1,8 +1,16 @@
 const ClientServer = require('../structures/ClientServer');
 const Dict = require('../structures/Dict');
+const build = require('../util/query');
 const endpoints = require('./endpoints');
 
 class ClientServerManager {
+    /**
+     * Allowed include arguments for client servers.
+     */
+    static get INCLUDES() {
+        return Object.freeze(['egg', 'subusers']);
+    }
+
     constructor(client) {
         this.client = client
 
@@ -21,9 +29,11 @@ class ClientServerManager {
                 const s = new ClientServer(this.client, o);
                 res.set(s.identifier, s);
             }
+
             if (this.client.options.servers.cache) res.forEach((v, k) => this.cache.set(k, v));
             return res;
         }
+
         const s = new ClientServer(this.client, data);
         if (this.client.options.servers.cache) this.cache.set(s.identifier, s);
         return s;
@@ -55,25 +65,17 @@ class ClientServerManager {
                 const s = this.cache.get(id);
                 if (s) return Promise.resolve(s);
             }
-            const data = await this.client.requests.make(
-                endpoints.servers.get(id) + joinParams(options.include)
-            );
-            return this._patch(data);
         }
-        const data = await this.client.requests.make(
-            endpoints.main + joinParams(options.include)
+
+        const query = build(options, { includes: ClientServerManager.INCLUDES });
+        const data = await this.client.requests.get(
+            (id ? endpoints.servers.get(id) : endpoints.servers.main) + query
         );
         return this._patch(data);
     }
 }
 
 module.exports = ClientServerManager;
-
-function joinParams(params) {
-    if (!params || !params.length) return '';
-    params = params.filter(p => ['egg', 'subusers'].includes(p));
-    return '?include='+ params.toString();
-}
 
 /**
  * @typedef {object} PageData

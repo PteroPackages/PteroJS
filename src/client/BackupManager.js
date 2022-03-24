@@ -28,6 +28,7 @@ class BackupManager {
             }
             return s;
         }
+
         data = data.attributes;
         this.cache.set(data.uuid, {
             uuid: data.uuid,
@@ -38,6 +39,7 @@ class BackupManager {
             createdAt: new Date(data.created_at),
             completedAt: data.completed_at ? new Date(data.completed_at) : null
         });
+
         return this.cache.get(data.uuid);
     }
 
@@ -48,18 +50,15 @@ class BackupManager {
      * @returns {Promise<Backup|Dict<string, Backup>>} The fetched backup(s).
      */
     async fetch(id, force = false) {
-        if (id) {
-            if (!force) {
-                const b = this.cache.get(id);
-                if (b) return Promise.resolve(b);
-            }
-            const data = await this.client.requests.make(
-                endpoints.servers.backups.get(this.server.identifier, id)
-            );
-            return this._patch(data);
+        if (id && !force) {
+            const b = this.cache.get(id);
+            if (b) return Promise.resolve(b);
         }
-        const data = await this.client.requests.make(
-            endpoints.servers.backups.main(this.server.identifier)
+
+        const data = await this.client.requests.get(
+            id
+            ? endpoints.servers.backups.get(this.server.identifier, id)
+            : endpoints.servers.backups.main(this.server.identifier)
         );
         return this._patch(data);
     }
@@ -70,9 +69,9 @@ class BackupManager {
      */
     async create() {
         return this._patch(
-            await this.client.requests.make(
+            await this.client.requests.post(
                 endpoints.servers.backups.main(this.server.identifier),
-                {}, 'POST'
+                null
             )
         );
     }
@@ -83,7 +82,7 @@ class BackupManager {
      * @returns {Promise<string>} The download link.
      */
     async download(id) {
-        const url = await this.client.requests.make(
+        const url = await this.client.requests.get(
             endpoints.servers.backups.download(this.server.identifier, id)
         );
         return url.attributes.url;
@@ -95,8 +94,8 @@ class BackupManager {
      * @returns {Promise<boolean>}
      */
     async delete(id) {
-        await this.client.requests.make(
-            endpoints.servers.backups.get(this.server.identifier, id), null, 'DELETE'
+        await this.client.requests.delete(
+            endpoints.servers.backups.get(this.server.identifier, id)
         );
         this.cache.delete(id);
         return true;
