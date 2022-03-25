@@ -25,12 +25,17 @@ class Shard {
         if (this.socket) this.socket = null;
         this.socket = new WebSocket(socket);
         this.status = 'CONNECTING';
+
+        this.socket.on('open', () => this._onOpen());
+        this.socket.on('message', data => this._onMessage(data.toString()));
+        this.socket.on('error', error => this._onError(error));
+        this.socket.on('close', () => this._onClose());
     }
 
     async reconnect() {
         if (this.status === 'RECONNECTING') return;
         this.status = 'RECONNECTING';
-        const data = await this.client.requests.make(endpoints.servers.ws(this.id));
+        const { data } = await this.client.requests.get(endpoints.servers.ws(this.id));
         this.socket.close(4009, 'pterojs::reconnect');
         this.token = data.token;
         this.connect(data);
@@ -49,22 +54,20 @@ class Shard {
     send(event, args) {
         if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         if (!Array.isArray(args)) args = [args];
-        this.socket.send({ event, args });
+        this.socket.send(JSON.stringify({ event, args }));
     }
 
     _onOpen() {
+        this.send('auth', this.token);
+        this.status = 'CONNECTED';
+        this.lastPing = Date.now();
+
         this.#debug('Socket connected');
     }
 
-    _onMessage({ data }) {
+    _onMessage(data) {
         if (!data) return this.#debug('Received a malformed packet');
         data = JSON.parse(data);
-
-        if (this.status === 'CONNECTING') {
-            this.status = 'CONNECTED';
-            this.lastPing = Date.now();
-            return this.send('auth', this.token);
-        }
 
         this.client.emit('rawPayload', data);
 
