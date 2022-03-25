@@ -56,6 +56,15 @@ class NestManager {
     }
 
     /**
+     * Returns a formatted URL to the nest in the admin panel.
+     * @param {number} id The ID of the nest.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(id) {
+        return `${this.client.domain}/admin/nests/view/${id}`;
+    }
+
+    /**
      * Fetches a nest from the Pterodactyl API.
      * @param {number} [id] The ID of the nest.
      * @param {string[]} [include] Additional data to include about the nest.

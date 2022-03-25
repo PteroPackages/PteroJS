@@ -130,6 +130,14 @@ class PteroUser extends BaseUser {
     }
 
     /**
+     * Returns a formatted URL to the user in the admin panel.
+     * @returns {string} The formatted URL.
+     */
+    get adminURL() {
+        return `${this.client.domain}/admin/users/view/${this.id}`;
+    }
+
+    /**
      * Updates the specified user's account.
      * @param {number|PteroUser} user The user to update.
      * @param {object} options Changes to update the user with.
@@ -191,6 +199,14 @@ class PteroSubUser extends BaseUser {
     }
 
     /**
+     * Returns a formatted URL to the subuser.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this._server}/users`;
+    }
+
+    /**
      * Updates the subuser's server permissions.
      * @param {PermissionResolvable} perms The permissions to set.
      * @returns {Promise<PteroSubUser>} The updated user instance.
@@ -225,6 +241,14 @@ class ClientUser extends BaseUser {
          * @type {APIKey[]}
          */
         this.apikeys = [];
+    }
+
+    /**
+     * Returns a formatted URL to the client account.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/account`;
     }
 
     /**

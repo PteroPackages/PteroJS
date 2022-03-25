@@ -1,4 +1,5 @@
 const Dict = require('../structures/Dict');
+const Node = require('../structures/Node');
 const build = require('../util/query');
 const endpoints = require('./endpoints');
 
@@ -30,6 +31,15 @@ class NodeAllocationManager {
         res.forEach((v, k) => allocs.set(k, v));
         this.cache.set(node, allocs);
         return res;
+    }
+
+    /**
+     * Returns a formatted URL to the node allocations in the admin panel.
+     * @param {number} id The ID of the node.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(id) {
+        return `${this.client.domain}/admin/nodes/view/${id}/allocation`;
     }
 
     /**

@@ -164,6 +164,22 @@ class ApplicationServer {
     }
 
     /**
+     * Returns a formatted URL to the server.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this.identifier}`;
+    }
+
+    /**
+     * Returns a formatted URL to the server in the admin panel.
+     * @returns {string} The formatted URL.
+     */
+    get adminURL() {
+        return `${this.client.domain}/admin/servers/view/${this.id}`;
+    }
+
+    /**
      * Fetches the PteroUser object of the server owner.
      * The user can be accessed via {@link ApplicationServer.owner}.
      * @returns {Promise<PteroUser>} The fetched user.

@@ -65,6 +65,16 @@ class UserManager {
     }
 
     /**
+     * Returns a formatted URL to the user in the admin panel.
+     * @param {number|PteroUser} user The user or ID of the user.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(user) {
+        if (user instanceof PteroUser) return user.adminURL;
+        return `${this.client.domain}/admin/users/view/${user}`;
+    }
+
+    /**
      * Fetches a user from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the user.
      * @param {object} [options] Additional fetch options.

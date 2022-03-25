@@ -21,6 +21,15 @@ class NestEggsManager {
     }
 
     /**
+     * Returns a formatted URL to the egg in the admin panel.
+     * @param {number} id The ID of the egg.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(id) {
+        return `${this.client.domain}/admin/nests/egg/${id}`;
+    }
+
+    /**
      * Fetches the eggs for the specified nest.
      * @param {number} nest The ID of the nest to fetch from.
      * @param {number} [id] The ID of the egg.

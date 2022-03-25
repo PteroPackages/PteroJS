@@ -68,6 +68,16 @@ class NodeManager {
     }
 
     /**
+     * Returns a formatted URL to the node in the admin panel.
+     * @param {number|Node} node The node or ID of the node.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(node) {
+        if (node instanceof Node) return node.adminURL;
+        return `${this.client.domain}/admin/nodes/view/${node}`;
+    }
+
+    /**
      * Fetches a node from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the node.
      * @param {object} [options] Additional fetch options.
