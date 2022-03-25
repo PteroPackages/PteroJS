@@ -41,6 +41,8 @@ export class ApplicationServerManager {
 
     _patch(data: any): ApplicationServer | Dict<number, ApplicationServer>;
     resolve(obj: string | number | object | ApplicationServer): ApplicationServer | undefined;
+    panelURLFor(server: string | ApplicationServer): string;
+    adminURLFor(server: number | ApplicationServer): string;
     fetch(id?: number, options?: Include<FetchOptions>): Promise<ApplicationServer | Dict<number, ApplicationServer>>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, ApplicationServer>>;
     create(user: number | PteroUser, options: ApplicationServerCreateOptions): Promise<ApplicationServer>;
@@ -54,6 +56,7 @@ export class NestEggsManager {
     client: PteroApp;
     cache: Dict<number, object>;
 
+    adminURLFor(id: number): string;
     fetch(nest: number, id?: number, options?: Include<FetchOptions>): Promise<Dict<number, object>>;
     for(nest: number): object[];
 }
@@ -77,6 +80,7 @@ export class NestManager {
     eggs: NestEggsManager;
 
     _patch(data: any): Set<Nest>;
+    adminURLFor(id: number): string;
     fetch(id: number, include: Include<{}>): Promise<Set<Nest>>;
 }
 
@@ -97,6 +101,7 @@ export class NodeAllocationManager {
     cache: Dict<number, NodeAllocation>;
 
     _patch(node: number, data: any): Dict<number, NodeAllocation>;
+    adminURLFor(id: number): string;
     fetch(node: number, options: Include<FetchOptions>): Promise<Dict<number, NodeAllocation>>;
     fetchAvailable(node: number, single?: boolean): Promise<Dict<number, NodeAllocation> | NodeAllocation | void>;
     create(node: number, ip: string, ports: string[]): Promise<void>;
@@ -121,6 +126,7 @@ export class NodeLocationManager {
 
     _patch(data: any): NodeLocation | Dict<number, NodeLocation>;
     resolve(obj: string | number | object): NodeLocation | undefined;
+    adminURLFor(id: number): string;
     fetch(id?: number, options?: Include<FetchOptions>): Promise<NodeLocation | Dict<number, NodeLocation>>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, NodeLocation>>;
     create(short: string, long: string): Promise<NodeLocation>;
@@ -155,6 +161,7 @@ export class NodeManager {
 
     _patch(data: any): Node | Dict<number, Node>;
     resolve(obj: string | number | object | Node): Node | undefined;
+    adminURLFor(node: number | Node): string;
     fetch(id: number, options?: Include<FetchOptions>): Promise<Node | Dict<number, Node>>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, Node>>;
     create(options: NodeCreateOptions): Promise<Node>;
@@ -206,6 +213,7 @@ export class UserManager {
 
     _patch(data: any): PteroUser | Dict<number, PteroUser>;
     resolve(obj: string | number | object | PteroUser): PteroUser | undefined;
+    adminURLFor(user: number | PteroUser): string;
     fetch(id?: number, options?: { withServers?: boolean } & FetchOptions): Promise<PteroUser | Dict<number, PteroUser>>;
     fetchExternal(id: number, options?: { withServers?: boolean } & FetchOptions): Promise<PteroUser>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, PteroUser>>;
@@ -307,6 +315,7 @@ export class ClientDatabaseManager {
     cache: Dict<string, ClientDatabase>;
 
     _patch(data: any): Dict<string, ClientDatabase>;
+    get panelURL(): string;
     fetch(withPass?: boolean): Promise<Dict<string, ClientDatabase>>;
     create(database: string, remote: string): Promise<ClientDatabase>;
     rotate(id: string): Promise<ClientDatabase>;
@@ -332,6 +341,7 @@ export class ClientServerManager {
 
     _patch(data: any): ClientServer | Dict<string, ClientServer>;
     _resolveMeta(data: any): void;
+    panelURLFor(server: string | ClientServer): string;
     fetch(id: string, options?: Include<FetchOptions>): Promise<ClientServer | Dict<string, ClientServer>>;
 }
 
@@ -355,6 +365,7 @@ export class FileManager {
     cache: Dict<string, Dict<string, PteroFile>>;
 
     _patch(data: any): Dict<string, PteroFile>;
+    get panelURL(): string;
     fetch(dir: string): Promise<Dict<string, PteroFile>>;
     getContents(filePath: string): Promise<string>;
     download(filePath: string): Promise<string>;
@@ -435,7 +446,7 @@ export class PteroClient extends EventEmitter {
 
     connect(): Promise<boolean>;
     fetchClient(): Promise<ClientUser>;
-    addSocketServer(...ids: string[]): this;
+    addSocketServer(ids: string | string[]): this;
     removeSocketServer(id: string): this;
     disconnect(): void;
 
@@ -463,6 +474,7 @@ export class ScheduleManager {
     cache: Dict<number, Schedule>;
 
     _patch(id: number, data: any): Schedule | Dict<number, Schedule>;
+    panelURLFor(id: string, schedule: string | Schedule): string;
     fetch(server: string, id?: string, force?: boolean): Promise<Schedule | Dict<number, Schedule>>;
     create(server: string, options: ScheduleCreateOptions): Promise<Schedule>;
     update(server: string, id: string, options: Partial<ScheduleCreateOptions>): Promise<Schedule>;
@@ -477,6 +489,7 @@ export class SubUserManager {
 
     _patch(data: any): PteroSubUser | Dict<string, PteroSubUser>;
     resolve(obj: string | number | object | PteroSubUser): PteroSubUser | undefined;
+    get panelURL(): string;
     fetch(id?: string, force?: boolean): Promise<PteroSubUser | Dict<string, PteroSubUser>>;
     add(email: string, permissions: PermissionResolvable): Promise<PteroSubUser>;
     setPermissions(uuid: string, permissions: PermissionResolvable): Promise<PteroSubUser>;
@@ -591,6 +604,8 @@ export class ApplicationServer {
     updatedTimestamp: number | null;
 
     _patch(data: any): void;
+    get panelURL(): string;
+    get adminURL(): string;
     fetchOwner(): Promise<PteroUser>;
     updateDetails(options: ApplicationServerUpdateOptions): Promise<this>;
     updateBuild(options: object): void;
@@ -634,6 +649,7 @@ export class ClientServer {
     schedules: Dict<string, Schedule>;
 
     _patch(data: any): void;
+    get panelURL(): string;
     addWebsocket(): void;
     fetchResouces(): void;
     sendCommand(command: string): Promise<void>;
@@ -742,6 +758,7 @@ export class Node {
     updatedAt: Date | null;
 
     _patch(data: any): void;
+    get adminURL(): string;
     getConfig(): Promise<object>;
     update(options: NodeUpdateOptions): Promise<Node>;
     delete(): Promise<boolean>;
@@ -817,6 +834,7 @@ export class Schedule {
 
     _patch(data: any): void;
     _resolveTask(data: any): ScheduleTask;
+    get panelURL(): string;
     update(options: ScheduleUpdateOptions): Promise<Schedule>;
     createTask(action: string, payload: string, offset: string): Promise<ScheduleTask>;
     updateTask(id: number, options:{ action: string; payload: string; offset: string }): Promise<ScheduleTask>;
@@ -858,6 +876,7 @@ export class PteroUser extends BaseUser {
     updatedAt: Date | null;
     updatedTimestamp: number | null;
 
+    get adminURL(): string;
     update(options: Partial<UserCreateOptions>): Promise<PteroUser>;
     delete(): Promise<boolean>;
 }
@@ -874,6 +893,7 @@ export class PteroSubUser extends BaseUser {
     createdAt: Date;
     createdTimestamp: number;
 
+    get panelURL(): string;
     setPermissions(perms: PermissionResolvable): Promise<this>;
 }
 
@@ -896,6 +916,7 @@ export class ClientUser extends BaseUser {
     tokens: string[];
     apikeys: APIKey[];
 
+    get panelURL(): string;
     get2faCode(): Promise<string>;
     enable2fa(): Promise<string>;
     disable2fa(password: string): Promise<void>;
