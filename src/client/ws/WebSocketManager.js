@@ -36,8 +36,8 @@ class WebSocketManager {
             }
         }
 
-        process.on('SIGINT', () => this.destroy());
-        process.on('SIGTERM', () => this.destroy());
+        process.on('SIGINT', () => this.destroy() || process.exit(0));
+        process.on('SIGTERM', () => this.destroy() || process.exit(0));
 
         this.readyAt = Date.now();
         this.client.emit('ready');
@@ -48,7 +48,7 @@ class WebSocketManager {
         for (const shard of this.shards.values()) shard.disconnect();
         this.shards.clear();
         this.readyAt = 0;
-        this.client.emit('debug', `[WS] Destroyed ${this.totalShards} shards`);
+        this.client.emit('debug', `[WS] Destroyed ${this.totalShards} shard(s)`);
         this.totalShards = 0;
     }
 
