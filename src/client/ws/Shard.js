@@ -71,12 +71,16 @@ class Shard extends EventEmitter {
      * Close socket connection
      */
     disconnect() {
-        if (!this.readyAt) return;
-        this.socket.close(1000, 'pterojs::disconnect');
+        return new Promise(async (resolve, reject) => {
+            if (!this.readyAt) return reject('Socket is not connected');
 
-        this.readyAt = 0;
-        this.lastPing = 0;
-        this.ping = -1;
+            this.once('serverDisconnect', resolve);
+            this.socket.close(1000, 'pterojs::disconnect');
+
+            this.readyAt = 0;
+            this.lastPing = 0;
+            this.ping = -1;
+        });
     }
 
     /**
@@ -85,7 +89,7 @@ class Shard extends EventEmitter {
      */
     async refreshToken() {
         return new Promise(async (resolve, reject) => {
-            if (this.status !== 'CONNECTED') return reject('Socket not connected');
+            if (this.status !== 'CONNECTED') return reject('Socket is not connected');
 
             // using this transitional property to avoid double token issuing during init
             if (!this.token) {
@@ -98,7 +102,7 @@ class Shard extends EventEmitter {
             this.lastPing = Date.now();
 
             this.once('authSuccess', () => resolve(this.socket));
-        })
+        });
     }
 
     /**
@@ -153,6 +157,7 @@ class Shard extends EventEmitter {
 
     _onClose() {
         this.status = 'CLOSED';
+        this.emit('serverDisconnect');
         this.#debug('Connection closed');
     }
 }

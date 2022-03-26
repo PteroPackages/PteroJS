@@ -295,7 +295,7 @@ export class Shard extends EventEmitter {
     connect(auth?: WebSocketAuth): Promise<WebSocket>;
     reconnect(): Promise<WebSocket>;
     refreshToken(): Promise<void>;
-    disconnect(): void;
+    disconnect(): Promise<void>;
     send<K extends keyof ShardCommands>(event: K, args: ShardCommands[K]): void;
     _onOpen(): void;
     _onMessage({ data }:{ data: string }): void;
