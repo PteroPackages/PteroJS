@@ -18,7 +18,7 @@ class WebSocketManager {
         for (const shard of this.shards.values()) shard.disconnect();
         this.shards.clear();
         this.readyAt = 0;
-        this.client.emit('debug', `[WS] Destroyed ${this.totalShards} shards`);
+        this.client.emit('debug', `[WS] Destroyed ${this.totalShards} shard(s)`);
         this.totalShards = 0;
     }
 

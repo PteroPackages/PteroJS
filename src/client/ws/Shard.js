@@ -22,7 +22,7 @@ class Shard extends EventEmitter {
      * @param {string} message Message text
      */
     #debug(message) {
-        this.client.emit('debug', `[SHARD ${this.id}] ${message}`);
+        this.emit('debug', `[SHARD ${this.id}] ${message}`);
     }
 
     /**
@@ -113,6 +113,7 @@ class Shard extends EventEmitter {
     send(event, args) {
         if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         if (!Array.isArray(args)) args = [args];
+        this.#debug(`Sending event '${event}'`);
         this.socket.send(JSON.stringify({ event, args }));
     }
 
@@ -133,13 +134,13 @@ class Shard extends EventEmitter {
         switch (data.event) {
             case 'auth success':
                 this.ping = Date.now() - this.lastPing;
-                this.#debug('Auth token refreshed');
                 this.emit('authSuccess');
 
                 break;
 
             case 'token expiring':
                 this.refreshToken();
+                this.#debug('Auth token refreshed');
                 return;
 
             case 'token expired':

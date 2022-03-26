@@ -236,31 +236,31 @@ export type WebSocketStatus =
     | 'CONNECTED';
 
 export interface ShardCommands {
-    'auth': [token: string]
-    'send stats': undefined
-    'send logs': undefined
-    'set state': [state: PowerState]
+    'auth':         [token: string]
+    'send stats':   []
+    'send logs':    []
+    'set state':    [state: PowerState]
     'send command': [command: string]
 }
 
 export interface ServerStats {
-    cpuAbsolute: number;
-    diskBytes: number;
-    memoryBytes: number;
-    memoryLimitBytes: number;
+    cpuAbsolute:        number;
+    diskBytes:          number;
+    memoryBytes:        number;
+    memoryLimitBytes:   number;
     network: {
-        rxBytes: number;
-        txBytes: number;
+        rxBytes:        number;
+        txBytes:        number;
     };
-    state: string;
-    uptime: number;
+    state:              string;
+    uptime:             number;
 }
 
 export interface ShardEvents {
     debug:              [message: string];
     error:              [id: string, error: any];
 
-    tokenRefresh:       [void];
+    tokenRefresh:       [];
 
     authSuccess:        [];
     serverConnect:      [socket: WebSocket];
@@ -320,8 +320,9 @@ export class WebSocketManager {
     readyAt: number;
     ping: number;
 
-    launch(): Promise<void>;
     destroy(): void;
+    createShard(id: string): Shard;
+    removeShard(id: string): boolean;
 }
 
 // Client API - Main
