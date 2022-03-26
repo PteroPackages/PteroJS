@@ -36,6 +36,9 @@ class WebSocketManager {
             }
         }
 
+        process.on('SIGINT', () => this.destroy());
+        process.on('SIGTERM', () => this.destroy());
+
         this.readyAt = Date.now();
         this.client.emit('ready');
     }
