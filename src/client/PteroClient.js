@@ -6,12 +6,13 @@ const ScheduleManager = require('./ScheduleManager');
 const WebSocketManager = require('./ws/WebSocketManager');
 const endpoints = require('./endpoints');
 const loader = require('../util/configLoader');
+const Shard = require('./ws/Shard');
 
 /**
  * The base class for the Pterodactyl client API.
  * This operates using a Pterodactyl user access token which can be found at
  * <your.domain.name/admin/api>.
- * 
+ *
  * The access token will grant you access to your servers only, with the option
  * to fetch node and API key information and establish websockets to your servers.
  * @extends {EventEmitter}
@@ -52,7 +53,7 @@ class PteroClient extends EventEmitter {
          */
         this.options = loader.clientConfig(options);
 
-        /** @type {?ClientUser} */
+        /** @type {ClientUser} */
         this.user = null;
 
         /** @type {ClientServerManager} */
@@ -76,7 +77,6 @@ class PteroClient extends EventEmitter {
     async connect() {
         if (this.options.fetchClient) await this.fetchClient();
         if (this.options.servers.fetch && this.options.servers.cache) await this.servers.fetch();
-        if (this.options.ws) await this.ws.launch();
 
         return true;
     }
@@ -98,26 +98,23 @@ class PteroClient extends EventEmitter {
 
     /**
      * Adds a server or an array of servers to be connected to websockets.
-     * @param {string[] | string} ids The identifier of the server, or an array of server identifiers.
-     * @returns {this}
+     * @param {string[] | string} ids The identifier(s) of the server.
+     * @returns {Shard|Shard[]} Created (or reused) shard(s).
      */
     addSocketServer(ids) {
         if (typeof ids === 'string')
-            this.ws.servers.push(ids);
+            return this.ws.createShard(ids);
         else if (ids instanceof Array)
-            this.ws.servers.push(...ids);
-
-        return this;
+            return ids.map(id => this.ws.createShard(id))
     }
 
     /**
      * Removes a server from websocket connections.
      * @param {string} id The identifier of the server.
-     * @returns {this}
+     * @returns {boolean} Whether shard was removed.
      */
     removeSocketServer(id) {
-        this.ws.servers = this.ws.servers.filter(i => i === id);
-        return this;
+        return this.ws.removeShard(id);
     }
 
     /**
@@ -141,7 +138,6 @@ module.exports = PteroClient;
 /**
  * Startup options for the client API.
  * @typedef {object} ClientOptions
- * @property {boolean} [ws] Whether to enable server websocket connections (default: `false`).
  * @property {boolean} [fetchClient] Whether to fetch the client user (default `true`).
  * @property {OptionSpec} [servers] Options for fetching and caching servers.
  * @property {OptionSpec} [subUsers] Options for fetching and caching server subusers.
