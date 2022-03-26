@@ -1,3 +1,5 @@
+const caseConv = require('../../util/caseConv');
+
 function handle(client, { event, args }) {
     switch (event) {
         case 'auth success':
@@ -22,7 +24,9 @@ function handle(client, { event, args }) {
             return client.emit('installComplete');
 
         case 'stats':
-            return client.emit('statsUpdate', JSON.parse(args));
+            const stats = JSON.parse(args);
+            stats.network = caseConv.camelCase(stats.network);
+            return client.emit('statsUpdate', caseConv.camelCase(stats));
 
         case 'transferLogs':
         case 'transferStatus':

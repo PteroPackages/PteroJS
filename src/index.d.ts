@@ -244,13 +244,13 @@ export interface ShardCommands {
 }
 
 export interface ServerStats {
-    cpu_absolute: number;
-    disk_bytes: number;
-    memory_bytes: number;
-    memory_limit_bytes: number;
+    cpuAbsolute: number;
+    diskBytes: number;
+    memoryBytes: number;
+    memoryLimitBytes: number;
     network: {
-        rx_bytes: number;
-        tx_bytes: number;
+        rxBytes: number;
+        txBytes: number;
     };
     state: string;
     uptime: number;
