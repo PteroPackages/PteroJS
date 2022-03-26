@@ -77,15 +77,14 @@ class Shard {
                 break;
 
             case 'token expiring':
-                // irrelevant
-                return;
-
             case 'token expired':
                 this.reconnect();
                 break;
-        }
 
-        handle(this.client, data, this.id);
+            default:
+                handle(this.client, data, this.id);
+                return;
+        }
     }
 
     _onError({ error }) {
