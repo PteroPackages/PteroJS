@@ -22,7 +22,7 @@ class Shard {
 
     connect({ socket }) {
         if (!['CLOSED', 'RECONNECTING'].includes(this.status)) return;
-        if (this.socket) this.socket = null;
+        this.socket?.close(1000, 'pterojs::disconnect');
         this.socket = new WebSocket(socket);
         this.status = 'CONNECTING';
 
@@ -35,6 +35,7 @@ class Shard {
     async reconnect() {
         if (this.status === 'RECONNECTING') return;
         this.status = 'RECONNECTING';
+        this.#debug('Attempting reconnect');
         const { data } = await this.client.requests.get(endpoints.servers.ws(this.id));
         this.socket.close(4009, 'pterojs::reconnect');
         this.token = data.token;
@@ -44,6 +45,7 @@ class Shard {
     disconnect() {
         if (!this.readyAt) return;
         this.socket.close(1000, 'pterojs::disconnect');
+        this.#debug('Connection closed; resetting shard');
 
         this.readyAt = 0;
         this.lastPing = 0;
@@ -54,6 +56,7 @@ class Shard {
     send(event, args) {
         if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         if (!Array.isArray(args)) args = [args];
+        this.#debug(`Sending event '${event}'`);
         this.socket.send(JSON.stringify({ event, args }));
     }
 
@@ -61,22 +64,27 @@ class Shard {
         this.send('auth', this.token);
         this.status = 'CONNECTED';
         this.lastPing = Date.now();
-
         this.#debug('Socket connected');
     }
 
     _onMessage(data) {
         if (!data) return this.#debug('Received a malformed packet');
         data = JSON.parse(data);
-
+        this.#debug(`Received event '${data.event}'`);
         this.client.emit('rawPayload', data);
 
         switch (data.event) {
             case 'auth success':
                 this.ping = Date.now() - this.lastPing;
+                this.#debug('Authenticated successfully');
+                console.log(this.token);
                 break;
 
             case 'token expiring':
+                this.#debug('Attempting heartbeat authentication');
+                this.send('auth', this.token);
+                break;
+
             case 'token expired':
                 this.reconnect();
                 break;
