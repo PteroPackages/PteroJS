@@ -128,6 +128,14 @@ class ClientServer {
     }
 
     /**
+     * Returns a formatted URL to the server.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this.identifier}`;
+    }
+
+    /**
      * Adds the server to the WebSocket connection list to be established.
      * @returns {void}
      */

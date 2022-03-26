@@ -69,6 +69,14 @@ class FileManager {
     }
 
     /**
+     * Returns a formatted URL to the server files page.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this.server.identifier}/files`;
+    }
+
+    /**
      * Fetches all files from a specified directory
      * (default is the root folder: `/home/container`).
      * @param {string} [dir] The directory (folder) to fetch from.

@@ -118,6 +118,14 @@ class Schedule {
     }
 
     /**
+     * Returns a formatted URL to the schedule.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this.serverId}/schedules/${this.id}`;
+    }
+
+    /**
      * Updates the schedule.
      * @param {object} options Schedule update options.
      * @param {string} [options.name] The name of the schedule.

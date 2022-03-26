@@ -171,6 +171,14 @@ class Node {
     }
 
     /**
+     * Returns a formatted URL to the node in the admin panel.
+     * @returns {string} The formatted URL.
+     */
+    get adminURL() {
+        return `${this.client.domain}/admin/nodes/view/${this.id}`;
+    }
+
+    /**
      * Returns the node's config (untyped).
      * @returns {Promise<object>} The node config.
      */

@@ -50,6 +50,14 @@ class SubUserManager {
     }
 
     /**
+     * Returns a formatted URL to the subuser.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this.server.identifier}/users`;
+    }
+
+    /**
      * Fetches a server subuser from the Pterodactyl API with an optional cache check.
      * @param {string} [id] The UUID of the user.
      * @param {boolean} [force] Whether to skip checking the cache and fetch directly.
