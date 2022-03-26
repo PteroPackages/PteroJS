@@ -36,7 +36,7 @@ class WebSocketManager {
      */
     createShard(id) {
         if (this.shards.has(id))
-            return this.shards(id);
+            return this.shards.get(id);
 
         const shard = new Shard(this.client, id);
         this.shards.set(id, shard);
