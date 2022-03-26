@@ -1,10 +1,8 @@
 const Shard = require('./Shard');
-const endpoints = require('../endpoints');
 
 class WebSocketManager {
     constructor(client) {
         this.client = client;
-        this.servers = [];
 
         /**
          * A map of active server shards.
@@ -13,34 +11,6 @@ class WebSocketManager {
         this.shards = new Map();
         this.totalShards = 0;
         this.readyAt = 0;
-    }
-
-    async launch() {
-        if (!this.servers.length) {
-            this.client.emit('debug', '[WS] No shards to launch');
-            return;
-        }
-
-        this.client.emit('debug', `[WS] Attempting to launch ${this.servers.length} shard(s)`);
-        for (const id of this.servers) {
-            const { data } = await this.client.requests.get(endpoints.servers.ws(id));
-            try {
-                const shard = new Shard(this.client, id, data);
-                this.shards.set(id, shard);
-                this.totalShards++;
-            } catch (err) {
-                this.client.emit(
-                    'debug',
-                    `[WS] Shard '${id}' failed to launch\n[WS] ${err.message}`
-                );
-            }
-        }
-
-        process.on('SIGINT', () => this.destroy() || process.exit(0));
-        process.on('SIGTERM', () => this.destroy() || process.exit(0));
-
-        this.readyAt = Date.now();
-        this.client.emit('ready');
     }
 
     destroy() {
@@ -57,6 +27,37 @@ class WebSocketManager {
         let sum = 0;
         for (const shard of this.shards.values()) sum += shard.ping;
         return sum / this.totalShards;
+    }
+
+    /**
+     * Adds a server to be connected to websockets.
+     * @param {string} id The identifier of the server.
+     * @returns {Shard} Created (or reused) shard.
+     */
+    createShard(id) {
+        if (this.shards.has(id))
+            return this.shards(id);
+
+        const shard = new Shard(this.client, id);
+        this.shards.set(id, shard);
+        this.totalShards++;
+
+        return shard;
+    }
+
+    /**
+     * Removes a server from websocket connections.
+     * @param {string} id The identifier of the server.
+     * @returns {boolean} Whether shard was removed.
+     */
+    removeShard(id) {
+        if (!this.shards.has(id))
+            return false;
+
+        this.shards.delete(id);
+        this.totalShards--;
+
+        return true;
     }
 }
 
