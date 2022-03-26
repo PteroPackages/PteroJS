@@ -227,11 +227,56 @@ export type WebSocketStatus =
     | 'RECONNECTING'
     | 'CONNECTED';
 
-export class Shard {
+export interface ShardCommands {
+    'auth': [token: string]
+    'send stats': undefined
+    'send logs': undefined
+    'set state': [state: PowerState]
+    'send command': [command: string]
+}
+
+export interface ServerStats {
+    cpu_absolute: number;
+    disk_bytes: number;
+    memory_bytes: number;
+    memory_limit_bytes: number;
+    network: {
+        rx_bytes: number;
+        tx_bytes: number;
+    };
+    state: string;
+    uptime: number;
+}
+
+export interface ShardEvents {
+    debug:              [message: string];
+    error:              [id: string, error: any];
+
+    tokenRefresh:       [void];
+
+    authSuccess:        [];
+    serverConnect:      [socket: WebSocket];
+    serverOutput:       [output: string];
+    serverDisconnect:   [];
+
+    statusUpdate:       [status: string];
+    statsUpdate:        [stats: ServerStats];
+    transferUpdate:     [data: any];
+
+    installStart:       [];
+    installOutput:      [output: string];
+    installComplete:    [];
+
+    backupComplete:     [backup: Partial<Backup>];
+
+    daemonMessage:      [message: any];
+}
+
+export class Shard extends EventEmitter {
     constructor(client: PteroClient, id: string, auth: WebSocketAuth);
     client: PteroClient;
     id: string;
-    token: string;
+    token: string | null;
     socket: WebSocket | null;
     status: WebSocketStatus;
     readyAt: number;
@@ -239,14 +284,23 @@ export class Shard {
     lastPing: number;
 
     #debug(message: string): void;
-    connect({ socket }: WebSocketAuth): void;
-    reconnect(): Promise<void>;
+    connect(auth?: WebSocketAuth): Promise<WebSocket>;
+    reconnect(): Promise<WebSocket>;
+    refreshToken(): Promise<void>;
     disconnect(): void;
-    send(event: string, args: string[]): void;
+    send<K extends keyof ShardCommands>(event: K, args: ShardCommands[K]): void;
     _onOpen(): void;
     _onMessage({ data }:{ data: string }): void;
     _onError({ error }: any): void;
     _onClose(): void;
+
+    emit<E extends keyof ShardEvents>(event: E, ...args: ShardEvents[E]): boolean;
+    on<E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => any): this;
+    on<T, E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => T): this;
+    once<E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => any): this;
+    once<T, E extends keyof ShardEvents>(events: E, listener: (...args: ShardEvents[E]) => T): this;
+    off<E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => any): this;
+    off<T, E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => T): this;
 }
 
 export class WebSocketManager {
@@ -403,22 +457,6 @@ export interface ClientEvents {
     debug:            [message: string];
     error:            [id: string, error: any];
     ready:            [];
-
-    serverConnect:    [server: ClientServer];
-    serverOutput:     [id: string, output: any];
-    serverDisconnect: [id: string];
-
-    statusUpdate:     [server: ClientServer, status: string];
-    statsUpdate:      [server: ClientServer, stats: any];
-    transferUpdate:   [id: string, data: any];
-
-    installStart:     [id: string];
-    installOutput:    [id: string, output: any];
-    installComplete:  [id: string];
-
-    backupComplete:   [server: ClientServer, backup: Partial<Backup>];
-
-    daemonMessage:    [id: string, message: any];
 }
 
 export class PteroClient extends EventEmitter {
@@ -435,8 +473,8 @@ export class PteroClient extends EventEmitter {
 
     connect(): Promise<boolean>;
     fetchClient(): Promise<ClientUser>;
-    addSocketServer(...ids: string[]): this;
-    removeSocketServer(id: string): this;
+    addSocketServer<T extends string | string[]>(ids: T): T extends string[] ? Shard[] : Shard;
+    removeSocketServer(id: string): boolean;
     disconnect(): void;
 
     emit<E extends keyof ClientEvents>(event: E, ...args: ClientEvents[E]): boolean;
