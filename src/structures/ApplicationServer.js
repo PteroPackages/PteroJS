@@ -220,10 +220,44 @@ class ApplicationServer {
 
     /**
      * Updates the server's build structure.
-     * @param {object} options Build options.
-     * @todo
+     * @param {object} options Update build options.
+     * @param {number} [options.allocation] The ID of the allocation for the server.
+     * @param {number} [options.swap] Server space swap option.
+     * @param {number} [options.memory] The amount of memory allowed for the server.
+     * @param {number} [options.disk] The amount of disk allowed for the server.
+     * @param {number} [options.cpu] The amount of CPU to allow for the server.
+     * @param {?number} [options.threads] The number of threads for the server.
+     * @param {number} [options.io]
+     * @param {object} [options.featureLimits] Feature limits options.
+     * @param {number} [options.featureLimits.allocations] The server allocations limit.
+     * @param {number} [options.featureLimits.backups] The server backups limit.
+     * @param {number} [options.featureLimits.databases] The server databases limit.
+     * @returns {Promise<ApplicationServer>} The updated server instance.
      */
-    async updateBuild(options = {}) {}
+    async updateBuild(options = {}) {
+        if (!Object.keys(options).length) throw new Error('Too few options to update.');
+
+        options.allocation ??= this.allocation;
+        options.swap ??= this.limits.swap ?? 0;
+        options.memory ??= this.memory;
+        options.disk ??= this.disk;
+        options.cpu ??= this.limits.cpu ?? 0;
+        options.threads ??= this.limits.threads;
+        options.io ??= this.limits.io;
+        options.featureLimits ??= {};
+        options.featureLimits.allocations ??= this.featureLimits.allocations ?? 0;
+        options.featureLimits.backups ??= this.featureLimits.backups ?? 0;
+        options.featureLimits.databases ??= this.featureLimits.databases ?? 0;
+
+        // TODO: caseConv update
+        options.feature_limits = caseConv.snakeCase(options.featureLimits);
+        await this.client.requests.patch(
+            endpoints.servers.build(this.id), options
+        );
+
+        this._patch(options);
+        return this;
+    }
 
     /**
      * Updates the server's startup configuration.
