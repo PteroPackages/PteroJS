@@ -124,7 +124,7 @@ class ApplicationServerManager {
             if (s) return Promise.resolve(s);
         }
 
-        const query = build(options, { includes: ApplicationServerManager.INCLUDES });
+        const query = build(options, { include: ApplicationServerManager.INCLUDES });
         const data = await this.client.requests.get(
             (id ? endpoints.servers.get(id) : endpoints.servers.main) + query
         );
