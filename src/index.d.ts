@@ -610,11 +610,26 @@ export class RequestManager extends EventEmitter {
 
 // Structures
 
-export interface ApplicationServerUpdateOptions {
+export interface UpdateDetailsOptions {
     name?:          string;
     owner?:         number | PteroUser;
     externalId?:    string;
     description?:   string;
+}
+
+export interface UpdateBuildOptions {
+    allocation?:        number;
+    swap?:              number;
+    memory?:            number;
+    disk?:              number;
+    cpu?:               number;
+    threads?:           number | null;
+    io?:                number;
+    featureLimits?:{
+        allocations?:   number;
+        backups?:       number;
+        databases?:     number;
+    };
 }
 
 export class ApplicationServer {
@@ -646,8 +661,8 @@ export class ApplicationServer {
     get panelURL(): string;
     get adminURL(): string;
     fetchOwner(): Promise<PteroUser>;
-    updateDetails(options: ApplicationServerUpdateOptions): Promise<this>;
-    updateBuild(options: object): void;
+    updateDetails(options: UpdateDetailsOptions): Promise<this>;
+    updateBuild(options: UpdateBuildOptions): Promise<this>;
     updateStartup(options: object): void;
     suspend(): Promise<void>;
     unsuspend(): Promise<void>;
