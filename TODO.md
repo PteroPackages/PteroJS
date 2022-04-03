@@ -17,6 +17,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Implement helper functions for all the managers
 - [X] Implement `ClientUser` required fetch on startup
 - [ ] Document all functions
+- [ ] Implement session client
 
 ## Global Managers
 - [X] Implement helper functions for all the managers
@@ -36,6 +37,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Implement tests in `/tests` (or move from `/test`)
 - [ ] Remove deprecated `PteroUser#tfa`
 - [X] Remove deprecated `Presets` util
+- [ ] Rewrite in TypeScript
 
 ## Feature Plans
 - [ ] Optional webhook client
