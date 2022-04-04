@@ -1,3 +1,14 @@
+export interface FeatureLimits {
+    allocations:    number;
+    backups:        number;
+    databases:      number;
+}
+
+export interface FileConfig {
+    application?: { [key: string]: OptionSpec };
+    client?: { [key: string]: OptionSpec };
+}
+
 export interface Limits {
     memory:     number;
     swap:       number;
@@ -7,13 +18,8 @@ export interface Limits {
     cpu:        number;
 }
 
-export interface FeatureLimits {
-    allocations:    number;
-    backups:        number;
-    databases:      number;
-}
-
 export interface OptionSpec {
-    fetch: boolean;
-    cache: boolean;
+    fetch?:  boolean;
+    cache?:  boolean;
+    max?:    number;
 }

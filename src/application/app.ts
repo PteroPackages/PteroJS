@@ -1,4 +1,6 @@
 import RestRequestManager from '../http/RestRequestManager';
+import { OptionSpec } from '../common';
+import loader from '../util/config';
 
 /**
  * The base class for the Pterodactyl application API.
@@ -22,11 +24,11 @@ export default class PteroApp {
      */
     public auth: string;
 
-    public options: object;
+    public options: { [key: string]: OptionSpec };
 
     public requests: RestRequestManager;
 
-    constructor(domain: string, auth: string, options: object = {}) {
+    constructor(domain: string, auth: string, options: { [key: string]: any } = {}) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new SyntaxError(
                 "Domain URL must start with 'http://' or 'https://' and "+
@@ -35,7 +37,7 @@ export default class PteroApp {
 
         this.domain = domain;
         this.auth = auth;
-        this.options = options;
+        this.options = loader.appConfig({ application: options });
 
         this.requests = new RestRequestManager('application', domain, auth);
     }
