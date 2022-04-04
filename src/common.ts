@@ -1,3 +1,9 @@
+export interface DaemonData {
+    listening:  number;
+    sftp:       number;
+    base:       string;
+}
+
 export interface FeatureLimits {
     allocations:    number;
     backups:        number;
@@ -16,6 +22,14 @@ export interface Limits {
     io:         number;
     threads:    string | null;
     cpu:        number;
+}
+
+export interface NodeLocation {
+    id:         number;
+    long:       string;
+    short:      string;
+    createdAt:  Date;
+    updatedAt:  Date | null;
 }
 
 export interface OptionSpec {

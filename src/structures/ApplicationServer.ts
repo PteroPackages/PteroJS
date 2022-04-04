@@ -1,3 +1,4 @@
+import type Node from './Node';
 import type PteroApp from '../application/app';
 import { Limits, FeatureLimits } from '../common';
 
@@ -18,13 +19,13 @@ export default class ApplicationServer {
     public readonly createdTimestamp: number;
 
     /** The external ID of the server (if set). */
-    public externalId: string | null;
+    public externalId: string | undefined;
 
     /** The name of the server. */
     public name: string;
 
     /** The description of the server (if set). */
-    public description: string | null;
+    public description: string | undefined;
 
     /** Whether the server is suspended from action. */
     public suspended: boolean;
@@ -51,9 +52,8 @@ export default class ApplicationServer {
     /**
      * The node the server is on. This is not fetched by default and must be
      * retrieved by including 'node' in ApplicationServerManager#fetch.
-     * @todo
      */
-    public node: null;
+    public node: Node;
 
     /** The ID of the allocation for the server. */
     public allocation: number;
