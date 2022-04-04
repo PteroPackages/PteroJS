@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { EventEmitter } from 'events';
+import { APIErrorResponse, PteroAPIError, RequestError } from '../structures/Errors';
 import { version } from '../../package.json';
 
 export type Method =
@@ -73,10 +74,13 @@ export default class RestRequestManager extends EventEmitter {
             super.emit('reveive', data);
             if (res.ok) return data;
             if (res.status >= 400 && res.status < 500)
-                throw "";
+                throw new PteroAPIError(data as APIErrorResponse);
         }
 
-        throw '';
+        throw new RequestError(
+            'Pterodactyl API returned an invalid or unacceptable response '+
+            `(status: ${res.status})`
+        );
     }
 
     async get(path: string) {
