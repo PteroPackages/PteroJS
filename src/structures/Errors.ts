@@ -1,5 +1,3 @@
-export class RequestError extends Error {}
-
 export interface APIErrorResponse {
     errors:{
         code:   string;
@@ -20,5 +18,7 @@ export class PteroAPIError extends Error {
         this.codes = data.errors.map(e => e.code);
     }
 }
+
+export class RequestError extends Error {}
 
 export class WebSocketError extends Error {}

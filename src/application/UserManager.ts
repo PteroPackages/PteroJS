@@ -1,8 +1,9 @@
-import { UpdateUserOptions } from './../common/app';
+import type PteroApp from './app';
 import BaseManager from '../structures/BaseManager';
 import Dict from '../structures/Dict';
-import type PteroApp from './app';
-import { PteroUser } from './../structures/User';
+import { CreateUserOptions } from '../common/app';
+import { PteroUser } from '../structures/User';
+import { UpdateUserOptions } from '../common/app';
 import {
     External,
     FetchOptions,
@@ -12,7 +13,6 @@ import {
     Resolvable,
     Sort
 } from '../common';
-import { CreateUserOptions } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 

@@ -1,8 +1,8 @@
 import type ApplicationServer from './ApplicationServer';
-import caseConv from '../util/caseConv';
+import type PteroApp from '../application/app';
 import Dict from './Dict';
 import Permissions from './Permissions';
-import type PteroApp from '../application/app';
+import caseConv from '../util/caseConv';
 
 export abstract class BaseUser {
     public client: PteroApp;

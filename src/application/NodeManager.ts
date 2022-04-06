@@ -2,6 +2,7 @@ import type PteroApp from './app';
 import BaseManager from '../structures/BaseManager';
 import Dict from '../structures/Dict';
 import Node from '../structures/Node';
+import { CreateNodeOptions } from '../common/app';
 import {
     Filter,
     FilterArray,
@@ -10,7 +11,6 @@ import {
     Resolvable,
     FetchOptions
 } from '../common';
-import { CreateNodeOptions } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 

@@ -1,8 +1,8 @@
 import ApplicationServerManager from './ApplicationServerManager';
-import loader from '../util/config';
-import { OptionSpec } from '../common';
 import RestRequestManager from '../http/RestRequestManager';
 import UserManager from './UserManager';
+import { OptionSpec } from '../common';
+import loader from '../util/config';
 
 /**
  * The base class for the Pterodactyl application API.

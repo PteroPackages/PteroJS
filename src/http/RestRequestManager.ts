@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
 import { EventEmitter } from 'events';
-import { APIErrorResponse, PteroAPIError, RequestError } from '../structures/Errors';
 import type BaseManager from '../structures/BaseManager';
-import buildQuery from '../util/query';
+import { APIErrorResponse, PteroAPIError, RequestError } from '../structures/Errors';
 import { FetchOptions } from '../common';
+import buildQuery from '../util/query';
 import { version } from '../../package.json';
 
 export type Method =

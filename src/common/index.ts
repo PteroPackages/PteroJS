@@ -1,3 +1,14 @@
+export type External<T> = { external?: boolean } & T;
+export type Filter<T> = { filter?: string } & T;
+export type FilterArray<T> = { filter?: string[] } & T;
+export type Include<T> = { include?: string[] } & T;
+export type Sort<T> = { sort?: string } & T;
+export type Resolvable<T> =
+    | string
+    | number
+    | { [key: string]: any }
+    | T;
+
 export interface DaemonData {
     listening:  number;
     sftp:       number;
@@ -15,12 +26,6 @@ export interface FetchOptions {
     page?:      number;
     perPage?:   number;
 }
-
-export type External<T> = { external?: boolean } & T;
-export type Filter<T> = { filter?: string } & T;
-export type FilterArray<T> = { filter?: string[] } & T;
-export type Include<T> = { include?: string[] } & T;
-export type Sort<T> = { sort?: string } & T;
 
 export interface FileConfig {
     application?:   { [key: string]: OptionSpec };
@@ -49,9 +54,3 @@ export interface OptionSpec {
     cache?:  boolean;
     max?:    number;
 }
-
-export type Resolvable<T> =
-    | string
-    | number
-    | { [key: string]: any }
-    | T;
