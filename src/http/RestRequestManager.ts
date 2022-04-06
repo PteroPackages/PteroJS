@@ -54,7 +54,7 @@ export default class RestRequestManager extends EventEmitter {
 
         const start = Date.now();
         const res = await fetch(
-            `${this.domain}/${this.type.toLocaleLowerCase()}/${path}`,
+            `${this.domain}/${this.type.toLowerCase()}/${path}`,
             {
                 method,
                 body,
