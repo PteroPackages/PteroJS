@@ -1,5 +1,14 @@
 import { FeatureLimits, Limits } from '../common';
 
+export interface Allocation {
+    id:         number;
+    ip:         string;
+    alias:      string | undefined;
+    port:       number;
+    notes:      string | undefined;
+    assigned:   boolean;
+}
+
 export interface CreateNodeOptions {
     name:                   string;
     location:               string;
