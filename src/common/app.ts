@@ -45,6 +45,37 @@ export interface CreateServerOptions {
     featureLimits:  Partial<FeatureLimits>;
 }
 
+export interface Egg {
+    id:             number;
+    uuid:           string;
+    nest:           number;
+    name:           string;
+    description:    string;
+    author:         string;
+    dockerImage:    string;
+    config:{
+        files:      { [key: string]: any };
+        startup:    { [key: string]: any };
+        stop:       string;
+        logs:       { [key: string]: any };
+        extends:    string | null;
+    };
+    startup:        string;
+    script:         { [key: string]: string | boolean | null };
+    createdAt:      Date;
+    updatedAt:      Date | undefined;
+}
+
+export interface Nest {
+    id:             number;
+    uuid:           string;
+    author:         string;
+    name:           string;
+    description:    string;
+    createdAt:      Date;
+    updatedAt:      Date | undefined;
+}
+
 export interface UpdateBuildOptions extends Partial<Limits & FeatureLimits> {
     allocation?:        number;
     oomDisabled?:       boolean;
