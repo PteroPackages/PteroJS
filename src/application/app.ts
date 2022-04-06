@@ -1,6 +1,6 @@
-import RestRequestManager from '../http/RestRequestManager';
-import { OptionSpec } from '../common';
 import loader from '../util/config';
+import { OptionSpec } from '../common';
+import RestRequestManager from '../http/RestRequestManager';
 
 /**
  * The base class for the Pterodactyl application API.

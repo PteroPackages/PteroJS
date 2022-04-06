@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { FileConfig, OptionSpec } from './../common';
+import { FileConfig, OptionSpec } from '../common';
 
 const DEFAULT = {
     APPLICATION:{
