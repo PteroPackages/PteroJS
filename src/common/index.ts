@@ -23,8 +23,8 @@ export type Include<T> = { include?: string[] } & T;
 export type Sort<T> = { sort?: string } & T;
 
 export interface FileConfig {
-    application?: { [key: string]: OptionSpec };
-    client?: { [key: string]: OptionSpec };
+    application?:   { [key: string]: OptionSpec };
+    client?:        { [key: string]: OptionSpec };
 }
 
 export interface Limits {

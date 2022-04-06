@@ -78,7 +78,7 @@ export default class UserManager extends BaseManager {
     async fetch<T extends number | undefined>(
         id?: T,
         options: External<Include<FetchOptions>> = {}
-    ): Promise<T extends undefined ? PteroUser : Dict<number, PteroUser>> {
+    ): Promise<T extends undefined ? Dict<number, PteroUser> : PteroUser> {
         if (id && !options.force) {
             const u = this.cache.get(id);
             if (u) return Promise.resolve<any>(u);

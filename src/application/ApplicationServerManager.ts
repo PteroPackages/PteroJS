@@ -104,7 +104,9 @@ export default class ApplicationServerManager extends BaseManager {
     async fetch<T extends number | undefined>(
         id?: T,
         options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? ApplicationServer : Dict<number, ApplicationServer>> {
+    ): Promise<
+        T extends undefined ? Dict<number, ApplicationServer> : ApplicationServer
+    > {
         if (id && !options.force) {
             const s = this.cache.get(id);
             if (s) return Promise.resolve<any>(s);
