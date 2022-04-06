@@ -37,7 +37,7 @@ function toCamelCase(obj: object, options: ConvertOptions = {}): object {
                 v = String(v);
             }
         }
-        parsed[k] = v;
+        parsed[camelCase(k)] = v;
     }
 
     return parsed;
@@ -71,7 +71,7 @@ function toSnakeCase(obj: object, options: ConvertOptions = {}): object {
                 v = String(v);
             }
         }
-        parsed[k] = v;
+        parsed[snakeCase(k)] = v;
     }
 
     return parsed;
