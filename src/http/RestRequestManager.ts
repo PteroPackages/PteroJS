@@ -1,6 +1,9 @@
 import fetch from 'node-fetch';
 import { EventEmitter } from 'events';
 import { APIErrorResponse, PteroAPIError, RequestError } from '../structures/Errors';
+import type BaseManager from '../structures/BaseManager';
+import buildQuery from '../util/query';
+import { FetchOptions } from '../common';
 import { version } from '../../package.json';
 
 export type Method =
@@ -83,20 +86,21 @@ export default class RestRequestManager extends EventEmitter {
         );
     }
 
-    async get(path: string) {
-        return this._make(path, undefined, 'GET');
+    async get(path: string, params: FetchOptions, cls: BaseManager) {
+        const query = buildQuery(params, cls.getQueryOptions());
+        return this._make(path + query, undefined, 'GET');
     }
 
-    async post(path: string, params: object = {}) {
-        return this._make(path, params, 'POST');
+    async post(path: string, data: object = {}) {
+        return this._make(path, data, 'POST');
     }
 
-    async patch(path: string, params: object = {}) {
-        return this._make(path, params, 'PATCH');
+    async patch(path: string, data: object = {}) {
+        return this._make(path, data, 'PATCH');
     }
 
-    async put(path: string, params: object = {}) {
-        return this._make(path, params, 'PUT');
+    async put(path: string, data: object = {}) {
+        return this._make(path, data, 'PUT');
     }
 
     async delete(path: string) {
