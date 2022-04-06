@@ -10,6 +10,17 @@ export interface FeatureLimits {
     databases:      number;
 }
 
+export interface FetchOptions {
+    force?:     boolean;
+    page?:      number;
+    perPage?:   number;
+}
+
+export type Filter<T> = { filter?: string } & T;
+export type FilterArray<T> = { filter?: string[] } & T;
+export type Include<T> = { include?: string[] } & T;
+export type Sort<T> = { sort?: string } & T;
+
 export interface FileConfig {
     application?: { [key: string]: OptionSpec };
     client?: { [key: string]: OptionSpec };
@@ -37,3 +48,9 @@ export interface OptionSpec {
     cache?:  boolean;
     max?:    number;
 }
+
+export type Resolvable<T> =
+    | string
+    | number
+    | { [key: string]: any }
+    | T;
