@@ -16,6 +16,7 @@ export interface FetchOptions {
     perPage?:   number;
 }
 
+export type External<T> = { external?: boolean } & T;
 export type Filter<T> = { filter?: string } & T;
 export type FilterArray<T> = { filter?: string[] } & T;
 export type Include<T> = { include?: string[] } & T;

@@ -1,6 +1,8 @@
+import ApplicationServerManager from './ApplicationServerManager';
 import loader from '../util/config';
 import { OptionSpec } from '../common';
 import RestRequestManager from '../http/RestRequestManager';
+import UserManager from './UserManager';
 
 /**
  * The base class for the Pterodactyl application API.
@@ -26,6 +28,8 @@ export default class PteroApp {
 
     public options: { [key: string]: OptionSpec };
 
+    public servers: ApplicationServerManager;
+    public users: UserManager;
     public requests: RestRequestManager;
 
     constructor(domain: string, auth: string, options: { [key: string]: any } = {}) {
@@ -39,6 +43,8 @@ export default class PteroApp {
         this.auth = auth;
         this.options = loader.appConfig({ application: options });
 
-        this.requests = new RestRequestManager('application', domain, auth);
+        this.servers = new ApplicationServerManager(this);
+        this.requests = new RestRequestManager('Application', domain, auth);
+        this.users = new UserManager(this);
     }
 }

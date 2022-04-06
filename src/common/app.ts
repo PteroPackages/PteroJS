@@ -1,5 +1,14 @@
 import { FeatureLimits, Limits } from '../common';
 
+export interface CreateUserOptions {
+    email:      string;
+    username:   string;
+    firstname:  string;
+    lastname:   string;
+    password?:  string;
+    isAdmin?:   boolean;
+}
+
 export interface CreateServerOptions {
     name:           string;
     egg:            number;
@@ -31,4 +40,8 @@ export interface UpdateStartupOptions {
     egg?:           number;
     image?:         string;
     skipScripts?:   boolean;
+}
+
+export interface UpdateUserOptions extends CreateUserOptions {
+    password: string;
 }

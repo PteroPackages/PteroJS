@@ -2,7 +2,7 @@ export default {
     users:{
         main: '/api/application/users',
         get: (u: number) => `/api/application/users/${u}`,
-        ext: (u: number) => `/api/application/users/external/${u}`
+        ext: (u: string) => `/api/application/users/external/${u}`
     },
     nodes:{
         main: '/api/application/nodes',
