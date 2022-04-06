@@ -77,7 +77,7 @@ export default class Dict<K, V> extends Map<K, V> {
      * Returns the first entry (or entries if otherwise specified) in the dict.
      * @param [amount] The number of entries to return from the start of the dict.
      */
-    first<T extends undefined>(amount?: T): T extends undefined ? V : V[] {
+    first<T extends number | undefined>(amount?: T): T extends undefined ? V : V[] {
         const v = [...super.values()];
         if (amount === undefined) return v[0] as any;
         const s = v.splice(0, amount);
@@ -88,7 +88,7 @@ export default class Dict<K, V> extends Map<K, V> {
      * Returns the first key (or keys if otherwise specified) in the dict.
      * @param [amount] The number of keys to return from the start of the dict.
      */
-    firstKey<T extends undefined>(amount?: T): T extends undefined ? K : K[] {
+    firstKey<T extends number | undefined>(amount?: T): T extends undefined ? K : K[] {
         const k = [...super.keys()];
         if (amount === undefined) return k[0] as any;
         const s = k.splice(0, amount);
@@ -99,7 +99,7 @@ export default class Dict<K, V> extends Map<K, V> {
      * Returns the last entry (or entries if otherwise specified) in the dict.
      * @param [amount] The number of entries to return from the end of the dict.
      */
-    last<T extends undefined>(amount?: T): T extends undefined ? V : V[] {
+    last<T extends number | undefined>(amount?: T): T extends undefined ? V : V[] {
         const v = [...super.values()];
         if (amount === undefined) return v[v.length-1] as any;
         const s = v.slice(-amount);
@@ -110,7 +110,7 @@ export default class Dict<K, V> extends Map<K, V> {
      * Returns the last key (or keys if otherwise specified) in the dict.
      * @param [amount] The number of keys to return from the end of the dict.
      */
-    lastKey<T extends undefined>(amount?: T): T extends undefined ? K : K[] {
+    lastKey<T extends number | undefined>(amount?: T): T extends undefined ? K : K[] {
         const k = [...super.keys()];
         if (amount === undefined) return k[k.length-1] as any;
         const s = k.slice(-amount);
@@ -121,7 +121,7 @@ export default class Dict<K, V> extends Map<K, V> {
      * Returns a random entry (or entries if otherwise specified) in the dict.
      * @param [amount] The number of entries to return from the dict.
      */
-    random<T extends undefined>(amount?: T): T extends undefined ? V : V[] {
+    random<T extends number | undefined>(amount?: T): T extends undefined ? V : V[] {
         const v = [...super.values()];
         if (amount === undefined) return v[Math.floor(Math.random() * v.length)] as any;
         const s = [];
@@ -133,7 +133,7 @@ export default class Dict<K, V> extends Map<K, V> {
      * Returns a random key (or keys if otherwise specified) in the dict.
      * @param [amount] The number of keys to return from the dict.
      */
-    randomKey<T extends undefined>(amount?: T): T extends undefined ? K : K[] {
+    randomKey<T extends number | undefined>(amount?: T): T extends undefined ? K : K[] {
         const k = [...super.keys()];
         if (amount === undefined) return k[Math.floor(Math.random() * k.length)] as any;
         const s = [];
