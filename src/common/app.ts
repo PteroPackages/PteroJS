@@ -1,5 +1,21 @@
 import { FeatureLimits, Limits } from '../common';
 
+export interface CreateNodeOptions {
+    name:                   string;
+    location:               string;
+    fqdn:                   string;
+    scheme:                 string;
+    memory:                 number;
+    memoryOverallocate?:    number;
+    disk:                   number;
+    diskOverallocate?:      number;
+    sftp:{
+        port:               number;
+        listener:           number;
+    };
+    uploadSize?:            number;
+}
+
 export interface CreateUserOptions {
     email:      string;
     username:   string;
