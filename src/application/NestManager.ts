@@ -1,10 +1,10 @@
-import type PteroApp from './app';
-import BaseManager from '../structures/BaseManager';
+import type { PteroApp } from './app';
+import { BaseManager } from '../structures/BaseManager';
 import { FetchOptions, Include } from '../common';
 import { Nest } from '../common/app';
 import endpoints from './endpoints';
 
-export default class NestManager extends BaseManager {
+export class NestManager extends BaseManager {
     public client: PteroApp;
     public cache: Set<Nest>;
     

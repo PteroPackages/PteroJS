@@ -1,9 +1,9 @@
-import type ApplicationServer from './ApplicationServer';
-import type Dict from './Dict';
-import type PteroApp from '../application/app';
+import type { ApplicationServer } from './ApplicationServer';
+import type { Dict } from './Dict';
+import type { PteroApp } from '../application/app';
 import { DaemonData, NodeLocation } from '../common';
 
-export default class Node {
+export class Node {
     public readonly client: PteroApp;
 
     public readonly id: number;

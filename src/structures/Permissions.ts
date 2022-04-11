@@ -57,7 +57,7 @@ export const FLAGS: PermissionFlag = {
     ADMIN_WEBSOCKET_TRANSFER: 42
 }
 
-export default class Permissions {
+export class Permissions {
     /** An object containing all Pterodactyl permissions. */
     static get FLAGS(): Readonly<PermissionFlag> {
         return Object.freeze(FLAGS);

@@ -1,7 +1,7 @@
-import type ApplicationServer from './ApplicationServer';
-import type PteroApp from '../application/app';
-import Dict from './Dict';
-import Permissions from './Permissions';
+import type { ApplicationServer } from './ApplicationServer';
+import type { PteroApp } from '../application/app';
+import { Dict } from './Dict';
+import { Permissions } from './Permissions';
 import caseConv from '../util/caseConv';
 
 export abstract class BaseUser {

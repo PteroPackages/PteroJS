@@ -1,7 +1,7 @@
-import type PteroApp from './app';
-import ApplicationServer from '../structures/ApplicationServer';
-import BaseManager from '../structures/BaseManager';
-import Dict from '../structures/Dict';
+import type { PteroApp } from './app';
+import { ApplicationServer } from '../structures/ApplicationServer';
+import { BaseManager } from '../structures/BaseManager';
+import { Dict } from '../structures/Dict';
 import {
     FeatureLimits,
     FetchOptions,
@@ -14,7 +14,7 @@ import {
 } from '../common';
 import endpoints from './endpoints';
 
-export default class ApplicationServerManager extends BaseManager {
+export class ApplicationServerManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
 

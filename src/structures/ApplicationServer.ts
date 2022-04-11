@@ -1,8 +1,8 @@
-import type Node from './Node';
-import type PteroApp from '../application/app';
+import type { Node } from './Node';
+import type { PteroApp } from '../application/app';
 import { Limits, FeatureLimits } from '../common';
 
-export default class ApplicationServer {
+export class ApplicationServer {
     public client: PteroApp;
 
     /** The internal ID of the server (separate from UUID). */

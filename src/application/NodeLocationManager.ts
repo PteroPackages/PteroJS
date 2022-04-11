@@ -1,6 +1,6 @@
-import type PteroApp from './app';
-import BaseManager from '../structures/BaseManager';
-import Dict from '../structures/Dict';
+import type { PteroApp } from './app';
+import { BaseManager } from '../structures/BaseManager';
+import { Dict } from '../structures/Dict';
 import {
     FetchOptions,
     Filter,
@@ -12,7 +12,7 @@ import {
 } from '../common';
 import endpoints from './endpoints';
 
-export default class NodeLocationManager extends BaseManager {
+export class NodeLocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, NodeLocation>;
 

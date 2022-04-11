@@ -1,4 +1,4 @@
-export default abstract class BaseManager {
+export abstract class BaseManager {
     abstract get FILTERS(): Readonly<string[]>;
     abstract get SORTS(): Readonly<string[]>;
     abstract get INCLUDES(): Readonly<string[]>;

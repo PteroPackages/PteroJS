@@ -1,10 +1,10 @@
-import ApplicationServerManager from './ApplicationServerManager';
-import NestManager from './NestManager';
-import NodeAllocationManager from './NodeAllocationManager';
-import NodeLocationManager from './NodeLocationManager';
-import NodeManager from './NodeManager';
-import RestRequestManager from '../http/RestRequestManager';
-import UserManager from './UserManager';
+import { ApplicationServerManager } from './ApplicationServerManager';
+import { NestManager } from './NestManager';
+import { NodeAllocationManager } from './NodeAllocationManager';
+import { NodeLocationManager } from './NodeLocationManager';
+import { NodeManager } from './NodeManager';
+import { RestRequestManager } from '../http/RestRequestManager';
+import { UserManager } from './UserManager';
 import { OptionSpec } from '../common';
 import loader from '../util/config';
 
@@ -16,7 +16,7 @@ import loader from '../util/config';
  * **Warning:** Keep your API key private at all times. Exposing this can lead
  * to your servers, nodes, configurations and more being corrupted and/or deleted.
  */
-export default class PteroApp {
+export class PteroApp {
     /**
      * The domain for your Pterodactyl panel. This should be the main URL only
      * (not "/api"). Any additional paths will count as the API path.

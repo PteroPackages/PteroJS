@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
 import { EventEmitter } from 'events';
-import type BaseManager from '../structures/BaseManager';
+import type { BaseManager } from '../structures/BaseManager';
 import { APIErrorResponse, PteroAPIError, RequestError } from '../structures/Errors';
 import { FetchOptions } from '../common';
-import buildQuery from '../util/query';
+import { buildQuery } from '../util/query';
 import { version } from '../../package.json';
 
 export type Method =
@@ -13,7 +13,7 @@ export type Method =
     | 'PUT'
     | 'DELETE';
 
-export default class RestRequestManager extends EventEmitter {
+export class RestRequestManager extends EventEmitter {
     private type: string;
     public domain: string;
     public auth: string;

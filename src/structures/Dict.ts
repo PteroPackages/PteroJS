@@ -10,7 +10,7 @@ export interface DictConstructor {
  * Dict (or Dictionary) is an extended Map with additional helper methods
  * used for manager caches in the PteroJS library.
  */
-export default class Dict<K, V> extends Map<K, V> {
+export class Dict<K, V> extends Map<K, V> {
     public ['constructor']: DictConstructor;
 
     private _limit = 0;

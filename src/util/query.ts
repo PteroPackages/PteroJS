@@ -1,4 +1,4 @@
-import { FetchOptions, Filter, Include, Sort, FilterArray } from '../common';
+import { FetchOptions, Include, Sort, FilterArray } from '../common';
 export type AllowedQueryOptions = {
     filters:    readonly string[];
     includes:   readonly string[];
@@ -11,10 +11,10 @@ export type AllowedQueryOptions = {
  * @param allowed Allowed argument guards.
  * @returns The parsed query.
  */
-export default function (
+export const buildQuery = (
     args: FilterArray<Include<Sort<FetchOptions>>>,
     allowed: AllowedQueryOptions
-): string {
+): string => {
     const parsed: string[] = [];
 
     if (args.page) {

@@ -1,7 +1,7 @@
-import type PteroApp from './app';
-import BaseManager from '../structures/BaseManager';
-import Dict from '../structures/Dict';
-import Node from '../structures/Node';
+import type { PteroApp } from './app';
+import { BaseManager } from '../structures/BaseManager';
+import { Dict } from '../structures/Dict';
+import { Node }from '../structures/Node';
 import { CreateNodeOptions } from '../common/app';
 import {
     Filter,
@@ -14,7 +14,7 @@ import {
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
-export default class NodeManager extends BaseManager {
+export class NodeManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Node>;
 

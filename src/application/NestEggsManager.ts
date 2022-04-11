@@ -1,11 +1,11 @@
-import type PteroApp from './app';
-import BaseManager from '../structures/BaseManager';
-import Dict from '../structures/Dict';
+import type { PteroApp } from './app';
+import { BaseManager } from '../structures/BaseManager';
+import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
 import { Egg } from '../common/app';
 import endpoints from './endpoints';
 
-export default class NestEggsManager extends BaseManager {
+export class NestEggsManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Egg>;
 
