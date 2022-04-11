@@ -31,7 +31,7 @@ export class Dict<K, V> extends Map<K, V> {
 
     /** @returns Whether the dict has a set limit. */
     isLimited(): boolean {
-        return super.size === this._limit;
+        return !!this._limit && super.size === this._limit;
     }
 
     set(key: K, value: V): this {
