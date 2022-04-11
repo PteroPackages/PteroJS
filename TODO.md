@@ -24,6 +24,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
 - [X] Document all functions (resolved into others)
 - [X] Switch `AllocationManager#cache` to maps
+- [ ] Fix endpoints paths & RestRequestManager fetch checks
 
 ## Global Structures
 - [X] Implement helper functions for all the structures

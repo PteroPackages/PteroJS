@@ -38,7 +38,7 @@ export class RestRequestManager extends EventEmitter {
     }
 
     private debug(message: string): void {
-        super.emit('debug', message);
+        //super.emit('debug', message);
     }
 
     async _make(
@@ -54,7 +54,7 @@ export class RestRequestManager extends EventEmitter {
 
         const start = Date.now();
         const res = await fetch(
-            `${this.domain}/${this.type.toLowerCase()}/${path}`,
+            `${this.domain}/api/${this.type.toLowerCase()}${path}`,
             {
                 method,
                 body,
@@ -74,7 +74,7 @@ export class RestRequestManager extends EventEmitter {
         }
 
         if (data) {
-            super.emit('reveive', data);
+            //super.emit('reveive', data);
             if (res.ok) return data;
             if (res.status >= 400 && res.status < 500)
                 throw new PteroAPIError(data as APIErrorResponse);
