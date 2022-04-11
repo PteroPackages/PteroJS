@@ -1,4 +1,8 @@
 import ApplicationServerManager from './ApplicationServerManager';
+import NestManager from './NestManager';
+import NodeAllocationManager from './NodeAllocationManager';
+import NodeLocationManager from './NodeLocationManager';
+import NodeManager from './NodeManager';
 import RestRequestManager from '../http/RestRequestManager';
 import UserManager from './UserManager';
 import { OptionSpec } from '../common';
@@ -28,11 +32,19 @@ export default class PteroApp {
 
     public options: { [key: string]: OptionSpec };
 
+    public allocations: NodeAllocationManager;
+    public locations: NodeLocationManager;
+    public nests: NestManager;
+    public nodes: NodeManager;
     public servers: ApplicationServerManager;
     public users: UserManager;
     public requests: RestRequestManager;
 
-    constructor(domain: string, auth: string, options: { [key: string]: any } = {}) {
+    constructor(
+        domain: string,
+        auth: string,
+        options: { [key: string]: OptionSpec } = {}
+    ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new SyntaxError(
                 "Domain URL must start with 'http://' or 'https://' and "+
@@ -43,8 +55,12 @@ export default class PteroApp {
         this.auth = auth;
         this.options = loader.appConfig({ application: options });
 
+        this.allocations = new NodeAllocationManager(this);
+        this.locations = new NodeLocationManager(this);
+        this.nests = new NestManager(this);
+        this.nodes = new NodeManager(this);
         this.servers = new ApplicationServerManager(this);
-        this.requests = new RestRequestManager('Application', domain, auth);
         this.users = new UserManager(this);
+        this.requests = new RestRequestManager('Application', domain, auth);
     }
 }
