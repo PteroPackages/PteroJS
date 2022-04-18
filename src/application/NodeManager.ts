@@ -2,7 +2,7 @@ import type { PteroApp } from './app';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { Node }from '../structures/Node';
-import { CreateNodeOptions } from '../common/app';
+import { CreateNodeOptions, NodeConfiguration } from '../common/app';
 import {
     Filter,
     FilterArray,
@@ -105,6 +105,13 @@ export class NodeManager extends BaseManager {
             this
         );
         return this._patch(data) as any;
+    }
+
+    async getConfig(id: number): Promise<NodeConfiguration> {
+        const data = await this.client.requests.get(
+            endpoints.nodes.config(id), {}, this
+        );
+        return caseConv.toCamelCase(data) as NodeConfiguration;
     }
 
     async create(options: CreateNodeOptions): Promise<Node> {

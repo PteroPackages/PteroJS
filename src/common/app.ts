@@ -76,6 +76,31 @@ export interface Nest {
     updatedAt:      Date | undefined;
 }
 
+export interface NodeConfiguration {
+    uuid:               string;
+    tokenId:            string;
+    token:              string;
+    debug:              boolean;
+    api:{
+        host:           string;
+        port:           number;
+        ssl:{
+            enabled:    boolean;
+            cert:       string;
+            key:        string;
+        };
+        uploadLimit:    number;
+    };
+    system:{
+        data:           string;
+        sftp:{
+            bindPort:   number;
+        };
+    };
+    allowedMounts:      string[];
+    remote:             string;
+}
+
 export interface UpdateBuildOptions extends Partial<Limits & FeatureLimits> {
     allocation?:        number;
     oomDisabled?:       boolean;
