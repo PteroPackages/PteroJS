@@ -14,31 +14,31 @@ export type Method =
     | 'DELETE';
 
 export class RestRequestManager extends EventEmitter {
-    private type: string;
-    public domain: string;
-    public auth: string;
-    public ping: number;
+    private _type: string;
+    public _domain: string;
+    public _auth: string;
+    public _ping: number;
 
     constructor(type: string, domain: string, auth: string) {
         super();
 
-        this.type = type;
-        this.domain = domain;
-        this.auth = auth;
-        this.ping = -1;
+        this._type = type;
+        this._domain = domain;
+        this._auth = auth;
+        this._ping = -1;
     }
 
     getHeaders(): { [key: string]: string } {
         return {
-            'User-Agent': `${this.type} PteroJS v${version}`,
+            'User-Agent': `${this._type} PteroJS v${version}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': `Bearer ${this.auth}`
+            'Authorization': `Bearer ${this._auth}`
         }
     }
 
     private debug(message: string): void {
-        //super.emit('debug', message);
+        super.emit('debug', message);
     }
 
     async _make(
@@ -54,15 +54,15 @@ export class RestRequestManager extends EventEmitter {
 
         const start = Date.now();
         const res = await fetch(
-            `${this.domain}/api/${this.type.toLowerCase()}${path}`,
+            `${this._domain}/api/${this._type.toLowerCase()}${path}`,
             {
                 method,
                 body,
                 headers: this.getHeaders()
             }
         );
-        this.ping = Date.now() - start;
-        this.debug(`received status: ${res.status} (${this.ping}ms)`);
+        this._ping = Date.now() - start;
+        this.debug(`received status: ${res.status} (${this._ping}ms)`);
 
         if ([202, 204].includes(res.status)) return;
         let data: object | Buffer;
@@ -74,7 +74,7 @@ export class RestRequestManager extends EventEmitter {
         }
 
         if (data) {
-            //super.emit('reveive', data);
+            super.emit('receive', data);
             if (res.ok) return data;
             if (res.status >= 400 && res.status < 500)
                 throw new PteroAPIError(data as APIErrorResponse);
