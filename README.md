@@ -1,6 +1,6 @@
 <h1 align="center">PteroJS</h1>
 <h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
-<p align="center"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/version-1.3.0-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge"> <img src="https://img.shields.io/badge/docs-coming_soon-e67e22?style=for-the-badge"></p>
+<p align="center"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/version-1.4.2-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge"> <img src="https://img.shields.io/badge/docs-coming_soon-e67e22?style=for-the-badge"></p>
 
 ## About
 PteroJS is a flexible API wrapper designed to give developers full access over the Pterodactyl API. The library uses a class-based management structure often seen in popular packages like Discord.js which keeps code clean, efficient and practical for any use-case.
@@ -36,16 +36,16 @@ const client = new PteroClient(
     { ws: true }
 );
 
-// Adding servers to listen for
-client.addSocksetServer([ 'kgujg66h', 'avipgt6e' ]);
+// Adding the server to listen for
+const shard = client.addSocksetServer('kgujg66h');
 
 // Listening to events
-client.on('statusUpdate', (server, status) => {
-    console.log(`${server.name} status: ${status}`);
+shard.on('statusUpdate', status => {
+    console.log(`server ${shard.id} status: ${status}`);
 });
 
-// Connecting to Pterodactyl
-client.connect();
+// Connecting to the server
+shard.connect();
 ```
 
 ## Contributing
@@ -58,9 +58,10 @@ Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TO
 
 ## Contributors
 * [Devonte](https://github.com/devnote-dev) - Owner, maintainer
+* [Chelog](https://github.com/chelog) - Code contributor
+* [Cain](https://github.com/cainthebest) - Code contributor
 * [Zumo](https://github.com/ZumoDev) - Tester
 * [Dino](https://github.com/DinoTheDevOfficial) - Tester
-* [Cain](https://github.com/cainthebest) - Code contributor
 
 This repository is managed under the MIT license.
 

@@ -1,51 +1,51 @@
-function handle(client, { event, args }, id) {
-    function getServer(id) {
-        return client.servers.cache.get(id);
-    }
+const caseConv = require('../../util/caseConv');
+
+function handle(shard, { event, args }) {
+    if (!Array.isArray(args)) args = [args];
 
     switch (event) {
         case 'auth success':
-            return client.emit('serverConnect', getServer(id));
+            return shard.emit('authSuccess');
 
         case 'status':
-            return client.emit('statusUpdate', getServer(id), ...args);
+            return shard.emit('statusUpdate', ...args);
 
         case 'console output':
-            return client.emit('serverOutput', id, ...args);
+            return shard.emit('serverOutput', ...args);
 
         case 'daemon message':
-            return client.emit('daemonMessage', getServer(id), ...args);
+            return shard.emit('daemonMessage', ...args);
 
         case 'install started':
-            return client.emit('installStart', id);
+            return shard.emit('installStart');
 
         case 'install output':
-            return client.emit('installOutput', id, ...args);
+            return shard.emit('installOutput', ...args);
 
         case 'install completed':
-            return client.emit('installComplete', id);
+            return shard.emit('installComplete');
 
         case 'stats':
-            return client.emit('statsUpdate', getServer(id), ...args);
+            const stats = JSON.parse(...args);
+            stats.network = caseConv.camelCase(stats.network);
+            return shard.emit('statsUpdate', caseConv.camelCase(stats));
 
         case 'transferLogs':
         case 'transferStatus':
-            return client.emit('transferUpdate', id, ...args);
+            return shard.emit('transferUpdate', ...args);
 
         case 'backup completed':
-            let backup = {};
-            if (args.length) backup = getServer(id).backups._patch(args[0]);
-            return client.emit('backupComplete', getServer(id), backup);
+            return shard.emit('backupComplete', args ?? {});
 
         case 'token expired':
-            return client.emit('serverDisconnect', id);
+            return shard.emit('serverDisconnect');
 
         case 'daemon error':
         case 'jwt error':
-            return client.emit('error', id, ...args);
+            return shard.emit('error', ...args);
 
         default:
-            return client.emit('debug', `[SHARD ${id}] Received unknown event: '${event}'`);
+            return shard.emit('debug', `[SHARD ${id}] Received unknown event: '${event}'`);
     }
 }
 

@@ -32,6 +32,17 @@ class ScheduleManager {
     }
 
     /**
+     * Returns a formatted URL to the schedule.
+     * @param {string} id The identifier of the server.
+     * @param {string|Schedule} schedule The schedule or identifier of the schedule.
+     * @returns {string} The formatted URL.
+     */
+    panelURLFor(id, schedule) {
+        if (schedule instanceof Schedule) return schedule.panelURL;
+        return `${this.client.domain}/server/${id}/schedules/${schedule}`;
+    }
+
+    /**
      * Fetches a schedule or all schedules from a specified server (with optional cache check).
      * @param {string} server The identifier of the server.
      * @param {string} [id] The ID of the schedule.

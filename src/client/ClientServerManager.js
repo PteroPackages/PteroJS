@@ -52,6 +52,16 @@ class ClientServerManager {
     }
 
     /**
+     * Returns a formatted URL to the server.
+     * @param {string|ClientServer} server The server or identifier of the server.
+     * @returns {string} The formatted URL.
+     */
+    panelURLFor(server) {
+        if (server instanceof ClientServer) return server.panelURL;
+        return `${this.client.domain}/server/${server}`;
+    }
+
+    /**
      * Fetches a server (or all if no id is specified) from the Pterodactyl API.
      * @param {string} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.

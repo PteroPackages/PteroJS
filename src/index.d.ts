@@ -41,6 +41,8 @@ export class ApplicationServerManager {
 
     _patch(data: any): ApplicationServer | Dict<number, ApplicationServer>;
     resolve(obj: string | number | object | ApplicationServer): ApplicationServer | undefined;
+    panelURLFor(server: string | ApplicationServer): string;
+    adminURLFor(server: number | ApplicationServer): string;
     fetch(id?: number, options?: Include<FetchOptions>): Promise<ApplicationServer | Dict<number, ApplicationServer>>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, ApplicationServer>>;
     create(user: number | PteroUser, options: ApplicationServerCreateOptions): Promise<ApplicationServer>;
@@ -54,6 +56,7 @@ export class NestEggsManager {
     client: PteroApp;
     cache: Dict<number, object>;
 
+    adminURLFor(id: number): string;
     fetch(nest: number, id?: number, options?: Include<FetchOptions>): Promise<Dict<number, object>>;
     for(nest: number): object[];
 }
@@ -77,6 +80,7 @@ export class NestManager {
     eggs: NestEggsManager;
 
     _patch(data: any): Set<Nest>;
+    adminURLFor(id: number): string;
     fetch(id: number, include: Include<{}>): Promise<Set<Nest>>;
 }
 
@@ -97,6 +101,7 @@ export class NodeAllocationManager {
     cache: Dict<number, NodeAllocation>;
 
     _patch(node: number, data: any): Dict<number, NodeAllocation>;
+    adminURLFor(id: number): string;
     fetch(node: number, options: Include<FetchOptions>): Promise<Dict<number, NodeAllocation>>;
     fetchAvailable(node: number, single?: boolean): Promise<Dict<number, NodeAllocation> | NodeAllocation | void>;
     create(node: number, ip: string, ports: string[]): Promise<void>;
@@ -121,6 +126,7 @@ export class NodeLocationManager {
 
     _patch(data: any): NodeLocation | Dict<number, NodeLocation>;
     resolve(obj: string | number | object): NodeLocation | undefined;
+    adminURLFor(id: number): string;
     fetch(id?: number, options?: Include<FetchOptions>): Promise<NodeLocation | Dict<number, NodeLocation>>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, NodeLocation>>;
     create(short: string, long: string): Promise<NodeLocation>;
@@ -155,6 +161,7 @@ export class NodeManager {
 
     _patch(data: any): Node | Dict<number, Node>;
     resolve(obj: string | number | object | Node): Node | undefined;
+    adminURLFor(node: number | Node): string;
     fetch(id: number, options?: Include<FetchOptions>): Promise<Node | Dict<number, Node>>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, Node>>;
     create(options: NodeCreateOptions): Promise<Node>;
@@ -206,6 +213,7 @@ export class UserManager {
 
     _patch(data: any): PteroUser | Dict<number, PteroUser>;
     resolve(obj: string | number | object | PteroUser): PteroUser | undefined;
+    adminURLFor(user: number | PteroUser): string;
     fetch(id?: number, options?: { withServers?: boolean } & FetchOptions): Promise<PteroUser | Dict<number, PteroUser>>;
     fetchExternal(id: number, options?: { withServers?: boolean } & FetchOptions): Promise<PteroUser>;
     query(entity: string, filter?: string, sort?: string): Promise<Dict<number, PteroUser>>;
@@ -227,11 +235,56 @@ export type WebSocketStatus =
     | 'RECONNECTING'
     | 'CONNECTED';
 
-export class Shard {
+export interface ShardCommands {
+    'auth':         [token: string]
+    'send stats':   []
+    'send logs':    []
+    'set state':    [state: PowerState]
+    'send command': [command: string]
+}
+
+export interface ServerStats {
+    cpuAbsolute:        number;
+    diskBytes:          number;
+    memoryBytes:        number;
+    memoryLimitBytes:   number;
+    network: {
+        rxBytes:        number;
+        txBytes:        number;
+    };
+    state:              string;
+    uptime:             number;
+}
+
+export interface ShardEvents {
+    debug:              [message: string];
+    error:              [id: string, error: any];
+
+    tokenRefresh:       [];
+
+    authSuccess:        [];
+    serverConnect:      [socket: WebSocket];
+    serverOutput:       [output: string];
+    serverDisconnect:   [];
+
+    statusUpdate:       [status: string];
+    statsUpdate:        [stats: ServerStats];
+    transferUpdate:     [data: any];
+
+    installStart:       [];
+    installOutput:      [output: string];
+    installComplete:    [];
+
+    backupComplete:     [backup: Partial<Backup>];
+
+    daemonMessage:      [message: any];
+}
+
+export class Shard extends EventEmitter {
     constructor(client: PteroClient, id: string, auth: WebSocketAuth);
     client: PteroClient;
     id: string;
-    token: string;
+    token: string | null;
     socket: WebSocket | null;
     status: WebSocketStatus;
     readyAt: number;
@@ -239,14 +292,23 @@ export class Shard {
     lastPing: number;
 
     #debug(message: string): void;
-    connect({ socket }: WebSocketAuth): void;
-    reconnect(): Promise<void>;
-    disconnect(): void;
-    send(event: string, args: string[]): void;
+    connect(auth?: WebSocketAuth): Promise<WebSocket>;
+    reconnect(): Promise<WebSocket>;
+    refreshToken(): Promise<void>;
+    disconnect(): Promise<void>;
+    send<K extends keyof ShardCommands>(event: K, args: ShardCommands[K]): void;
     _onOpen(): void;
     _onMessage({ data }:{ data: string }): void;
     _onError({ error }: any): void;
     _onClose(): void;
+
+    emit<E extends keyof ShardEvents>(event: E, ...args: ShardEvents[E]): boolean;
+    on<E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => any): this;
+    on<T, E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => T): this;
+    once<E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => any): this;
+    once<T, E extends keyof ShardEvents>(events: E, listener: (...args: ShardEvents[E]) => T): this;
+    off<E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => any): this;
+    off<T, E extends keyof ShardEvents>(event: E, listener: (...args: ShardEvents[E]) => T): this;
 }
 
 export class WebSocketManager {
@@ -258,8 +320,9 @@ export class WebSocketManager {
     readyAt: number;
     ping: number;
 
-    launch(): Promise<void>;
     destroy(): void;
+    createShard(id: string): Shard;
+    removeShard(id: string): boolean;
 }
 
 // Client API - Main
@@ -307,6 +370,7 @@ export class ClientDatabaseManager {
     cache: Dict<string, ClientDatabase>;
 
     _patch(data: any): Dict<string, ClientDatabase>;
+    get panelURL(): string;
     fetch(withPass?: boolean): Promise<Dict<string, ClientDatabase>>;
     create(database: string, remote: string): Promise<ClientDatabase>;
     rotate(id: string): Promise<ClientDatabase>;
@@ -332,6 +396,7 @@ export class ClientServerManager {
 
     _patch(data: any): ClientServer | Dict<string, ClientServer>;
     _resolveMeta(data: any): void;
+    panelURLFor(server: string | ClientServer): string;
     fetch(id: string, options?: Include<FetchOptions>): Promise<ClientServer | Dict<string, ClientServer>>;
 }
 
@@ -355,6 +420,7 @@ export class FileManager {
     cache: Dict<string, Dict<string, PteroFile>>;
 
     _patch(data: any): Dict<string, PteroFile>;
+    get panelURL(): string;
     fetch(dir: string): Promise<Dict<string, PteroFile>>;
     getContents(filePath: string): Promise<string>;
     download(filePath: string): Promise<string>;
@@ -403,22 +469,6 @@ export interface ClientEvents {
     debug:            [message: string];
     error:            [id: string, error: any];
     ready:            [];
-
-    serverConnect:    [server: ClientServer];
-    serverOutput:     [id: string, output: any];
-    serverDisconnect: [id: string];
-
-    statusUpdate:     [server: ClientServer, status: string];
-    statsUpdate:      [server: ClientServer, stats: any];
-    transferUpdate:   [id: string, data: any];
-
-    installStart:     [id: string];
-    installOutput:    [id: string, output: any];
-    installComplete:  [id: string];
-
-    backupComplete:   [server: ClientServer, backup: Partial<Backup>];
-
-    daemonMessage:    [id: string, message: any];
 }
 
 export class PteroClient extends EventEmitter {
@@ -435,8 +485,8 @@ export class PteroClient extends EventEmitter {
 
     connect(): Promise<boolean>;
     fetchClient(): Promise<ClientUser>;
-    addSocketServer(...ids: string[]): this;
-    removeSocketServer(id: string): this;
+    addSocketServer<T extends string | string[]>(ids: T): T extends string[] ? Shard[] : Shard;
+    removeSocketServer(id: string): boolean;
     disconnect(): void;
 
     emit<E extends keyof ClientEvents>(event: E, ...args: ClientEvents[E]): boolean;
@@ -463,6 +513,7 @@ export class ScheduleManager {
     cache: Dict<number, Schedule>;
 
     _patch(id: number, data: any): Schedule | Dict<number, Schedule>;
+    panelURLFor(id: string, schedule: string | Schedule): string;
     fetch(server: string, id?: string, force?: boolean): Promise<Schedule | Dict<number, Schedule>>;
     create(server: string, options: ScheduleCreateOptions): Promise<Schedule>;
     update(server: string, id: string, options: Partial<ScheduleCreateOptions>): Promise<Schedule>;
@@ -477,6 +528,7 @@ export class SubUserManager {
 
     _patch(data: any): PteroSubUser | Dict<string, PteroSubUser>;
     resolve(obj: string | number | object | PteroSubUser): PteroSubUser | undefined;
+    get panelURL(): string;
     fetch(id?: string, force?: boolean): Promise<PteroSubUser | Dict<string, PteroSubUser>>;
     add(email: string, permissions: PermissionResolvable): Promise<PteroSubUser>;
     setPermissions(uuid: string, permissions: PermissionResolvable): Promise<PteroSubUser>;
@@ -558,11 +610,26 @@ export class RequestManager extends EventEmitter {
 
 // Structures
 
-export interface ApplicationServerUpdateOptions {
+export interface UpdateDetailsOptions {
     name?:          string;
     owner?:         number | PteroUser;
     externalId?:    string;
     description?:   string;
+}
+
+export interface UpdateBuildOptions {
+    allocation?:        number;
+    swap?:              number;
+    memory?:            number;
+    disk?:              number;
+    cpu?:               number;
+    threads?:           number | null;
+    io?:                number;
+    featureLimits?:{
+        allocations?:   number;
+        backups?:       number;
+        databases?:     number;
+    };
 }
 
 export class ApplicationServer {
@@ -591,9 +658,11 @@ export class ApplicationServer {
     updatedTimestamp: number | null;
 
     _patch(data: any): void;
+    get panelURL(): string;
+    get adminURL(): string;
     fetchOwner(): Promise<PteroUser>;
-    updateDetails(options: ApplicationServerUpdateOptions): Promise<this>;
-    updateBuild(options: object): void;
+    updateDetails(options: UpdateDetailsOptions): Promise<this>;
+    updateBuild(options: UpdateBuildOptions): Promise<this>;
     updateStartup(options: object): void;
     suspend(): Promise<void>;
     unsuspend(): Promise<void>;
@@ -634,6 +703,7 @@ export class ClientServer {
     schedules: Dict<string, Schedule>;
 
     _patch(data: any): void;
+    get panelURL(): string;
     addWebsocket(): void;
     fetchResouces(): void;
     sendCommand(command: string): Promise<void>;
@@ -742,6 +812,7 @@ export class Node {
     updatedAt: Date | null;
 
     _patch(data: any): void;
+    get adminURL(): string;
     getConfig(): Promise<object>;
     update(options: NodeUpdateOptions): Promise<Node>;
     delete(): Promise<boolean>;
@@ -817,6 +888,7 @@ export class Schedule {
 
     _patch(data: any): void;
     _resolveTask(data: any): ScheduleTask;
+    get panelURL(): string;
     update(options: ScheduleUpdateOptions): Promise<Schedule>;
     createTask(action: string, payload: string, offset: string): Promise<ScheduleTask>;
     updateTask(id: number, options:{ action: string; payload: string; offset: string }): Promise<ScheduleTask>;
@@ -858,6 +930,7 @@ export class PteroUser extends BaseUser {
     updatedAt: Date | null;
     updatedTimestamp: number | null;
 
+    get adminURL(): string;
     update(options: Partial<UserCreateOptions>): Promise<PteroUser>;
     delete(): Promise<boolean>;
 }
@@ -874,6 +947,7 @@ export class PteroSubUser extends BaseUser {
     createdAt: Date;
     createdTimestamp: number;
 
+    get panelURL(): string;
     setPermissions(perms: PermissionResolvable): Promise<this>;
 }
 
@@ -896,6 +970,7 @@ export class ClientUser extends BaseUser {
     tokens: string[];
     apikeys: APIKey[];
 
+    get panelURL(): string;
     get2faCode(): Promise<string>;
     enable2fa(): Promise<string>;
     disable2fa(password: string): Promise<void>;

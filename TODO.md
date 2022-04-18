@@ -21,7 +21,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 ## Global Managers
 - [X] Implement helper functions for all the managers
 - [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
-- [ ] Document all functions
+- [X] Document all functions (resolved into others)
 - [X] Switch `AllocationManager#cache` to maps
 
 ## Global Structures
@@ -34,7 +34,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] TypeScript support (`index.d.ts`)
 - [X] Investigate incorrectly documented endpoints
 - [X] Implement tests in `/tests` (or move from `/test`)
-- [ ] Remove deprecated `PteroUser#tfa`
+- [X] Remove deprecated `PteroUser#tfa`
 - [X] Remove deprecated `Presets` util
 
 ## Feature Plans

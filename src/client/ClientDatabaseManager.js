@@ -29,6 +29,14 @@ class ClientDatabaseManager {
         return res;
     }
 
+    /**
+     * Returns a formatted URL to the server databases page.
+     * @returns {string} The formatted URL.
+     */
+    get panelURL() {
+        return `${this.client.domain}/server/${this.server.identifier}/databases`;
+    }
+
     async fetch(withPass = false) {
         const data = await this.client.requests.get(
             endpoints.servers.databases.main(this.server.identifier) +

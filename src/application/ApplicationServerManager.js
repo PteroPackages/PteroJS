@@ -91,6 +91,26 @@ class ApplicationServerManager {
     }
 
     /**
+     * Returns a formatted URL to the server.
+     * @param {string|ApplicationServer} server The server or server identifier.
+     * @returns {string} The formatted URL.
+     */
+    panelURLFor(server) {
+        if (server instanceof ApplicationServer) return server.panelURL;
+        return `${this.client.domain}/server/${server}`;
+    }
+
+    /**
+     * Returns a formatted URL to the server in the admin panel.
+     * @param {number|ApplicationServer} server The server or server ID.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(server) {
+        if (server instanceof ApplicationServer) return server.adminURL;
+        return `${this.client.domain}/admin/servers/view/${server}`;
+    }
+
+    /**
      * Fetches a server from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the server.
      * @param {object} [options] Additional fetch options.
@@ -104,7 +124,7 @@ class ApplicationServerManager {
             if (s) return Promise.resolve(s);
         }
 
-        const query = build(options, { includes: ApplicationServerManager.INCLUDES });
+        const query = build(options, { include: ApplicationServerManager.INCLUDES });
         const data = await this.client.requests.get(
             (id ? endpoints.servers.get(id) : endpoints.servers.main) + query
         );

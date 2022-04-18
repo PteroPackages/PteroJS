@@ -87,7 +87,7 @@ class PteroApp {
     }
 
     get ping() {
-        return this.requests.ping;
+        return this.requests._ping;
     }
 }
 

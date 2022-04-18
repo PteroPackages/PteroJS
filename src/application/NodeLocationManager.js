@@ -77,6 +77,15 @@ class NodeLocationManager {
     }
 
     /**
+     * Returns a formatted URL to the node location in the admin panel.
+     * @param {number} id The ID of the node location.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(id) {
+        return `${this.client.domain}/admin/locations/view/${id}`;
+    }
+
+    /**
      * Fetches a node location from the Pterodactyl API with an optional cache check.
      * @param {number} [id] The ID of the location.
      * @param {object} [options] Additional fetch options.
@@ -91,10 +100,10 @@ class NodeLocationManager {
         }
 
         const query = build(options, { include: NodeLocationManager.INCLUDES });
-        const data = await this.client.requests.make(
+        const data = await this.client.requests.get(
             (id ? endpoints.locations.get(id) : endpoints.locations.main) + query
         );
-        return this.patch(data);
+        return this._patch(data);
     }
 
     /**

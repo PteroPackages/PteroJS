@@ -63,8 +63,18 @@ class NodeManager {
         if (obj instanceof Node) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string') return this.cache.find(n => n.name === obj);
-        if (obj.relationships?.nodes) return this._patch(obj.relationships.nodes);
+        if (obj.relationships?.node) return this._patch(obj.relationships.node);
         return undefined;
+    }
+
+    /**
+     * Returns a formatted URL to the node in the admin panel.
+     * @param {number|Node} node The node or ID of the node.
+     * @returns {string} The formatted URL.
+     */
+    adminURLFor(node) {
+        if (node instanceof Node) return node.adminURL;
+        return `${this.client.domain}/admin/nodes/view/${node}`;
     }
 
     /**
