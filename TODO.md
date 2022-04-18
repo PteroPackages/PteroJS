@@ -34,7 +34,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] TypeScript support (`index.d.ts`)
 - [X] Investigate incorrectly documented endpoints
 - [X] Implement tests in `/tests` (or move from `/test`)
-- [ ] Remove deprecated `PteroUser#tfa`
+- [X] Remove deprecated `PteroUser#tfa`
 - [X] Remove deprecated `Presets` util
 
 ## Feature Plans
