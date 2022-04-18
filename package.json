@@ -1,6 +1,6 @@
 {
   "name": "@devnote-dev/pterojs",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A flexibile API wrapper for Pterodactyl",
   "main": "src/index.js",
   "scripts": {
