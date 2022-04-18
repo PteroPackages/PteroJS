@@ -1,6 +1,13 @@
 import type { Node } from './Node';
+import type { PteroUser } from './User';
 import type { PteroApp } from '../application/app';
 import { Limits, FeatureLimits } from '../common';
+import {
+    UpdateBuildOptions,
+    UpdateDetailsOptions,
+    UpdateStartupOptions
+} from '../common/app';
+import caseConv from '../util/caseConv';
 
 export class ApplicationServer {
     public client: PteroApp;
@@ -42,9 +49,8 @@ export class ApplicationServer {
     /**
      * The owner of the server. This is not fetched by default and must be
      * retrieved by including 'user' in ApplicationServerManager#fetch.
-     * @todo
      */
-    public owner: null;
+    public owner: PteroUser | undefined;
 
     /** The ID of the node the server is on. */
     public nodeId: number;
@@ -53,7 +59,7 @@ export class ApplicationServer {
      * The node the server is on. This is not fetched by default and must be
      * retrieved by including 'node' in ApplicationServerManager#fetch.
      */
-    public node: Node;
+    public node: Node | undefined;
 
     /** The ID of the allocation for the server. */
     public allocation: number;
@@ -75,5 +81,87 @@ export class ApplicationServer {
         this._patch(data);
     }
 
-    _patch(data: any) {}
+    _patch(data: any): void {
+        if ('external_id' in data) this.externalId = data.external_id;
+        if ('name' in data) this.name = data.name;
+        if ('description' in data) this.description = data.description || undefined;
+        if ('suspended' in data) this.suspended = data.suspended;
+        if ('limits' in data) this.limits = data.limits;
+        if ('feature_limits' in data) this.featureLimits = data.feature_limits;
+        if ('user' in data) this.ownerId = data.user;
+        if ('node' in data) this.nodeId = data.node;
+        if ('allocation' in data) this.allocation = data.allocation;
+        if ('nest' in data) this.nest = data.nest;
+        if ('egg' in data) this.egg = data.egg;
+
+        if ('relationships' in data) {
+            this.owner = this.client.users.resolve(data);
+            this.node = this.client.nodes.resolve(data);
+        }
+    }
+
+    /**
+     * Returns a formatted URL to the server.
+     * @returns The formatted URL.
+     */
+    get panelURL(): string {
+        return `${this.client.domain}/server/${this.identifier}`;
+    }
+
+    /**
+     * Returns a formatted URL to the server in the admin panel.
+     * @returns The formatted URL.
+     */
+    get adminURL(): string {
+        return `${this.client.domain}/admin/servers/view/${this.id}`;
+    }
+
+    /**
+     * Fetches the PteroUser object of the server owner.
+     * The user can be accessed via {@link ApplicationServer.owner}.
+     * @returns The fetched user.
+     */
+    async fetchOwner(): Promise<PteroUser> {
+        if (this.owner) return this.owner;
+        const user = await this.client.users.fetch(this.ownerId, { force: true });
+        this.owner = user;
+        return user;
+    }
+
+    async updateDetails(options: UpdateDetailsOptions): Promise<this> {
+        const data = await this.client.servers.updateDetails(this.id, options);
+        this._patch(data.toJSON());
+        return this;
+    }
+
+    async updateBuild(options: UpdateBuildOptions): Promise<this> {
+        const data = await this.client.servers.updateBuild(this.id, options);
+        this._patch(data);
+        return this;
+    }
+
+    async updateStartup(options: UpdateStartupOptions) {}
+
+    async suspend(): Promise<void> {
+        await this.client.servers.suspend(this.id);
+    }
+
+    async unsuspend(): Promise<void> {
+        await this.client.servers.unsuspend(this.id);
+    }
+
+    async reinstall(): Promise<void> {
+        await this.client.servers.reinstall(this.id);
+    }
+
+    toJSON(): object {
+        return caseConv.toSnakeCase(this, {
+            ignore:['client', 'user', 'node'],
+            map:{ ownerId: 'user', nodeId: 'node' }
+        });
+    }
+
+    toString(): string {
+        return this.name;
+    }
 }

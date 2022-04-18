@@ -63,4 +63,8 @@ export class PteroApp {
         this.users = new UserManager(this);
         this.requests = new RestRequestManager('Application', domain, auth);
     }
+
+    get ping(): number {
+        return this.requests._ping;
+    }
 }

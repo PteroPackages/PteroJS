@@ -12,6 +12,8 @@ import {
     Resolvable,
     Sort
 } from '../common';
+import { UpdateBuildOptions, UpdateDetailsOptions, UpdateStartupOptions } from '../common/app';
+import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
 export class ApplicationServerManager extends BaseManager {
@@ -137,6 +139,62 @@ export class ApplicationServerManager extends BaseManager {
             this
         );
         return this._patch(data) as any;
+    }
+
+    async updateDetails(
+        id: number,
+        options: UpdateDetailsOptions
+    ): Promise<ApplicationServer> {
+        if (!Object.keys(options).length)
+            throw new Error('Too few options to update the server.');
+
+        const server = await this.fetch(id, { force: true });
+        options.name ||= server.name;
+        options.owner ??= server.ownerId;
+        options.externalId ||= server.externalId;
+        options.description ||= server.description;
+
+        const payload = caseConv.toSnakeCase(options, { map:{ owner: 'user' }});
+        const data = await this.client.requests.patch(
+            endpoints.servers.build(id), payload
+        );
+        return this._patch(data) as any;
+    }
+
+    async updateBuild(
+        id: number,
+        options: UpdateBuildOptions
+    ): Promise<ApplicationServer> {
+        if (!Object.keys(options).length)
+            throw new Error('Too few options to update the server.');
+
+        const server = await this.fetch(id, { force: true });
+        options = Object.assign(server.limits, options);
+        options = Object.assign(server.featureLimits, options);
+        options.allocation ??= server.allocation;
+
+        const data = await this.client.requests.patch(
+            endpoints.servers.build(id),
+            caseConv.toSnakeCase(options)
+        );
+        return this._patch(data) as any;
+    }
+
+    async updateStartup(
+        id: number,
+        options: UpdateStartupOptions
+    ) {}
+
+    async suspend(id: number): Promise<void> {
+        await this.client.requests.post(endpoints.servers.suspend(id));
+    }
+
+    async unsuspend(id: number): Promise<void> {
+        await this.client.requests.post(endpoints.servers.unsuspend(id));
+    }
+
+    async reinstall(id: number): Promise<void> {
+        await this.client.requests.post(endpoints.servers.reinstall(id));
     }
 
     async delete(
