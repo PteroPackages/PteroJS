@@ -82,7 +82,7 @@ class PteroClient extends EventEmitter {
     }
 
     get ping() {
-        return this.requests.ping;
+        return this.requests._ping;
     }
 
     /**

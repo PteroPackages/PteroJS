@@ -10,18 +10,18 @@ const { version } = require('../../package.json');
 class RequestManager extends EventEmitter {
     constructor(type, domain, auth) {
         super();
-        this.type = type;
-        this.domain = domain;
-        this.auth = auth;
-        this.ping = -1;
+        this._type = type;
+        this._domain = domain;
+        this._auth = auth;
+        this._ping = -1;
     }
 
     getHeaders() {
         return {
-            'User-Agent': `${this.type} PteroJS v${version}`,
+            'User-Agent': `${this._type} PteroJS v${version}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': `Bearer ${this.auth}`
+            'Authorization': `Bearer ${this._auth}`
         }
     }
 
@@ -38,17 +38,17 @@ class RequestManager extends EventEmitter {
      */
     async _make(path, params, method = 'GET') {
         const body = params?.raw ?? (params ? JSON.stringify(params) : null);
-        this.#debug(`sending request: ${method} ${this.domain + path}`);
+        this.#debug(`sending request: ${method} ${this._domain + path}`);
 
         const start = Date.now();
-        const res = await fetch(this.domain + path, {
+        const res = await fetch(this._domain + path, {
             method,
             body,
             headers: this.getHeaders()
         });
-        this.ping = Date.now() - start;
+        this._ping = Date.now() - start;
 
-        this.#debug(`received status: ${res.status} (${this.ping}ms)`);
+        this.#debug(`received status: ${res.status} (${this._ping}ms)`);
 
         if ([202, 204].includes(res.status)) return null;
         let data;
