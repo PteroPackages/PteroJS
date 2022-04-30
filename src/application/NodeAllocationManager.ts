@@ -9,13 +9,13 @@ export class NodeAllocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Dict<number, Allocation>>;
 
-    get FILTERS(): [] { return [] }
+    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
     get INCLUDES() {
         return Object.freeze(['node', 'server']);
     }
 
-    get SORTS(): [] { return [] }
+    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();
@@ -95,9 +95,8 @@ export class NodeAllocationManager extends BaseManager {
         );
     }
 
-    async delete(node: number, id: number): Promise<true> {
+    async delete(node: number, id: number): Promise<void> {
         await this.client.requests.delete(endpoints.nodes.allocations.get(node, id));
         this.cache.get(node)?.delete(id);
-        return true;
     }
 }

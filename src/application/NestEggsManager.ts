@@ -9,7 +9,7 @@ export class NestEggsManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Egg>;
 
-    get FILTERS(): [] { return [] }
+    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze([
@@ -18,7 +18,7 @@ export class NestEggsManager extends BaseManager {
         ]);
     }
 
-    get SORTS(): [] { return [] }
+    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();

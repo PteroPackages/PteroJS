@@ -27,7 +27,7 @@ export class UserManager extends BaseManager {
         ]);
     }
 
-    get INCLUDES(): Readonly<string[]> { return [] }
+    get INCLUDES(): Readonly<string[]> { return Object.freeze([]); }
 
     get SORTS(): Readonly<string[]> {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
@@ -137,7 +137,7 @@ export class UserManager extends BaseManager {
         );
 
         const data = await this.client.requests.post(
-            endpoints.users.main, options
+            endpoints.users.main, payload
         );
         return this._patch(data) as PteroUser;
     }
@@ -161,10 +161,9 @@ export class UserManager extends BaseManager {
         return this._patch(data) as any;
     }
 
-    async delete(user: number | PteroUser): Promise<true> {
+    async delete(user: number | PteroUser): Promise<void> {
         const id = typeof user === 'number' ? user : user.id;
         await this.client.requests.delete(endpoints.users.get(id));
         this.cache.delete(id);
-        return true;
     }
 }

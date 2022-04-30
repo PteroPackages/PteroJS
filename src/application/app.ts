@@ -30,7 +30,7 @@ export class PteroApp {
      */
     public auth: string;
 
-    public options: { [key: string]: OptionSpec };
+    public options: Record<string, OptionSpec>;
 
     public allocations: NodeAllocationManager;
     public locations: NodeLocationManager;
@@ -43,7 +43,7 @@ export class PteroApp {
     constructor(
         domain: string,
         auth: string,
-        options: { [key: string]: OptionSpec } = {}
+        options: Record<string, OptionSpec> = {}
     ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new SyntaxError(

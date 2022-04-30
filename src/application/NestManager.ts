@@ -8,13 +8,13 @@ export class NestManager extends BaseManager {
     public client: PteroApp;
     public cache: Set<Nest>;
     
-    get FILTERS(): [] { return [] };
+    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze(['eggs', 'servers']);
     }
 
-    get SORTS(): [] { return [] }
+    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();

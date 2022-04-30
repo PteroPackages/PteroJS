@@ -39,7 +39,7 @@ export interface CreateServerOptions {
     egg:            number;
     image:          string;
     startup:        string;
-    env:            { [key: string]: string };
+    env:            Record<string, string>;
     allocation:     number;
     limits:         Partial<Limits>;
     featureLimits:  Partial<FeatureLimits>;
@@ -54,14 +54,14 @@ export interface Egg {
     author:         string;
     dockerImage:    string;
     config:{
-        files:      { [key: string]: any };
-        startup:    { [key: string]: any };
+        files:      Record<string, any>;
+        startup:    Record<string, any>;
         stop:       string;
-        logs:       { [key: string]: any };
+        logs:       Record<string, any>;
         extends:    string | null;
     };
     startup:        string;
-    script:         { [key: string]: string | boolean | null };
+    script:         Record<string, string | boolean | null>;
     createdAt:      Date;
     updatedAt:      Date | undefined;
 }
@@ -117,7 +117,7 @@ export interface UpdateDetailsOptions {
 
 export interface UpdateStartupOptions {
     startup?:       string;
-    environment?:   { [key: string]: string };
+    environment?:   Record<string, string>;
     egg?:           number;
     image?:         string;
     skipScripts?:   boolean;

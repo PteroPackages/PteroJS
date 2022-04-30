@@ -24,7 +24,7 @@ export class NodeLocationManager extends BaseManager {
         return Object.freeze(['nodes', 'servers']);
     }
 
-    get SORTS(): Readonly<[]> { return [] }
+    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();
@@ -134,9 +134,8 @@ export class NodeLocationManager extends BaseManager {
         return this._patch(data) as NodeLocation;
     }
 
-    async delete(id: number): Promise<true> {
+    async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.locations.get(id));
         this.cache.delete(id);
-        return true;
     }
 }

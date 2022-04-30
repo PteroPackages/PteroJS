@@ -6,7 +6,7 @@ export type Sort<T> = { sort?: string } & T;
 export type Resolvable<T> =
     | string
     | number
-    | { [key: string]: any }
+    | Record<string, any>
     | T;
 
 export interface DaemonData {
@@ -28,8 +28,8 @@ export interface FetchOptions {
 }
 
 export interface FileConfig {
-    application?:   { [key: string]: OptionSpec };
-    client?:        { [key: string]: OptionSpec };
+    application?:   Record<string, OptionSpec>;
+    client?:        Record<string, OptionSpec>;
 }
 
 export interface Limits {

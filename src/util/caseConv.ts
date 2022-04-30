@@ -1,7 +1,7 @@
 interface ConvertOptions {
     ignore?:    string[];
-    map?:       { [key: string]: string };
-    cast?:      { [key: string]: object };
+    map?:       Record<string, string>;
+    cast?:      Record<string, any>;
 }
 
 function camelCase(str: string): string {

@@ -12,7 +12,11 @@ import {
     Resolvable,
     Sort
 } from '../common';
-import { UpdateBuildOptions, UpdateDetailsOptions, UpdateStartupOptions } from '../common/app';
+import {
+    UpdateBuildOptions,
+    UpdateDetailsOptions,
+    UpdateStartupOptions
+} from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -125,7 +129,9 @@ export class ApplicationServerManager extends BaseManager {
         entity: string,
         options: Filter<Sort<{}>>
     ): Promise<Dict<number, ApplicationServer>> {
-        if (!options.sort && !options.filter) throw new Error('Sort or filter is required.');
+        if (!options.sort && !options.filter)
+            throw new Error('Sort or filter is required.');
+
         if (options.filter === 'identifier') options.filter = 'uuidShort';
         if (options.filter === 'externalId') options.filter = 'external_id';
 
@@ -200,12 +206,11 @@ export class ApplicationServerManager extends BaseManager {
     async delete(
         server: number | ApplicationServer,
         force: boolean = false
-    ): Promise<true> {
+    ): Promise<void> {
         const id = typeof server === 'number' ? server : server.id;
         await this.client.requests.delete(
             endpoints.servers.get(id) + (force ? '/force' : '')
         );
         this.cache.delete(id);
-        return true;
     }
 }

@@ -1,5 +1,5 @@
 import { FetchOptions, Include, Sort, FilterArray } from '../common';
-export type AllowedQueryOptions = {
+export interface AllowedQueryOptions {
     filters:    readonly string[];
     includes:   readonly string[];
     sorts:      readonly string[];

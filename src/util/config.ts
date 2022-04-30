@@ -48,16 +48,16 @@ const DEFAULT = {
 }
 
 function parseAs(
-    from: { [key: string]: any },
-    to: { [key: string]: any }
-): { [key: string]: any } {
+    from: Record<string, any>,
+    to: Record<string, any>
+): Record<string, any> {
     const res: { [key: string]: any } = {};
     for (const [k, v] of Object.entries(to)) res[k] = k in from ? from[k] : v;
     for (const [k, v] of Object.entries(res)) if (v.max === -1) res[k].max = Infinity;
     return res;
 }
 
-function appConfig(options?: FileConfig): { [key: string]: OptionSpec } {
+function appConfig(options?: FileConfig): Record<string, OptionSpec> {
     if (
         options !== undefined &&
         typeof options === 'object' &&
@@ -71,7 +71,7 @@ function appConfig(options?: FileConfig): { [key: string]: OptionSpec } {
     }
 }
 
-function clientConfig(options?: FileConfig): { [key: string]: OptionSpec | any } {
+function clientConfig(options?: FileConfig): Record<string, OptionSpec | any> {
     if (
         options !== undefined &&
         typeof options === 'object' &&

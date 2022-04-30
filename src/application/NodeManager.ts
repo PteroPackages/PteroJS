@@ -140,10 +140,9 @@ export class NodeManager extends BaseManager {
         return this._patch(data) as Node;
     }
 
-    async delete(node: number | Node): Promise<true> {
+    async delete(node: number | Node): Promise<void> {
         const id = typeof node === 'number' ? node : node.id;
         await this.client.requests.delete(endpoints.nodes.get(id));
         this.cache.delete(id);
-        return true;
     }
 }
