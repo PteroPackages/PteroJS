@@ -66,10 +66,8 @@ export class NodeManager extends BaseManager {
         return undefined;
     }
 
-    adminURLFor(node: number | Node): string {
-        return `${this.client.domain}/admin/nodes/view/${
-            typeof node === 'number' ? node : node.id
-        }`;
+    adminURLFor(id: number): string {
+        return `${this.client.domain}/admin/nodes/view/${id}`;
     }
 
     async fetch<T extends number | undefined>(
@@ -96,7 +94,7 @@ export class NodeManager extends BaseManager {
         if (options.filter === 'daemonTokenId') options.filter = 'daemon_token_id';
 
         const payload: FilterArray<Sort<{}>> = {};
-        if (options.filter) payload.filter = [entity, options.filter];
+        if (options.filter) payload.filter = [options.filter, entity];
         if (options.sort) payload.sort = options.sort;
 
         const data = await this.client.requests.get(

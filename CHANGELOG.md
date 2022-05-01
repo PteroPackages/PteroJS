@@ -14,6 +14,7 @@ All changes to PteroJS as of v2.
 - all application and client managers now extend `BaseManager`
 
 ### Deprecated
+- `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead
 
 ### Removed
 - useless value return types (e.g. `Promise<true>` which should be `Promise<void>`)

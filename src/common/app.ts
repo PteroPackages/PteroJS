@@ -46,24 +46,32 @@ export interface CreateServerOptions {
 }
 
 export interface Egg {
-    id:             number;
-    uuid:           string;
-    nest:           number;
-    name:           string;
-    description:    string;
-    author:         string;
-    dockerImage:    string;
+    id:                 number;
+    uuid:               string;
+    nest:               number;
+    name:               string;
+    description:        string;
+    author:             string;
+    dockerImage:        string;
+    dockerImages:       string[]; // not sure why this is here
     config:{
-        files:      Record<string, any>;
-        startup:    Record<string, any>;
-        stop:       string;
-        logs:       Record<string, any>;
-        extends:    string | null;
+        files:          Record<string, any>;
+        startup:        Record<string, any>;
+        stop:           string;
+        logs:           string[];
+        fileDenylist:   string[];
+        extends:        string | null;
     };
-    startup:        string;
-    script:         Record<string, string | boolean | null>;
-    createdAt:      Date;
-    updatedAt:      Date | undefined;
+    startup:            string;
+    script:{
+        privileged:     boolean;
+        install:        string;
+        entry:          string;
+        container:      string;
+        extends:        string | null;
+    }
+    createdAt:          Date;
+    updatedAt:          Date | undefined;
 }
 
 export interface Nest {

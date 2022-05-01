@@ -103,7 +103,7 @@ export class NodeLocationManager extends BaseManager {
         if (!options.sort && !options.filter) throw new Error('Sort or filter is required.');
 
         const payload: FilterArray<Sort<{}>> = {};
-        if (options.filter) payload.filter = [entity, options.filter];
+        if (options.filter) payload.filter = [options.filter, entity];
         if (options.sort) payload.sort = options.sort;
 
         const data = await this.client.requests.get(

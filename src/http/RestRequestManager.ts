@@ -28,7 +28,7 @@ export class RestRequestManager extends EventEmitter {
         this._ping = -1;
     }
 
-    getHeaders(): { [key: string]: string } {
+    getHeaders(): Record<string, string> {
         return {
             'User-Agent': `${this._type} PteroJS v${version}`,
             'Content-Type': 'application/json',
@@ -52,6 +52,9 @@ export class RestRequestManager extends EventEmitter {
             else body = JSON.stringify(params);
         }
 
+        this.debug(
+            `fetching: ${method} ${this._domain}/api/${this._type.toLowerCase()}${path}`
+        );
         const start = Date.now();
         const res = await fetch(
             `${this._domain}/api/${this._type.toLowerCase()}${path}`,
@@ -107,7 +110,7 @@ export class RestRequestManager extends EventEmitter {
         return this._make(path, data, 'PUT');
     }
 
-    async delete(path: string) {
-        return this._make(path, undefined, 'DELETE');
+    async delete(path: string): Promise<void> {
+        return this._make(path, undefined, 'DELETE') as Promise<void>;
     }
 }

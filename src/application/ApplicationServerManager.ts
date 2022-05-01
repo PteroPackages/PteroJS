@@ -95,16 +95,12 @@ export class ApplicationServerManager extends BaseManager {
         return undefined;
     }
 
-    adminURLFor(server: number | ApplicationServer): string {
-        return `${this.client.domain}/admin/servers/view/${
-            typeof server === 'number' ? server : server.id
-        }`;
+    adminURLFor(id: number): string {
+        return `${this.client.domain}/admin/servers/view/${id}`;
     }
 
-    panelURLFor(server: string | ApplicationServer): string {
-        return `${this.client.domain}/server/${
-            typeof server === 'string' ? server : server.identifier
-        }`;
+    panelURLFor(id: string): string {
+        return `${this.client.domain}/server/${id}`;
     }
 
     async fetch<T extends number | undefined>(
@@ -136,7 +132,7 @@ export class ApplicationServerManager extends BaseManager {
         if (options.filter === 'externalId') options.filter = 'external_id';
 
         const payload: FilterArray<Sort<{}>> = {};
-        if (options.filter) payload.filter = [entity, options.filter];
+        if (options.filter) payload.filter = [options.filter, entity];
         if (options.sort) payload.sort = options.sort;
 
         const data = await this.client.requests.get(
@@ -162,7 +158,7 @@ export class ApplicationServerManager extends BaseManager {
 
         const payload = caseConv.toSnakeCase(options, { map:{ owner: 'user' }});
         const data = await this.client.requests.patch(
-            endpoints.servers.build(id), payload
+            endpoints.servers.details(id), payload
         );
         return this._patch(data) as any;
     }

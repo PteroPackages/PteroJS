@@ -2,8 +2,8 @@ import type { ApplicationServer } from './ApplicationServer';
 import type { Dict } from './Dict';
 import type { PteroApp } from '../application/app';
 import { DaemonData, NodeLocation } from '../common';
-import caseConv from '../util/caseConv';
 import { CreateNodeOptions, NodeConfiguration } from '../common/app';
+import caseConv from '../util/caseConv';
 
 export class Node {
     public readonly client: PteroApp;
@@ -32,7 +32,7 @@ export class Node {
 
     public behindProxy: boolean;
 
-    public maintainance: boolean;
+    public maintenance: boolean;
 
     public memory: number;
 
@@ -63,7 +63,7 @@ export class Node {
         if ('fqdn' in data) this.fqdn = data.fqdn;
         if ('scheme' in data) this.scheme = data.scheme;
         if ('behind_proxy' in data) this.behindProxy = data.behind_proxy;
-        if ('maintenance_mode' in data) this.maintainance = data.maintainance_mode;
+        if ('maintenance_mode' in data) this.maintenance = data.maintenance_mode;
         if ('memory' in data) this.memory = data.memory;
         if ('memory_overallocate' in data) this.overallocatedMemory = data.memory_overallocate;
         if ('disk' in data) this.disk = data.disk;

@@ -69,23 +69,25 @@ export class UserManager extends BaseManager {
         return undefined;
     }
 
-    adminURLFor(user: number | PteroUser): string {
-        return `${this.client.domain}/admin/users/view/${
-            typeof user === 'number' ? user : user.id
-        }`;
+    adminURLFor(id: number): string {
+        return `${this.client.domain}/admin/users/view/${id}`;
     }
 
-    async fetch<T extends number | undefined>(
+    async fetch<T extends number | string | undefined>(
         id?: T,
         options: External<Include<FetchOptions>> = {}
     ): Promise<T extends undefined ? Dict<number, PteroUser> : PteroUser> {
-        if (id && !options.force) {
+        if (typeof id === 'number' && !options.force) {
             const u = this.cache.get(id);
             if (u) return Promise.resolve<any>(u);
         }
+        if (typeof id === 'string' && !options.external)
+            throw new TypeError("The 'external' option must be set to fetch externally");
 
         const data = await this.client.requests.get(
-            (id ? endpoints.users.get(id) : endpoints.users.main),
+            options.external && id
+                ? endpoints.users.ext(id as string)
+                : (id ? endpoints.users.get(id as number) : endpoints.users.main),
             options, this
         );
         return this._patch(data) as any;
@@ -113,7 +115,7 @@ export class UserManager extends BaseManager {
         if (options.filter === 'externalId') options.filter = 'external_id';
 
         const payload: FilterArray<Sort<{}>> = {};
-        if (options.filter) payload.filter = [entity, options.filter];
+        if (options.filter) payload.filter = [options.filter, entity];
         if (options.sort) payload.sort = options.sort;
 
         const data = await this.client.requests.get(

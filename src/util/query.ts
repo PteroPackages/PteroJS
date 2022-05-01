@@ -1,8 +1,8 @@
 import { FetchOptions, Include, Sort, FilterArray } from '../common';
 export interface AllowedQueryOptions {
-    filters:    readonly string[];
-    includes:   readonly string[];
-    sorts:      readonly string[];
+    filters:    Readonly<string[]>;
+    includes:   Readonly<string[]>;
+    sorts:      Readonly<string[]>;
 }
 
 /**

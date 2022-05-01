@@ -95,8 +95,13 @@ export class ApplicationServer {
         if ('egg' in data) this.egg = data.egg;
 
         if ('relationships' in data) {
-            this.owner = this.client.users.resolve(data);
-            this.node = this.client.nodes.resolve(data);
+            this.owner = 'user' in data['relationships']
+                ? this.client.users.resolve(data)
+                : undefined;
+
+            this.node = 'node' in data['relationships']
+                ? this.client.nodes.resolve(data)
+                : undefined;
         }
     }
 
