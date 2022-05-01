@@ -2,7 +2,7 @@ import type { PteroApp } from './app';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { CreateUserOptions } from '../common/app';
-import { PteroUser } from '../structures/User';
+import { User } from '../structures/User';
 import { UpdateUserOptions } from '../common/app';
 import {
     External,
@@ -18,7 +18,7 @@ import endpoints from './endpoints';
 
 export class UserManager extends BaseManager {
     public client: PteroApp;
-    public cache: Dict<number, PteroUser>;
+    public cache: Dict<number, User>;
 
     get FILTERS(): Readonly<string[]> {
         return Object.freeze([
@@ -36,14 +36,14 @@ export class UserManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, PteroUser>();
+        this.cache = new Dict<number, User>();
     }
 
-    _patch(data: any): PteroUser | Dict<number, PteroUser> {
+    _patch(data: any): User | Dict<number, User> {
         if (data?.data) {
-            const res = new Dict<number, PteroUser>();
+            const res = new Dict<number, User>();
             for (const obj of data.data) {
-                const s = new PteroUser(this.client, obj.attributes);
+                const s = new User(this.client, obj.attributes);
                 res.set(s.id, s);
             }
             if (this.client.options.servers.cache) res.forEach(
@@ -52,19 +52,19 @@ export class UserManager extends BaseManager {
             return res;
         }
 
-        const s = new PteroUser(this.client, data.attributes);
+        const s = new User(this.client, data.attributes);
         if (this.client.options.servers.cache) this.cache.set(s.id, s);
         return s;
     }
 
-    resolve(obj: Resolvable<PteroUser>): PteroUser | undefined {
-        if (obj instanceof PteroUser) return obj;
+    resolve(obj: Resolvable<User>): User | undefined {
+        if (obj instanceof User) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string') return this.cache.find(
             s => (s.username === obj) || (s.firstname === obj) || (s.lastname === obj)
         );
         if (obj.relationships?.user)
-            return this._patch(obj.relationships.user) as PteroUser;
+            return this._patch(obj.relationships.user) as User;
 
         return undefined;
     }
@@ -76,7 +76,7 @@ export class UserManager extends BaseManager {
     async fetch<T extends number | string | undefined>(
         id?: T,
         options: External<Include<FetchOptions>> = {}
-    ): Promise<T extends undefined ? Dict<number, PteroUser> : PteroUser> {
+    ): Promise<T extends undefined ? Dict<number, User> : User> {
         if (typeof id === 'number' && !options.force) {
             const u = this.cache.get(id);
             if (u) return Promise.resolve<any>(u);
@@ -94,7 +94,7 @@ export class UserManager extends BaseManager {
     }
 
     /** @deprecated Use {@link UserManager.fetch} with `options.external`. */
-    async fetchExternal(id: string, options: Include<FetchOptions>): Promise<PteroUser> {
+    async fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
         if (!options.force) {
             const u = this.cache.find(u => u.externalId === id);
             if (u) return Promise.resolve<any>(u);
@@ -109,7 +109,7 @@ export class UserManager extends BaseManager {
     async query(
         entity: string,
         options: Filter<Sort<{}>>
-    ): Promise<Dict<number, PteroUser>> {
+    ): Promise<Dict<number, User>> {
         if (!options.sort && !options.filter) throw new Error('Sort or filter is required.');
         if (options.filter === 'identifier') options.filter = 'uuidShort';
         if (options.filter === 'externalId') options.filter = 'external_id';
@@ -126,7 +126,7 @@ export class UserManager extends BaseManager {
         return this._patch(data) as any;
     }
 
-    async create(options: CreateUserOptions): Promise<PteroUser> {
+    async create(options: CreateUserOptions): Promise<User> {
         const payload = caseConv.toSnakeCase(
             options,
             {
@@ -141,11 +141,10 @@ export class UserManager extends BaseManager {
         const data = await this.client.requests.post(
             endpoints.users.main, payload
         );
-        return this._patch(data) as PteroUser;
+        return this._patch(data) as User;
     }
 
-    async update(user: number | PteroUser, options: UpdateUserOptions): Promise<PteroUser> {
-        const id = typeof user === 'number' ? user : user.id;
+    async update(id: number, options: UpdateUserOptions): Promise<User> {
         const payload = caseConv.toSnakeCase(
             options,
             {
@@ -163,8 +162,7 @@ export class UserManager extends BaseManager {
         return this._patch(data) as any;
     }
 
-    async delete(user: number | PteroUser): Promise<void> {
-        const id = typeof user === 'number' ? user : user.id;
+    async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.users.get(id));
         this.cache.delete(id);
     }

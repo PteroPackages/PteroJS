@@ -12,6 +12,10 @@ All changes to PteroJS as of v2.
 ### Changed
 - `RequestManager` -> `RestRequestManager`
 - all application and client managers now extend `BaseManager`
+- renamed user classes to reflect the API
+- `PteroUser` is now `User`
+- `PteroSubUser` is now `SubUser`
+- `ClientUser` is now `Account`
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead

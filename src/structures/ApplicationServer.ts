@@ -1,5 +1,5 @@
 import type { Node } from './Node';
-import type { PteroUser } from './User';
+import type { User } from './User';
 import type { PteroApp } from '../application/app';
 import { Limits, FeatureLimits } from '../common';
 import {
@@ -50,7 +50,7 @@ export class ApplicationServer {
      * The owner of the server. This is not fetched by default and must be
      * retrieved by including 'user' in ApplicationServerManager#fetch.
      */
-    public owner: PteroUser | undefined;
+    public owner: User | undefined;
 
     /** The ID of the node the server is on. */
     public nodeId: number;
@@ -122,11 +122,11 @@ export class ApplicationServer {
     }
 
     /**
-     * Fetches the PteroUser object of the server owner.
+     * Fetches the User object of the server owner.
      * The user can be accessed via {@link ApplicationServer.owner}.
      * @returns The fetched user.
      */
-    async fetchOwner(): Promise<PteroUser> {
+    async fetchOwner(): Promise<User> {
         if (this.owner) return this.owner;
         const user = await this.client.users.fetch(this.ownerId, { force: true });
         this.owner = user;

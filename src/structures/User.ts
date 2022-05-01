@@ -49,7 +49,7 @@ export abstract class BaseUser {
     }
 }
 
-export class PteroUser extends BaseUser {
+export class User extends BaseUser {
     public readonly uuid: string;
 
     public readonly createdAt: Date;
@@ -90,7 +90,7 @@ export class PteroUser extends BaseUser {
     }
 }
 
-export class PteroSubUser extends BaseUser {
+export class SubUser extends BaseUser {
     public readonly uuid: string;
     private _server: string;
 
@@ -116,4 +116,4 @@ export class PteroSubUser extends BaseUser {
     }
 }
 
-export class ClientUser extends BaseUser {}
+export class Account extends BaseUser {}
