@@ -1,11 +1,13 @@
 import type { ApplicationServer } from './ApplicationServer';
 import type { PteroApp } from '../application/app';
+import type { PteroClient } from '../client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
 import caseConv from '../util/caseConv';
+import endpoints from '../client/endpoints';
 
 export abstract class BaseUser {
-    public client: PteroApp;
+    public client: PteroApp | PteroClient;
 
     public readonly id: number;
 
@@ -19,7 +21,7 @@ export abstract class BaseUser {
 
     public language: string;
 
-    constructor(client: PteroApp, data: any) {
+    constructor(client: PteroApp | PteroClient, data: any) {
         this.client = client;
         this.id = data.id;
 
@@ -116,4 +118,26 @@ export class SubUser extends BaseUser {
     }
 }
 
-export class Account extends BaseUser {}
+export class Account extends BaseUser {
+    public override id: number;
+    public isAdmin: boolean;
+    public tokens: string[];
+    public apikeys: any[];
+
+    constructor(public client: PteroClient) {
+        super(client, {});
+
+        this.isAdmin = false;
+        this.tokens = [];
+        this.apikeys = [];
+    }
+
+    async fetch(): Promise<this> {
+        const data: any = await this.client.requests.get(endpoints.account.main, {});
+        super._patch(data.attributes);
+
+        this.id = data.attributes.id;
+        this.isAdmin = data.attributes.admin;
+        return this;
+    }
+}
