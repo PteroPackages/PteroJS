@@ -12,6 +12,9 @@ export { NodeLocationManager } from './application/NodeLocationManager';
 export { NodeManager } from './application/NodeManager';
 export { UserManager } from './application/UserManager';
 
+// Client API
+export { PteroClient } from './client';
+
 // Commons
 export * from './common';
 export * from './common/app';
