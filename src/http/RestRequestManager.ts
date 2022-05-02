@@ -92,9 +92,9 @@ export class RestRequestManager extends EventEmitter {
     async get(
         path: string,
         params: FetchOptions,
-        cls: BaseManager
+        cls?: BaseManager
     ): Promise<object | Buffer> {
-        const query = buildQuery(params, cls.getQueryOptions());
+        const query = buildQuery(params, cls?.getQueryOptions() || {} as any);
         return this._make(path + query, undefined, 'GET') as object | Buffer;
     }
 
