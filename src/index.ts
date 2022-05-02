@@ -14,6 +14,8 @@ export { UserManager } from './application/UserManager';
 
 // Client API
 export { PteroClient } from './client';
+export { Shard } from './client/ws/Shard';
+export { WebSocketManager } from './client/ws/WebSocketManager';
 
 // Commons
 export * from './common';

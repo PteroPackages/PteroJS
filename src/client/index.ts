@@ -1,5 +1,6 @@
 import { Account } from '../structures/User';
 import { RestRequestManager } from '../http/RestRequestManager';
+import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
 import loader from '../util/config';
 
@@ -10,6 +11,7 @@ export class PteroClient {
     public account: Account;
 
     public requests: RestRequestManager;
+    public ws: WebSocketManager;
 
     constructor(
         domain: string,
@@ -28,6 +30,7 @@ export class PteroClient {
         this.account = new Account(this);
 
         this.requests = new RestRequestManager('Client', domain, auth);
+        this.ws = new WebSocketManager(this);
     }
 
     get ping(): number {
