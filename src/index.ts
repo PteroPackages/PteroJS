@@ -14,6 +14,7 @@ export { UserManager } from './application/UserManager';
 
 // Client API
 export { PteroClient } from './client';
+export { ClientServerManager } from './client/ClientServerManager';
 export { Shard } from './client/ws/Shard';
 export { WebSocketManager } from './client/ws/WebSocketManager';
 
@@ -27,6 +28,7 @@ export { RestRequestManager } from './http/RestRequestManager';
 // Structures
 export { ApplicationServer } from './structures/ApplicationServer';
 export { BaseManager } from './structures/BaseManager';
+export { ClientServer } from './structures/ClientServer';
 export * from './structures/Dict';
 export * from './structures/Errors';
 export { Node } from './structures/Node';

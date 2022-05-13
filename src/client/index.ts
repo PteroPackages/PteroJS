@@ -1,4 +1,5 @@
 import { Account } from '../structures/User';
+import { ClientServerManager } from './ClientServerManager';
 import { RestRequestManager } from '../http/RestRequestManager';
 import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
@@ -10,6 +11,7 @@ export class PteroClient {
     public options: Record<string, OptionSpec>;
     public account: Account;
 
+    public servers: ClientServerManager;
     public requests: RestRequestManager;
     public ws: WebSocketManager;
 
@@ -29,6 +31,7 @@ export class PteroClient {
         this.options = loader.clientConfig({ client: options });
         this.account = new Account(this);
 
+        this.servers = new ClientServerManager(this);
         this.requests = new RestRequestManager('Client', domain, auth);
         this.ws = new WebSocketManager(this);
     }

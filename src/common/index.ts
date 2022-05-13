@@ -54,3 +54,12 @@ export interface OptionSpec {
     cache?:  boolean;
     max?:    number;
 }
+
+export interface PaginationMeta {
+    current:    number;
+    total:      number;
+    count:      number;
+    perPage:    number;
+    totalPages: number;
+    links?:     string[];
+}

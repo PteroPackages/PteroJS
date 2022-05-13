@@ -16,6 +16,7 @@ All changes to PteroJS as of v2.
 - `PteroUser` is now `User`
 - `PteroSubUser` is now `SubUser`
 - `ClientUser` is now `Account`
+- renamed `ClientServerManager#pageData` to `#meta`
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead
@@ -23,6 +24,7 @@ All changes to PteroJS as of v2.
 ### Removed
 - useless value return types (e.g. `Promise<true>` which should be `Promise<void>`)
 - most union string/number & instance type parameters
+- `ClientServer#addWebsocket()`: use the client directly instead
 
 ### Fixed
 - export all endpoints properly

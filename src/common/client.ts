@@ -11,6 +11,24 @@ export interface Backup {
     completedAt:    Date | undefined;
 }
 
+export interface ClientMeta {
+    isServerOwner?:     boolean;
+    userPermissions?:   Record<string, string>;
+}
+
+export interface ClientResources {
+    currentState:       string;
+    isSuspended:        boolean;
+    resources:{
+        memoryBytes:    number;
+        cpuAbsolute:    number;
+        diskBytes:      number;
+        networkRxBytes: number;
+        networkTxBytes: number;
+        uptime:         number;
+    }
+}
+
 export enum ShardStatus {
     CLOSED,
     CONNECTING,
