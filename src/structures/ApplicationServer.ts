@@ -1,6 +1,6 @@
 import type { Node } from './Node';
 import type { User } from './User';
-import type { PteroApp } from '../application/app';
+import type { PteroApp } from '../application';
 import { Limits, FeatureLimits } from '../common';
 import {
     UpdateBuildOptions,

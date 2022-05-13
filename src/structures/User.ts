@@ -1,5 +1,5 @@
 import type { ApplicationServer } from './ApplicationServer';
-import type { PteroApp } from '../application/app';
+import type { PteroApp } from '../application';
 import type { PteroClient } from '../client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';

@@ -3,7 +3,7 @@ import { version as v } from '../package.json';
 export const version: string = v;
 
 // Application API
-export { PteroApp } from './application/app';
+export { PteroApp } from './application';
 export { ApplicationServerManager } from './application/ApplicationServerManager';
 export { NestEggsManager } from './application/NestEggsManager';
 export { NestManager } from './application/NestManager';

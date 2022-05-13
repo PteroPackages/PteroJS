@@ -1,6 +1,6 @@
 import type { ApplicationServer } from './ApplicationServer';
 import type { Dict } from './Dict';
-import type { PteroApp } from '../application/app';
+import type { PteroApp } from '../application';
 import { DaemonData, NodeLocation } from '../common';
 import { CreateNodeOptions, NodeConfiguration } from '../common/app';
 import caseConv from '../util/caseConv';

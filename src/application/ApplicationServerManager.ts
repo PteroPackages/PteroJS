@@ -1,4 +1,4 @@
-import type { PteroApp } from './app';
+import type { PteroApp } from '.';
 import { ApplicationServer } from '../structures/ApplicationServer';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
