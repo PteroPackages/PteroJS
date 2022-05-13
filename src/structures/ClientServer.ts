@@ -1,4 +1,5 @@
 import type { PteroClient } from '../client';
+import { FileManager } from '../client/FileManager';
 import { FeatureLimits, Limits } from '../common';
 import { ClientResources } from '../common/client';
 import endpoints from '../client/endpoints';
@@ -46,10 +47,14 @@ export class ClientServer {
     /** Whether the server is transferring. */
     public installing: boolean;
 
+    public files: FileManager;
+
     constructor(client: PteroClient, data: any) {
         this.client = client;
         this.uuid = data.uuid;
         this.identifier = data.identifier;
+
+        this.files = new FileManager(client, data.identifier);
 
         this._patch(data);
     }

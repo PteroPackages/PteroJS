@@ -9,6 +9,9 @@ All changes to PteroJS as of v2.
 - `BaseManager` with abstract query properties
 - additional parse options for `caseConv` util
 - support sometimes "meta" property for API errors
+- `FileManager#getDownloadURL()` replaces old `download()` method
+- `FileManager#getUploadURL()` replaces old `upload()` method
+- `FileManager#chmod()` method
 
 ### Changed
 - `RequestManager` -> `RestRequestManager`
@@ -18,6 +21,8 @@ All changes to PteroJS as of v2.
 - `PteroSubUser` is now `SubUser`
 - `ClientUser` is now `Account`
 - renamed `ClientServerManager#pageData` to `#meta`
+- `PteroFile` -> `File` (typing change)
+- `FileManager#download()` now downloads the file
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead
@@ -26,6 +31,7 @@ All changes to PteroJS as of v2.
 - useless value return types (e.g. `Promise<true>` which should be `Promise<void>`)
 - most union string/number & instance type parameters
 - `ClientServer#addWebsocket()`: use the client directly instead
+- `File#isEditable`: never existed in the API, issue from the docs
 
 ### Fixed
 - export all endpoints properly

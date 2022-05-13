@@ -29,6 +29,18 @@ export interface ClientResources {
     }
 }
 
+export interface File {
+    name:       string;
+    mode:       string;
+    modeBits:   bigint;
+    size:       number;
+    isFile:     boolean;
+    isSymlink:  boolean;
+    mimetype:   string;
+    createdAt:  Date;
+    modifiedAt: Date | undefined;
+}
+
 export enum ShardStatus {
     CLOSED,
     CONNECTING,

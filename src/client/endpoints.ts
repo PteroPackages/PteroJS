@@ -25,7 +25,8 @@ export default {
             decompress: (s: string) => `/servers/${s}/files/decompress`,
             delete: (s: string) => `/servers/${s}/files/delete`,
             create: (s: string) => `/servers/${s}/files/create-folder`,
-            upload: (s: string) => `/servers/${s}/files/upload`
+            upload: (s: string) => `/servers/${s}/files/upload`,
+            chmod: (s: string) => `/servers/${s}/files/chmod`
         },
         schedules:{
             main: (s: string) => `/servers/${s}/schedules`,
