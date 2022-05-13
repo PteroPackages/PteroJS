@@ -60,7 +60,7 @@ export class ClientServer {
         if ('is_owner' in data) this.isOwner = data.is_owner;
         if ('node' in data) this.node = data.node;
         if ('sftp_details' in data) this.sftpDetails = data.sftp_details;
-        if ('limits' in data) this.limits = <Limits> caseConv.toCamelCase(data.limits);
+        if ('limits' in data) this.limits = caseConv.toCamelCase(data.limits);
         if ('feature_limits' in data) this.featureLimits = data.feature_limits;
         if ('state' in data) this.state = data.state;
         if ('is_suspended' in data) this.suspended = data.is_suspended;

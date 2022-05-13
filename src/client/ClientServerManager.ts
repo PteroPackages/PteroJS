@@ -33,7 +33,7 @@ export class ClientServerManager extends BaseManager {
     }
 
     _patch(data: any): ClientServer | Dict<string, ClientServer> {
-        if (data.meta) this.meta = <ClientMeta> caseConv.toCamelCase(data.meta);
+        if (data.meta) this.meta = caseConv.toCamelCase<ClientMeta>(data.meta);
 
         if (data?.data) {
             const res = new Dict<string, ClientServer>();
@@ -77,7 +77,7 @@ export class ClientServerManager extends BaseManager {
         const data: any = await this.client.requests.get(
             endpoints.servers.resources(id), {}
         );
-        return caseConv.toCamelCase(data.attributes) as ClientResources;
+        return caseConv.toCamelCase(data.attributes);
     }
 
     async sendCommand(id: string, command: string): Promise<void> {

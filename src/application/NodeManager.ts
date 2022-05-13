@@ -109,11 +109,11 @@ export class NodeManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.nodes.config(id), {}, this
         );
-        return caseConv.toCamelCase(data) as NodeConfiguration;
+        return caseConv.toCamelCase(data);
     }
 
     async create(options: CreateNodeOptions): Promise<Node> {
-        const payload = caseConv.toSnakeCase(options);
+        const payload = caseConv.toSnakeCase<object>(options);
         const data = await this.client.requests.post(
             endpoints.users.main, payload
         );
@@ -130,7 +130,7 @@ export class NodeManager extends BaseManager {
         const id = typeof node === 'number' ? node : node.id;
         const _node = await this.fetch(id);
         options = Object.assign(options, _node);
-        const payload = caseConv.toSnakeCase(options);
+        const payload = caseConv.toSnakeCase<object>(options);
 
         const data = await this.client.requests.patch(
             endpoints.nodes.get(id), payload

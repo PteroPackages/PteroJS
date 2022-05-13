@@ -127,7 +127,7 @@ export class UserManager extends BaseManager {
     }
 
     async create(options: CreateUserOptions): Promise<User> {
-        const payload = caseConv.toSnakeCase(
+        const payload = caseConv.toSnakeCase<object>(
             options,
             {
                 map:{
@@ -145,7 +145,7 @@ export class UserManager extends BaseManager {
     }
 
     async update(id: number, options: UpdateUserOptions): Promise<User> {
-        const payload = caseConv.toSnakeCase(
+        const payload = caseConv.toSnakeCase<object>(
             options,
             {
                 map:{

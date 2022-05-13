@@ -156,7 +156,7 @@ export class ApplicationServerManager extends BaseManager {
         options.externalId ||= server.externalId;
         options.description ||= server.description;
 
-        const payload = caseConv.toSnakeCase(options, { map:{ owner: 'user' }});
+        const payload = caseConv.toSnakeCase<object>(options, { map:{ owner: 'user' }});
         const data = await this.client.requests.patch(
             endpoints.servers.details(id), payload
         );

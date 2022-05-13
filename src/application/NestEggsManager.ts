@@ -31,7 +31,7 @@ export class NestEggsManager extends BaseManager {
         if (data?.data) {
             const res = new Dict<number, Egg>();
             for (let o of data.data) {
-                let e = caseConv.toCamelCase(o.attributes) as Egg;
+                let e = caseConv.toCamelCase<Egg>(o.attributes);
                 e.createdAt = new Date(e.createdAt);
                 e.updatedAt &&= new Date(e.updatedAt);
                 res.set(e.id, e);
@@ -43,7 +43,7 @@ export class NestEggsManager extends BaseManager {
             return res;
         }
 
-        let e = caseConv.toCamelCase(data.attributes) as Egg;
+        let e = caseConv.toCamelCase<Egg>(data.attributes);
         e.createdAt = new Date(e.createdAt);
         e.updatedAt &&= new Date(e.updatedAt);
         this.cache.set(e.id, e);
