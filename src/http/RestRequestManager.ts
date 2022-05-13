@@ -46,9 +46,13 @@ export class RestRequestManager extends EventEmitter {
         params: object | undefined,
         method: Method
     ): Promise<object | Buffer | void> {
+        const headers = this.getHeaders();
         let body = undefined;
         if (params !== undefined) {
-            if ('raw' in params) body = (params as { raw: string }).raw;
+            if ('raw' in params) {
+                body = (params as { raw: string }).raw;
+                headers['Content-Type'] = 'text/plain';
+            }
             else body = JSON.stringify(params);
         }
 
@@ -58,11 +62,7 @@ export class RestRequestManager extends EventEmitter {
         const start = Date.now();
         const res = await fetch(
             `${this._domain}/api/${this._type.toLowerCase()}${path}`,
-            {
-                method,
-                body,
-                headers: this.getHeaders()
-            }
+            { method, body, headers }
         );
         this._ping = Date.now() - start;
         this.debug(`received status: ${res.status} (${this._ping}ms)`);
@@ -85,6 +85,44 @@ export class RestRequestManager extends EventEmitter {
 
         throw new RequestError(
             'Pterodactyl API returned an invalid or unacceptable response '+
+            `(status: ${res.status})`
+        );
+    }
+
+    async _raw(
+        url: string,
+        params: object | undefined,
+        headers: Record<string, string> = {},
+        method: Method
+    ) {
+        const body = params ? JSON.stringify(params) : undefined;
+        headers = Object.assign(this.getHeaders(), headers);
+
+        this.debug(`fetching: ${method} ${url}`);
+        const res = await fetch(url, {
+            method,
+            headers,
+            body
+        });
+        this.debug(`received status: ${res.status}`);
+
+        if ([202, 204].includes(res.status)) return;
+        let data: object | Buffer;
+
+        if (res.headers.get('content-type') === 'application/json') {
+            data = await res.json().catch(null);
+        } else {
+            data = await res.buffer().catch(null);
+        }
+
+        if (data) {
+            if (res.ok) return data;
+            if (res.status >= 400 && res.status < 500)
+                throw new Error(res.statusText);
+        }
+
+        throw new RequestError(
+            'Received an invalid or unacceptable response '+
             `(status: ${res.status})`
         );
     }
