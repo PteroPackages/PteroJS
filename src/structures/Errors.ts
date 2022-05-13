@@ -3,11 +3,13 @@ export interface APIErrorResponse {
         code:   string;
         status: string;
         detail: string;
+        meta?:  unknown;
     }[];
 }
 
 export class PteroAPIError extends Error {
     public readonly codes: string[];
+    public readonly meta: unknown;
 
     constructor(data: APIErrorResponse) {
         const fmt = data.errors.map(
@@ -16,6 +18,7 @@ export class PteroAPIError extends Error {
 
         super('\n'+ fmt);
         this.codes = data.errors.map(e => e.code);
+        this.meta = data.errors.map(e => e.meta);
     }
 }
 

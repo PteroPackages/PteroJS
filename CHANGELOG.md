@@ -8,6 +8,7 @@ All changes to PteroJS as of v2.
 - "page" and "perPage" query options support
 - `BaseManager` with abstract query properties
 - additional parse options for `caseConv` util
+- support sometimes "meta" property for API errors
 
 ### Changed
 - `RequestManager` -> `RestRequestManager`
