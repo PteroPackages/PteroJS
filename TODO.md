@@ -17,14 +17,13 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Implement helper functions for all the managers
 - [X] Implement `ClientUser` required fetch on startup
 - [ ] Document all functions
-- [ ] Implement session client
 
 ## Global Managers
 - [X] Implement helper functions for all the managers
 - [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
 - [X] Document all functions (resolved into others)
 - [X] Switch `AllocationManager#cache` to maps
-- [ ] Fix endpoints paths & RestRequestManager fetch checks
+- [X] Fix endpoints paths & RestRequestManager fetch checks
 
 ## Global Structures
 - [X] Implement helper functions for all the structures
@@ -39,8 +38,11 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Remove deprecated `PteroUser#tfa`
 - [X] Remove deprecated `Presets` util
 - [ ] Rewrite in TypeScript
+- [ ] Switch `node-fetch` to a different library
+- [ ] Implement builder classes
+- [ ] Remove deprecated `UserManager#fetchExternal`
 
 ## Feature Plans
 - [ ] Optional webhook client
-- [X] Node status client
+- [ ] Node status client
 - [ ] Data formatter interface client (may be updated to logging client)
