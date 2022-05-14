@@ -2,7 +2,7 @@ import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { File } from '../common/client';
+import { File, FileChmodData } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -107,7 +107,7 @@ export class FileManager extends BaseManager {
         await this.client.requests.put(
             endpoints.servers.files.rename(this.serverId),
             {
-                root: this.clean(path),
+                root: path,
                 files:[{
                     from: path.split('/').pop(),
                     to: name
@@ -116,11 +116,16 @@ export class FileManager extends BaseManager {
         );
     }
 
-    async chmod(dir: string, files: string[]): Promise<void> {
-        files = files.map(f => f.startsWith('.') ? f.slice(1) : f);
+    /** @todo Add warning for request note */
+    async chmod(dir: string, files: FileChmodData[]): Promise<void> {
+        files = files.map(f => {
+            if (f.file.startsWith('.')) f.file = f.file.slice(1);
+            return f;
+        });
+
         await this.client.requests.post(
             endpoints.servers.files.chmod(this.serverId),
-            { root: this.clean(dir), files }
+            { root: dir, files }
         );
     }
 
@@ -135,15 +140,16 @@ export class FileManager extends BaseManager {
         files = files.map(f => f.startsWith('.') ? f.slice(1) : f);
         const data = await this.client.requests.post(
             endpoints.servers.files.compress(this.serverId),
-            { root: this.clean(dir), files }
+            { root: dir, files }
         );
+        console.log(data);
         return this._patch(dir, data);
     }
 
     async decompress(dir: string, file: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.files.decompress(this.serverId),
-            { root: this.clean(dir), file }
+            { root: dir, file }
         );
     }
 
@@ -151,7 +157,7 @@ export class FileManager extends BaseManager {
         files = files.map(f => f.startsWith('.') ? f.slice(1) : f);
         await this.client.requests.post(
             endpoints.servers.files.delete(this.serverId),
-            { root: this.clean(dir), files }
+            { root: dir, files }
         );
     }
 }

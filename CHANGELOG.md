@@ -12,6 +12,7 @@ All changes to PteroJS as of v2.
 - `FileManager#getDownloadURL()` replaces old `download()` method
 - `FileManager#getUploadURL()` replaces old `upload()` method
 - `FileManager#chmod()` method
+- `FileChmodData` type for chmod requests
 
 ### Changed
 - `RequestManager` -> `RestRequestManager`

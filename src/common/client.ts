@@ -41,6 +41,11 @@ export interface File {
     modifiedAt: Date | undefined;
 }
 
+export interface FileChmodData {
+    file: string;
+    mode: number;
+}
+
 export enum ShardStatus {
     CLOSED,
     CONNECTING,
