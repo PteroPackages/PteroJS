@@ -1,32 +1,22 @@
 import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
-import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { File, FileChmodData } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
-export class FileManager extends BaseManager {
+export class FileManager {
     public client: PteroClient;
     public cache: Dict<string, Dict<string, File>>;
     public serverId: string;
 
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
-
-    get INCLUDES(): Readonly<string[]> { return Object.freeze([]); }
-
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
-
     constructor(client: PteroClient, serverId: string) {
-        super();
         this.client = client;
         this.cache = new Dict<string, Dict<string, File>>();
         this.serverId = serverId;
     }
 
     _patch(dir: string, data: any): Dict<string, File> {
-        dir = decodeURIComponent(dir);
-
         const res = new Dict<string, File>();
         for (let o of data.data) {
             let f = caseConv.toCamelCase<File>(o.attributes);
@@ -142,7 +132,6 @@ export class FileManager extends BaseManager {
             endpoints.servers.files.compress(this.serverId),
             { root: dir, files }
         );
-        console.log(data);
         return this._patch(dir, data);
     }
 
