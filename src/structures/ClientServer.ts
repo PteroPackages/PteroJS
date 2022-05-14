@@ -1,4 +1,5 @@
 import type { PteroClient } from '../client';
+import { BackupManager } from '../client/BackupManager';
 import { FileManager } from '../client/FileManager';
 import { NetworkManager } from '../client/NetworkManager';
 import { FeatureLimits, Limits } from '../common';
@@ -48,6 +49,7 @@ export class ClientServer {
     /** Whether the server is transferring. */
     public installing: boolean;
 
+    public backups: BackupManager;
     public network: NetworkManager;
     public files: FileManager;
 
@@ -56,6 +58,7 @@ export class ClientServer {
         this.uuid = data.uuid;
         this.identifier = data.identifier;
 
+        this.backups = new BackupManager(client, data.identifier);
         this.network = new NetworkManager(client, data.identifier);
         this.files = new FileManager(client, data.identifier);
 

@@ -48,7 +48,9 @@ export default {
         backups:{
             main: (s: string) => `/servers/${s}/backups`,
             get: (s: string, id: string) => `/servers/${s}/backups/${id}`,
-            download: (s: string, id: string) => `/servers/${s}/backups/${id}/download`
+            lock: (s: string, id: string) => `/servers/${s}/backups/${id}/lock`,
+            download: (s: string, id: string) => `/servers/${s}/backups/${id}/download`,
+            restore: (s: string, id: string) => `/servers/${s}/backups/${id}/restore`
         },
         startup:{
             get: (s: string) => `/servers/${s}/startup`,

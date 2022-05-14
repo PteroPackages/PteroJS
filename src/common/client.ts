@@ -29,6 +29,12 @@ export interface ClientResources {
     }
 }
 
+export interface CreateBackupOptions {
+    name?:      string;
+    isLocked?:  boolean;
+    ignored?:   string;
+}
+
 export interface File {
     name:       string;
     mode:       string;

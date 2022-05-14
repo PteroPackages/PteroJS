@@ -14,6 +14,7 @@ All changes to PteroJS as of v2.
 - `FileManager#chmod()` method
 - `FileChmodData` type for chmod requests
 - `NodeManager#fetchDeployable()` method with types
+- `BackupManager#getDownloadURL()` replaces old `download()` method
 
 ### Changed
 - `RequestManager` -> `RestRequestManager`
@@ -25,6 +26,7 @@ All changes to PteroJS as of v2.
 - renamed `ClientServerManager#pageData` to `#meta`
 - `PteroFile` -> `File` (typing change)
 - `FileManager#download()` now downloads the file
+- `BackupManager#download()` now downloads the backup
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead
