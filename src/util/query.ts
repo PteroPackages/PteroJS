@@ -43,7 +43,7 @@ export const buildQuery = (
             if (!allowed.includes.includes(arg))
                 throw new SyntaxError(`Invalid include argument '${arg}'.`);
         }
-        parsed.push(`include=${args.include}`);
+        if (args.include?.length) parsed.push(`include=${args.include}`);
     }
 
     if (args.sort) {
