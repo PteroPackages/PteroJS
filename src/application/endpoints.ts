@@ -7,6 +7,7 @@ export default {
     nodes:{
         main: '/nodes',
         get: (n: number) => `/nodes/${n}`,
+        deploy: '/nodes/deployable',
         config: (n: number) => `/nodes/${n}/configuration`,
         allocations:{
             main: (n: number) => `/nodes/${n}/allocations`,

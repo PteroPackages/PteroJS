@@ -109,6 +109,12 @@ export interface NodeConfiguration {
     remote:             string;
 }
 
+export interface NodeDeploymentOptions {
+    memory:         number;
+    disk:           number;
+    locationIds?:   number[];
+}
+
 export interface UpdateBuildOptions extends Partial<Limits & FeatureLimits> {
     allocation?:        number;
     oomDisabled?:       boolean;
