@@ -29,6 +29,19 @@ export interface ClientResources {
     }
 }
 
+export interface Database {
+    id:                 number;
+    name:               string;
+    username:           string;
+    host:{
+        address:        string;
+        port:           number;
+    }
+    connectionsFrom:    string;
+    maxConnections:     string;
+    password?:          string;
+}
+
 export interface CreateBackupOptions {
     name?:      string;
     isLocked?:  boolean;

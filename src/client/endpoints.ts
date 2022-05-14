@@ -11,8 +11,8 @@ export default {
         get: (s: string) => `/servers/${s}`,
         databases:{
             main: (s: string) => `/servers/${s}/databases`,
-            get: (s: string, id: string) => `/servers/${s}/databases/${id}`,
-            rotate: (s: string, id: string) => `/servers/${s}/databases/${id}/rotate-password`
+            get: (s: string, id: number) => `/servers/${s}/databases/${id}`,
+            rotate: (s: string, id: number) => `/servers/${s}/databases/${id}/rotate-password`
         },
         files:{
             main: (s: string) => `/servers/${s}/files/list`,
