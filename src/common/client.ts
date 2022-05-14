@@ -46,6 +46,15 @@ export interface FileChmodData {
     mode: number;
 }
 
+export interface NetworkAllocation {
+    id:         number;
+    ip:         string;
+    ipAlias:    string;
+    port:       number;
+    notes:      string | null;
+    isDefault:  boolean;
+}
+
 export enum ShardStatus {
     CLOSED,
     CONNECTING,

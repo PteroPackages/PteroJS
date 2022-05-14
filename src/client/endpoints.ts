@@ -38,8 +38,8 @@ export default {
         },
         network:{
             main: (s: string) => `/servers/${s}/network/allocations`,
-            get: (s: string, id: string) => `/servers/${s}/network/allocations/${id}`,
-            primary: (s: string, id: string) => `/servers/${s}/network/allocations/${id}/primary`
+            get: (s: string, id: number) => `/servers/${s}/network/allocations/${id}`,
+            primary: (s: string, id: number) => `/servers/${s}/network/allocations/${id}/primary`
         },
         users:{
             main: (s: string) => `/servers/${s}/users`,
