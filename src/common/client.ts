@@ -59,6 +59,28 @@ export interface WebSocketAuth {
     }
 }
 
+export interface WebSocketEvents {
+    debug:              [message: string];
+    error:              [message: string];
+    rawPayload:         [data: any];
+
+    authSuccess:        [];
+    serverConnect:      [id: string];
+    serverOutput:       [output: string];
+    daemonMessage:      [output: string];
+    serverDisconnect:   [];
+
+    statsUpdate:        [stats: ClientResources];
+    statusUpdate:       [status: string];
+    transferUpdate:     [data: any];
+
+    installStart:       [];
+    installOutput:      [output: string];
+    installComplete:    [];
+
+    backupComplete:     [backup: Partial<Backup>];
+}
+
 export interface WebSocketPayload {
     event: string;
     args?: string[];

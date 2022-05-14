@@ -9,7 +9,7 @@ export default function (shard: Shard, payload: WebSocketPayload): void {
         case 'status': shard.emit('statusUpdate', ...args); break;
         case 'console output': shard.emit('serverOutput', ...args); break;
         case 'daemon message': shard.emit('daemonMessage', ...args); break;
-        case 'install started': shard.emit('installShard'); break;
+        case 'install started': shard.emit('installStart'); break;
         case 'install output': shard.emit('installOutput', ...args); break;
         case 'install completed': shard.emit('installComplete'); break;
         case 'stats':

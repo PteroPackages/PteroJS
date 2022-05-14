@@ -4,6 +4,7 @@ import type { PteroClient } from '..';
 import {
     ShardStatus,
     WebSocketAuth,
+    WebSocketEvents,
     WebSocketPayload
 } from '../../common/client';
 import endpoints from '../endpoints';
@@ -27,6 +28,37 @@ export class Shard extends EventEmitter {
         this.readyAt = 0;
         this.ping = -1;
         this.lastPing = 0;
+    }
+
+    emit<E extends keyof WebSocketEvents>(
+        event: E,
+        ...args: WebSocketEvents[E]
+    ): boolean {
+        return super.emit(event, ...args);
+    }
+
+    on<E extends keyof WebSocketEvents>(
+        event: E,
+        listener: (...args: WebSocketEvents[E]) => any
+    ): this {
+        super.on(event, listener);
+        return this;
+    }
+
+    once<E extends keyof WebSocketEvents>(
+        event: E,
+        listener: (...args: WebSocketEvents[E]) => any
+    ): this {
+        super.once(event, listener);
+        return this;
+    }
+
+    off<E extends keyof WebSocketEvents>(
+        event: E,
+        listener: (...args: WebSocketEvents[E]) => any
+    ): this {
+        super.off(event, listener);
+        return this;
     }
 
     private debug(message: string): void {
