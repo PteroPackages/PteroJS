@@ -14,7 +14,11 @@ export { UserManager } from './application/UserManager';
 
 // Client API
 export { PteroClient } from './client';
+export { BackupManager } from './client/BackupManager';
 export { ClientServerManager } from './client/ClientServerManager';
+export { DatabaseManager } from './client/DatabaseManager';
+export { FileManager } from './client/FileManager';
+export { NetworkManager } from './client/NetworkManager';
 export { Shard } from './client/ws/Shard';
 export { WebSocketManager } from './client/ws/WebSocketManager';
 

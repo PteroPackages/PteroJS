@@ -22,18 +22,24 @@ export class DatabaseManager extends BaseManager {
     constructor(client: PteroClient, serverId: string) {
         super();
         this.client = client;
-        this.cache = new Dict<number, Database>();
+        this.cache = new Dict();
         this.serverId = serverId;
     }
 
-    _patch(data: any): Dict<number, Database> {
-        const res = new Dict<number, Database>();
-        for (let o of data.data) {
-            const d = caseConv.toCamelCase<Database>(o.attributes);
-            res.set(d.id, d);
+    _patch(data: any): any {
+        if (data.data) {
+            const res = new Dict<number, Database>();
+            for (let o of data.data) {
+                const d = caseConv.toCamelCase<Database>(o.attributes);
+                res.set(d.id, d);
+            }
+            this.cache = this.cache.join(res);
+            return res;
         }
-        this.cache = this.cache.join(res);
-        return res;
+
+        const d = caseConv.toCamelCase<Database>(data.attributes);
+        this.cache.set(d.id, d);
+        return d;
     }
 
     async fetch(options: Include<FetchOptions> = {}): Promise<Dict<number, Database>> {
@@ -49,14 +55,14 @@ export class DatabaseManager extends BaseManager {
             endpoints.servers.databases.main(this.serverId),
             { database, remote }
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async rotate(id: number): Promise<Database> {
         const data = await this.client.requests.post(
             endpoints.servers.databases.rotate(this.serverId, id)
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async delete(id: number): Promise<void> {

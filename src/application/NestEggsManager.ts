@@ -24,10 +24,10 @@ export class NestEggsManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, Egg>();
+        this.cache = new Dict();
     }
 
-    _patch(data: any) {
+    _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, Egg>();
             for (let o of data.data) {
@@ -37,9 +37,7 @@ export class NestEggsManager extends BaseManager {
                 res.set(e.id, e);
             }
 
-            if (this.client.options.eggs.cache)
-                res.forEach((v, k) => this.cache.set(k, v));
-
+            this.cache = this.cache.join(res);
             return res;
         }
 
@@ -68,6 +66,6 @@ export class NestEggsManager extends BaseManager {
             id ? endpoints.nests.eggs.get(nest, id) : endpoints.nests.eggs.main(nest),
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 }

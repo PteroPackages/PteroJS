@@ -37,25 +37,23 @@ export class NodeManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, Node>();
+        this.cache = new Dict();
     }
 
-    _patch(data: any): Node | Dict<number, Node> {
+    _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, Node>();
             for (const obj of data.data) {
                 const s = new Node(this.client, obj.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) res.forEach(
-                (v, k) => this.cache.set(k, v)
-            );
+            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
             return res;
         }
 
-        const s = new Node(this.client, data.attributes);
-        if (this.client.options.nodes.cache) this.cache.set(s.id, s);
-        return s;
+        const n = new Node(this.client, data.attributes);
+        if (this.client.options.nodes.cache) this.cache.set(n.id, n);
+        return n;
     }
 
     resolve(obj: Resolvable<Node>): Node | undefined {
@@ -87,7 +85,7 @@ export class NodeManager extends BaseManager {
             (id ? endpoints.nodes.get(id) : endpoints.nodes.main),
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     /** compatibility issue with node-fetch */
@@ -95,7 +93,7 @@ export class NodeManager extends BaseManager {
         const data = await this.client.requests._make(
             endpoints.nodes.deploy, options, 'GET'
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async query(
@@ -114,7 +112,7 @@ export class NodeManager extends BaseManager {
             payload as FilterArray<Sort<FetchOptions>>,
             this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async getConfig(id: number): Promise<NodeConfiguration> {
@@ -129,17 +127,16 @@ export class NodeManager extends BaseManager {
         const data = await this.client.requests.post(
             endpoints.users.main, payload
         );
-        return this._patch(data) as Node;
+        return this._patch(data);
     }
 
     async update(
-        node: number | Node,
+        id: number,
         options: Partial<CreateNodeOptions>
     ): Promise<Node> {
         if (!Object.keys(options).length)
             throw new Error('Too few options to update the node.');
 
-        const id = typeof node === 'number' ? node : node.id;
         const _node = await this.fetch(id);
         options = Object.assign(options, _node);
         const payload = caseConv.toSnakeCase<object>(options);
@@ -147,11 +144,10 @@ export class NodeManager extends BaseManager {
         const data = await this.client.requests.patch(
             endpoints.nodes.get(id), payload
         );
-        return this._patch(data) as Node;
+        return this._patch(data);
     }
 
-    async delete(node: number | Node): Promise<void> {
-        const id = typeof node === 'number' ? node : node.id;
+    async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.nodes.get(id));
         this.cache.delete(id);
     }

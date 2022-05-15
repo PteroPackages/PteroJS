@@ -36,25 +36,23 @@ export class UserManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, User>();
+        this.cache = new Dict();
     }
 
-    _patch(data: any): User | Dict<number, User> {
+    _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, User>();
-            for (const obj of data.data) {
-                const s = new User(this.client, obj.attributes);
+            for (const o of data.data) {
+                const s = new User(this.client, o.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) res.forEach(
-                (v, k) => this.cache.set(k, v)
-            );
+            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
             return res;
         }
 
-        const s = new User(this.client, data.attributes);
-        if (this.client.options.servers.cache) this.cache.set(s.id, s);
-        return s;
+        const u = new User(this.client, data.attributes);
+        if (this.client.options.servers.cache) this.cache.set(u.id, u);
+        return u;
     }
 
     resolve(obj: Resolvable<User>): User | undefined {
@@ -77,10 +75,16 @@ export class UserManager extends BaseManager {
         id?: T,
         options: External<Include<FetchOptions>> = {}
     ): Promise<T extends undefined ? Dict<number, User> : User> {
-        if (typeof id === 'number' && !options.force) {
-            const u = this.cache.get(id);
-            if (u) return Promise.resolve<any>(u);
+        if (!options.force) {
+            if (typeof id === 'number') {
+                const u = this.cache.get(id);
+                if (u) return Promise.resolve<any>(u);
+            } else {
+                const u = this.cache.find(u => u.externalId === id);
+                if (u) return Promise.resolve<any>(u);
+            }
         }
+
         if (typeof id === 'string' && !options.external)
             throw new TypeError("The 'external' option must be set to fetch externally");
 
@@ -90,20 +94,12 @@ export class UserManager extends BaseManager {
                 : (id ? endpoints.users.get(id as number) : endpoints.users.main),
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     /** @deprecated Use {@link UserManager.fetch} with `options.external`. */
     async fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
-        if (!options.force) {
-            const u = this.cache.find(u => u.externalId === id);
-            if (u) return Promise.resolve<any>(u);
-        }
-
-        const data = await this.client.requests.get(
-            endpoints.users.ext(id), options, this
-        );
-        return this._patch(data) as any;
+        return this.fetch(id, { ...options, external: true });
     }
 
     async query(
@@ -123,7 +119,7 @@ export class UserManager extends BaseManager {
             payload as FilterArray<Sort<FetchOptions>>,
             this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async create(options: CreateUserOptions): Promise<User> {
@@ -141,7 +137,7 @@ export class UserManager extends BaseManager {
         const data = await this.client.requests.post(
             endpoints.users.main, payload
         );
-        return this._patch(data) as User;
+        return this._patch(data);
     }
 
     async update(id: number, options: UpdateUserOptions): Promise<User> {
@@ -159,7 +155,7 @@ export class UserManager extends BaseManager {
         const data = await this.client.requests.patch(
             endpoints.users.get(id), payload
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async delete(id: number): Promise<void> {

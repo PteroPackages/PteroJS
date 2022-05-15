@@ -10,6 +10,7 @@ import {
     Sort,
     Resolvable
 } from '../common';
+import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
 export class NodeLocationManager extends BaseManager {
@@ -29,38 +30,26 @@ export class NodeLocationManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, NodeLocation>();
+        this.cache = new Dict();
     }
 
-    _patch(data: any): NodeLocation | Dict<number, NodeLocation> {
+    _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, NodeLocation>();
-            for (let obj of data.data) {
-                obj = obj.attributes;
-                res.set(obj.id, {
-                    id: obj.id,
-                    long: obj.long,
-                    short: obj.short,
-                    createdAt: new Date(obj.created_at),
-                    updatedAt: obj.updated_at ? new Date(obj.updated_at) : null
-                });
+            for (let o of data.data) {
+                const n = caseConv.toCamelCase<NodeLocation>(o.attributes);
+                n.createdAt = new Date(n.createdAt);
+                n.updatedAt &&= new Date(n.updatedAt);
+                res.set(n.id, n);
             }
 
-            if (this.client.options.locations.cache)
-                res.forEach((v, k) => this.cache.set(k, v));
-
+            if (this.client.options.locations.cache) this.cache = this.cache.join(res);
             return res;
         }
 
-        data = data.attributes;
-        const loc: NodeLocation = {
-            id: data.id,
-            long: data.long,
-            short: data.short,
-            createdAt: new Date(data.created_at),
-            updatedAt: data.updated_at ? new Date(data.updated_at) : null
-        }
-
+        const loc = caseConv.toCamelCase<NodeLocation>(data.attributes);
+        loc.createdAt = new Date(loc.createdAt);
+        loc.updatedAt &&= new Date(loc.updatedAt);
         if (this.client.options.locations.cache) this.cache.set(data.id, loc);
         return loc;
     }
@@ -93,7 +82,7 @@ export class NodeLocationManager extends BaseManager {
             (id ? endpoints.locations.get(id) : endpoints.locations.main),
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async query(
@@ -111,14 +100,14 @@ export class NodeLocationManager extends BaseManager {
             payload as FilterArray<Sort<FetchOptions>>,
             this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async create(short: string, long: string): Promise<NodeLocation> {
         const data = await this.client.requests.post(
             endpoints.locations.main, { short, long }
         );
-        return this._patch(data) as NodeLocation;
+        return this._patch(data);
     }
 
     async update(
@@ -131,7 +120,7 @@ export class NodeLocationManager extends BaseManager {
         const data = await this.client.requests.patch(
             endpoints.locations.get(id), options
         );
-        return this._patch(data) as NodeLocation;
+        return this._patch(data);
     }
 
     async delete(id: number): Promise<void> {

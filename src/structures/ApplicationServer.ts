@@ -86,7 +86,7 @@ export class ApplicationServer {
         if ('name' in data) this.name = data.name;
         if ('description' in data) this.description = data.description || undefined;
         if ('suspended' in data) this.suspended = data.suspended;
-        if ('limits' in data) this.limits = data.limits;
+        if ('limits' in data) this.limits = caseConv.toCamelCase(data.limits);
         if ('feature_limits' in data) this.featureLimits = data.feature_limits;
         if ('user' in data) this.ownerId = data.user;
         if ('node' in data) this.nodeId = data.node;

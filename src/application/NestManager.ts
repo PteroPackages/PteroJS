@@ -4,6 +4,7 @@ import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
 import { Nest } from '../common/app';
 import { NestEggsManager } from './NestEggsManager';
+import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
 export class NestManager extends BaseManager {
@@ -22,42 +23,27 @@ export class NestManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, Nest>();
+        this.cache = new Dict();
         this.eggs = new NestEggsManager(client);
     }
 
-        _patch(data: any): Nest | Dict<number, Nest> {
+        _patch(data: any): any {
             if (data?.data) {
                 const res = new Dict<number, Nest>();
                 for (let o of data.data) {
-                    o = o.attributes;
-                    res.set(o.id, {
-                        id: o.id,
-                        uuid: o.uuid,
-                        author: o.author,
-                        name: o.name,
-                        description: o.description,
-                        createdAt: new Date(o.created_at),
-                        updatedAt: o.updated_at ? new Date(o.updated_at) : undefined
-                    });
+                    const n = caseConv.toCamelCase<Nest>(o.attributes);
+                    n.createdAt = new Date(n.createdAt);
+                    n.updatedAt &&= new Date(n.updatedAt);
+                    res.set(n.id, n);
                 }
 
-                if (this.client.options.nests.cache)
-                    res.forEach((v, k) => this.cache.set(k, v));
-
+                if (this.client.options.nests.cache) this.cache = this.cache.join(res);
                 return res;
             }
 
-            data = data.attributes;
-            const n = {
-                id: data.id,
-                uuid: data.uuid,
-                author: data.author,
-                name: data.name,
-                description: data.description,
-                createdAt: new Date(data.created_at),
-                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
-            }
+            const n = caseConv.toCamelCase<Nest>(data.attributes);
+            n.createdAt = new Date(n.createdAt);
+            n.updatedAt &&= new Date(n.updatedAt);
             if (this.client.options.nodes.cache) this.cache.set(n.id, n);
             return n;
         }
@@ -75,6 +61,6 @@ export class NestManager extends BaseManager {
             { include } as Include<FetchOptions>,
             this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 }

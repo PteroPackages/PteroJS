@@ -28,23 +28,20 @@ export class ClientServerManager extends BaseManager {
     constructor(client: PteroClient) {
         super();
         this.client = client;
-        this.cache = new Dict<string, ClientServer>();
+        this.cache = new Dict();
         this.meta = undefined;
     }
 
-    _patch(data: any): ClientServer | Dict<string, ClientServer> {
+    _patch(data: any): any {
         if (data.meta) this.meta = caseConv.toCamelCase<ClientMeta>(data.meta);
 
         if (data?.data) {
             const res = new Dict<string, ClientServer>();
             for (let o of data.data) {
-                o = o.attributes;
-                const s = new ClientServer(this.client, o);
+                const s = new ClientServer(this.client, o.attributes);
                 res.set(s.identifier, s);
             }
-            if (this.client.options.servers.cache) res.forEach(
-                (v, k) => this.cache.set(k, v)
-            );
+            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
             return res;
         }
 
@@ -70,7 +67,7 @@ export class ClientServerManager extends BaseManager {
             id ? endpoints.servers.get(id) : endpoints.servers.main,
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async fetchResources(id: string): Promise<ClientResources> {

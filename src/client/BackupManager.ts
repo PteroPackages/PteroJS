@@ -23,11 +23,11 @@ export class BackupManager extends BaseManager {
     constructor(client: PteroClient, serverId: string) {
         super();
         this.client = client;
-        this.cache = new Dict<string, Backup>();
+        this.cache = new Dict();
         this.serverId = serverId;
     }
 
-    _patch(data: any): Backup | Dict<string, Backup> {
+    _patch(data: any): any {
         if (data.data) {
             const res = new Dict<string, Backup>();
             for (let o of data.data) {
@@ -72,7 +72,7 @@ export class BackupManager extends BaseManager {
                 : endpoints.servers.backups.main(this.serverId),
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async create(options: CreateBackupOptions = {}): Promise<Backup> {
@@ -80,14 +80,14 @@ export class BackupManager extends BaseManager {
             endpoints.servers.backups.main(this.serverId),
             options
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async toggleLock(id: string): Promise<Backup> {
         const data = await this.client.requests.post(
             endpoints.servers.backups.lock(this.serverId, id)
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async getDownloadURL(id: string): Promise<string> {

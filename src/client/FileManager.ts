@@ -12,7 +12,7 @@ export class FileManager {
 
     constructor(client: PteroClient, serverId: string) {
         this.client = client;
-        this.cache = new Dict<string, Dict<string, File>>();
+        this.cache = new Dict();
         this.serverId = serverId;
     }
 

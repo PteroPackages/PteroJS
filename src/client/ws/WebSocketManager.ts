@@ -8,7 +8,7 @@ export class WebSocketManager {
 
     constructor(client: PteroClient) {
         this.client = client;
-        this.shards = new Map<string, Shard>();
+        this.shards = new Map();
         this.active = false;
     }
 

@@ -11,11 +11,11 @@ export class NetworkManager {
 
     constructor(client: PteroClient, serverId: string) {
         this.client = client;
-        this.cache = new Dict<number, NetworkAllocation>();
+        this.cache = new Dict();
         this.serverId = serverId;
     }
 
-    _patch(data: any): NetworkAllocation | Dict<number, NetworkAllocation> {
+    _patch(data: any): any {
         if (data.data) {
             const res = new Dict<number, NetworkAllocation>();
             for (let o of data.data) {
@@ -37,7 +37,7 @@ export class NetworkManager {
         const data = await this.client.requests.get(
             endpoints.servers.network.main(this.serverId), {}
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async setNote(id: number, notes: string): Promise<NetworkAllocation> {
@@ -45,14 +45,14 @@ export class NetworkManager {
             endpoints.servers.network.get(this.serverId, id),
             { notes }
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async setPrimary(id: number): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
             endpoints.servers.network.primary(this.serverId, id)
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async unassign(id: number): Promise<void> {

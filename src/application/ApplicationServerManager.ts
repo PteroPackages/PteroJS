@@ -46,7 +46,7 @@ export class ApplicationServerManager extends BaseManager {
     constructor(client: PteroApp) {
         super();
         this.client = client;
-        this.cache = new Dict<number, ApplicationServer>();
+        this.cache = new Dict();
     }
 
     get defaultLimits(): Limits {
@@ -68,17 +68,14 @@ export class ApplicationServerManager extends BaseManager {
         }
     }
 
-    _patch(data: any): ApplicationServer | Dict<number, ApplicationServer> {
-        if (data?.data) {
+    _patch(data: any): any {
+        if (data.data) {
             const res = new Dict<number, ApplicationServer>();
             for (let o of data.data) {
-                o = o.attributes;
-                const s = new ApplicationServer(this.client, o);
+                const s = new ApplicationServer(this.client, o.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) res.forEach(
-                (v, k) => this.cache.set(k, v)
-            );
+            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
             return res;
         }
 
@@ -118,7 +115,7 @@ export class ApplicationServerManager extends BaseManager {
             (id ? endpoints.servers.get(id) : endpoints.servers.main),
             options, this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async query(
@@ -140,7 +137,7 @@ export class ApplicationServerManager extends BaseManager {
             payload as FilterArray<Sort<FetchOptions>>,
             this
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async updateDetails(
@@ -160,7 +157,7 @@ export class ApplicationServerManager extends BaseManager {
         const data = await this.client.requests.patch(
             endpoints.servers.details(id), payload
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async updateBuild(
@@ -179,7 +176,7 @@ export class ApplicationServerManager extends BaseManager {
             endpoints.servers.build(id),
             caseConv.toSnakeCase(options)
         );
-        return this._patch(data) as any;
+        return this._patch(data);
     }
 
     async updateStartup(
@@ -200,10 +197,9 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     async delete(
-        server: number | ApplicationServer,
+        id: number,
         force: boolean = false
     ): Promise<void> {
-        const id = typeof server === 'number' ? server : server.id;
         await this.client.requests.delete(
             endpoints.servers.get(id) + (force ? '/force' : '')
         );
