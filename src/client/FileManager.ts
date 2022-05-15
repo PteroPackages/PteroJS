@@ -93,16 +93,10 @@ export class FileManager {
         );
     }
 
-    async rename(path: string, name: string): Promise<void> {
+    async rename(path: string, files:{ from: string; to: string }[]): Promise<void> {
         await this.client.requests.put(
             endpoints.servers.files.rename(this.serverId),
-            {
-                root: path,
-                files:[{
-                    from: path.split('/').pop(),
-                    to: name
-                }]
-            }
+            { root: path, files }
         );
     }
 
