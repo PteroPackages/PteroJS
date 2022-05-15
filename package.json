@@ -4,6 +4,7 @@
   "description": "A flexibile API wrapper for Pterodactyl",
   "main": "src/index.ts",
   "scripts": {
+    "build":"npx typedoc --out docs src/index.ts",
     "tests": "node tests/index"
   },
   "repository": {
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^17.0.23",
     "@types/ws": "^8.5.3",
+    "typedoc": "^0.22.15",
     "typescript": "^4.6.3"
   }
 }
