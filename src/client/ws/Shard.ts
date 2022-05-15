@@ -39,7 +39,7 @@ export class Shard extends EventEmitter {
 
     on<E extends keyof WebSocketEvents>(
         event: E,
-        listener: (...args: WebSocketEvents[E]) => any
+        listener: (...args: WebSocketEvents[E]) => void
     ): this {
         super.on(event, listener);
         return this;
@@ -47,7 +47,7 @@ export class Shard extends EventEmitter {
 
     once<E extends keyof WebSocketEvents>(
         event: E,
-        listener: (...args: WebSocketEvents[E]) => any
+        listener: (...args: WebSocketEvents[E]) => void
     ): this {
         super.once(event, listener);
         return this;
@@ -55,7 +55,7 @@ export class Shard extends EventEmitter {
 
     off<E extends keyof WebSocketEvents>(
         event: E,
-        listener: (...args: WebSocketEvents[E]) => any
+        listener: (...args: WebSocketEvents[E]) => void
     ): this {
         super.off(event, listener);
         return this;
