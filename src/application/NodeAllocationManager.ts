@@ -10,12 +10,15 @@ export class NodeAllocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Dict<number, Allocation>>;
 
+    /** Allowed filter arguments for allocations. */
     get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
+    /** Allowed include arguments for allocations. */
     get INCLUDES() {
         return Object.freeze(['node', 'server']);
     }
 
+    /** Allowed sort arguments for allocations. */
     get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -36,10 +39,20 @@ export class NodeAllocationManager extends BaseManager {
         return res;
     }
 
+    /**
+     * @param id The ID of the allocation.
+     * @returns The formatted URL to the allocation in the admin panel.
+     */
     adminURLFor(id: number): string {
         return `${this.client.domain}/admin/nodes/view/${id}/allocation`;
     }
 
+    /**
+     * Fetches a list of allocations from the Pterodactyl API.
+     * @param node The ID of the node.
+     * @param options Additional fetch options.
+     * @returns The fetched allocations.
+     */
     async fetch(
         node: number,
         options: Include<FetchOptions>
@@ -56,6 +69,12 @@ export class NodeAllocationManager extends BaseManager {
         return this._patch(node, data);
     }
 
+    /**
+     * Fetches the available allocations on a node.
+     * @param node The ID of the node.
+     * @param single Whether to return a single allocation.
+     * @returns The available allocation(s).
+     */
     async fetchAvailable<T extends true | false>(
         node: number,
         single: T
@@ -66,6 +85,12 @@ export class NodeAllocationManager extends BaseManager {
             : allocs.filter(a => !a.assigned) as any;
     }
 
+    /**
+     * Creates a number of allocations based on the ports specified.
+     * @param node The ID of the node.
+     * @param ip The IP for the allocation.
+     * @param ports A list of ports or port ranges for the allocation.
+     */
     async create(node: number, ip: string, ports: string[]): Promise<void> {
         if (!ports.every(p => typeof p === 'string')) throw new TypeError(
             'Allocation ports must be a string integer or string range.'
@@ -91,6 +116,11 @@ export class NodeAllocationManager extends BaseManager {
         );
     }
 
+    /**
+     * Deletes an allocation from a node.
+     * @param node The ID of the node.
+     * @param id The ID of the allocation.
+     */
     async delete(node: number, id: number): Promise<void> {
         await this.client.requests.delete(endpoints.nodes.allocations.get(node, id));
         this.cache.get(node)?.delete(id);

@@ -24,6 +24,7 @@ export class ApplicationServerManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
 
+    /** Allowed filter arguments for servers. */
     get FILTERS(): Readonly<string[]> {
         return Object.freeze([
             'name', 'uuid', 'uuidShort',
@@ -31,6 +32,7 @@ export class ApplicationServerManager extends BaseManager {
         ]);
     }
 
+    /** Allowed include arguments for servers. */
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze([
             'allocations', 'user', 'subusers',
@@ -39,6 +41,7 @@ export class ApplicationServerManager extends BaseManager {
         ]);
     }
 
+    /** Allowed sort arguments for servers. */
     get SORTS(): Readonly<string[]> {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
@@ -84,6 +87,15 @@ export class ApplicationServerManager extends BaseManager {
         return s;
     }
 
+    /**
+     * Resolves a server from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * @param obj The object to resolve from.
+     * @returns The resolved server or undefined if not found.
+     */
     resolve(obj: Resolvable<ApplicationServer>): ApplicationServer | undefined {
         if (obj instanceof ApplicationServer) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
@@ -92,14 +104,28 @@ export class ApplicationServerManager extends BaseManager {
         return undefined;
     }
 
+    /**
+     * @param id The ID of the server.
+     * @returns The formatted URL to the server in the admin panel.
+     */
     adminURLFor(id: number): string {
         return `${this.client.domain}/admin/servers/view/${id}`;
     }
 
+    /**
+     * @param id The ID of the server.
+     * @returns The formatted URL to the server.
+     */
     panelURLFor(id: string): string {
         return `${this.client.domain}/server/${id}`;
     }
 
+    /**
+     * Fetches a server or a list of servers from the Pterodactyl API.
+     * @param [id] The ID of the server.
+     * @param [options] Additional fetch options.
+     * @returns The fetched server(s).
+     */
     async fetch<T extends number | undefined>(
         id?: T,
         options: Include<FetchOptions> = {}
@@ -118,6 +144,28 @@ export class ApplicationServerManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Queries the Pterodactyl API for servers that match the specified query filters.
+     * This fetches from the API directly and does not check the cache. Use cache methods
+     * for filtering and sorting.
+     * Available query filters:
+     * * name
+     * * uuid
+     * * uuidShort
+     * * identifier (alias for uuidShort)
+     * * externalId
+     * * image
+     * 
+     * Available sort options:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * 
+     * @param entity The entity to query.
+     * @param options The query options to filter by.
+     * @returns The queried servers.
+     */
     async query(
         entity: string,
         options: Filter<Sort<{}>>
@@ -140,6 +188,13 @@ export class ApplicationServerManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Updates the details of a server.
+     * @param id The ID of the server.
+     * @param options Update details options.
+     * @see {@link UpdateDetailsOptions}.
+     * @returns The updated server.
+     */
     async updateDetails(
         id: number,
         options: UpdateDetailsOptions
@@ -160,6 +215,13 @@ export class ApplicationServerManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Updates the build configuration of a server.
+     * @param id The ID of the server.
+     * @param options Update build options.
+     * @see {@link UpdateBuildOptions}.
+     * @returns The updated server.
+     */
     async updateBuild(
         id: number,
         options: UpdateBuildOptions
@@ -179,23 +241,47 @@ export class ApplicationServerManager extends BaseManager {
         return this._patch(data);
     }
 
-    async updateStartup(
+    /**
+     * Updates the startup configuration of a server.
+     * @param id The ID of the server.
+     * @param options Update startup options.
+     * @see {@link UpdateStartupOptions}.
+     * @todo
+     */
+    private async updateStartup(
         id: number,
         options: UpdateStartupOptions
     ) {}
 
+    /**
+     * Suspends a server.
+     * @param id The ID of the server.
+     */
     async suspend(id: number): Promise<void> {
         await this.client.requests.post(endpoints.servers.suspend(id));
     }
 
+    /**
+     * Unsuspends a server.
+     * @param id The ID of the server.
+     */
     async unsuspend(id: number): Promise<void> {
         await this.client.requests.post(endpoints.servers.unsuspend(id));
     }
 
+    /**
+     * Triggers the reinstall process of a server.
+     * @param id The ID of the server.
+     */
     async reinstall(id: number): Promise<void> {
         await this.client.requests.post(endpoints.servers.reinstall(id));
     }
 
+    /**
+     * Deletes a server.
+     * @param id The ID of the server.
+     * @param [force] Whether to force delete the server.
+     */
     async delete(
         id: number,
         force: boolean = false

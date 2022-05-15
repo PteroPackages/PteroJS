@@ -20,6 +20,7 @@ export class UserManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, User>;
 
+    /** Allowed filter arguments for users. */
     get FILTERS(): Readonly<string[]> {
         return Object.freeze([
             'email', 'uuid', 'uuidShort',
@@ -27,8 +28,10 @@ export class UserManager extends BaseManager {
         ]);
     }
 
+    /** Allowed include arguments for users. */
     get INCLUDES(): Readonly<string[]> { return Object.freeze([]); }
 
+    /** Allowed sort arguments for users. */
     get SORTS(): Readonly<string[]> {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
@@ -55,6 +58,15 @@ export class UserManager extends BaseManager {
         return u;
     }
 
+    /**
+     * Resolves a user from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * @param obj The object to resolve from.
+     * @returns The resolved user or undefined if not found.
+     */
     resolve(obj: Resolvable<User>): User | undefined {
         if (obj instanceof User) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
@@ -67,10 +79,20 @@ export class UserManager extends BaseManager {
         return undefined;
     }
 
+    /**
+     * @param id The ID of the user.
+     * @returns The formatted URL to the user in the admin panel.
+     */
     adminURLFor(id: number): string {
         return `${this.client.domain}/admin/users/view/${id}`;
     }
 
+    /**
+     * Fetches a user or a list of users from the Pterodactyl API.
+     * @param [id] The ID of the user.
+     * @param [options] Additional fetch options.
+     * @returns The fetched user(s).
+     */
     async fetch<T extends number | string | undefined>(
         id?: T,
         options: External<Include<FetchOptions>> = {}
@@ -102,6 +124,29 @@ export class UserManager extends BaseManager {
         return this.fetch(id, { ...options, external: true });
     }
 
+    /**
+     * Queries the Pterodactyl API for users that match the specified query filters.
+     * This fetches from the API directly and does not check the cache. Use cache methods
+     * for filtering and sorting.
+     * Available query filters:
+     * * email
+     * * uuid
+     * * uuidShort
+     * * identifier (alias for uuidShort)
+     * * username
+     * * image
+     * * externalId
+     * 
+     * Available sort options:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * 
+     * @param entity The entity to query.
+     * @param options The query options to filter by.
+     * @returns The queried users.
+     */
     async query(
         entity: string,
         options: Filter<Sort<{}>>
@@ -122,6 +167,12 @@ export class UserManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Creates a user account.
+     * @param options Create user options.
+     * @see {@link CreateUserOptions}.
+     * @returns The new user.
+     */
     async create(options: CreateUserOptions): Promise<User> {
         const payload = caseConv.toSnakeCase<object>(
             options,
@@ -140,6 +191,13 @@ export class UserManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Updates the user account with the specified options.
+     * @param id The ID of the user.
+     * @param options Update user options.
+     * @see {@link UpdateUserOptions}.
+     * @returns The updated user.
+     */
     async update(id: number, options: UpdateUserOptions): Promise<User> {
         const payload = caseConv.toSnakeCase<object>(
             options,
@@ -158,6 +216,10 @@ export class UserManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Deletes a user account.
+     * @param id The ID of the user.
+     */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.users.get(id));
         this.cache.delete(id);

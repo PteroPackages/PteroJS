@@ -17,14 +17,17 @@ export class NodeLocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, NodeLocation>;
 
+    /** Allowed filter arguments for locations. */
     get FILTERS(): Readonly<string[]> {
         return Object.freeze(['short', 'long']);
     }
 
+    /** Allowed include arguments for locations. */
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze(['nodes', 'servers']);
     }
 
+    /** Allowed sort arguments for locations. */
     get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -54,6 +57,15 @@ export class NodeLocationManager extends BaseManager {
         return loc;
     }
 
+    /**
+     * Resolves a location from an object. This can be:
+     * * a string
+     * * a number
+     * * an object
+     * 
+     * @param obj The object to resolve from.
+     * @returns The resolved location or undefined if not found.
+     */
     resolve(obj: Resolvable<any>): NodeLocation | undefined {
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string') return this.cache.find(
@@ -65,10 +77,20 @@ export class NodeLocationManager extends BaseManager {
         return undefined;
     }
 
+    /**
+     * @param id The ID of the location.
+     * @returns The formatted URL to the location in the admin panel.
+     */
     adminURLFor(id: number) {
         return `${this.client.domain}/admin/locations/view/${id}`;
     }
 
+    /**
+     * Fetches a location or a list of locations from the Pterodactyl API.
+     * @param [id] The ID of the location.
+     * @param [options] Additional fetch options.
+     * @returns The fetched locations(s).
+     */
     async fetch<T extends number | undefined>(
         id?: T,
         options: Include<FetchOptions> = {}
@@ -80,14 +102,26 @@ export class NodeLocationManager extends BaseManager {
 
         const data = await this.client.requests.get(
             (id ? endpoints.locations.get(id) : endpoints.locations.main),
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }
 
+    /**
+     * Queries the Pterodactyl API for locations that match the specified query filters.
+     * This fetches from the API directly and does not check the cache. Use cache methods
+     * for filtering and sorting.
+     * Available query filters:
+     * * short
+     * * long
+     * 
+     * @param entity The entity to query.
+     * @param options The query options to filter by.
+     * @returns The queried locations.
+     */
     async query(
         entity: string,
-        options: Filter<Sort<{}>>
+        options: Filter<Sort<{}>> // might remove sort in future
     ): Promise<Dict<number, NodeLocation>> {
         if (!options.sort && !options.filter) throw new Error(
             'Sort or filter is required.'
@@ -105,6 +139,12 @@ export class NodeLocationManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Creates a location.
+     * @param short The short name for the location (usually the country code).
+     * @param long The long name for the location.
+     * @returns The new location.
+     */
     async create(short: string, long: string): Promise<NodeLocation> {
         const data = await this.client.requests.post(
             endpoints.locations.main, { short, long }
@@ -112,6 +152,12 @@ export class NodeLocationManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Updates a location.
+     * @param id The ID of the location.
+     * @param options The updated short and/or long name of the location.
+     * @returns The updated location.
+     */
     async update(
         id: number,
         options:{ short?: string; long?: string }
@@ -125,6 +171,10 @@ export class NodeLocationManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Deletes a location.
+     * @param id The ID of the location.
+     */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.locations.get(id));
         this.cache.delete(id);

@@ -10,8 +10,10 @@ export class NestEggsManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Egg>;
 
+    /** Allowed filter arguments for eggs. */
     get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
+    /** Allowed include arguments for eggs. */
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze([
             'nest', 'servers', 'config',
@@ -19,6 +21,7 @@ export class NestEggsManager extends BaseManager {
         ]);
     }
 
+    /** Allowed sort arguments for eggs. */
     get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -48,10 +51,21 @@ export class NestEggsManager extends BaseManager {
         return e;
     }
 
+    /**
+     * @param id The ID of the egg.
+     * @returns The formatted URL to the egg in the admin panel.
+     */
     adminURLFor(id: number): string {
         return `${this.client.domain}/admin/nests/egg/${id}`;
     }
 
+    /**
+     * Fetches an egg or a list of eggs from the Pterodactyl API.
+     * @param nest The ID of the nest.
+     * @param [id] The ID of the egg.
+     * @param [options] Additional fetch options.
+     * @returns The fetched egg(s).
+     */
     async fetch<T extends number | undefined>(
         nest: number,
         id?: T,
