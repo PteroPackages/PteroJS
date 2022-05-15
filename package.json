@@ -24,12 +24,12 @@
   },
   "homepage": "https://github.com/PteroPackages/PteroJS#readme",
   "dependencies": {
-    "node-fetch": "^2.6.7",
+    "axios": "^0.27.2",
+    "form-data": "^4.0.0",
     "ws": "^8.5.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
-    "@types/node-fetch": "^2.6.1",
     "@types/ws": "^8.5.3",
     "typescript": "^4.6.3"
   }

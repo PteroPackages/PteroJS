@@ -1,7 +1,7 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { Node }from '../structures/Node';
+import { Node } from '../structures/Node';
 import {
     CreateNodeOptions,
     NodeConfiguration,
@@ -83,15 +83,14 @@ export class NodeManager extends BaseManager {
 
         const data = await this.client.requests.get(
             (id ? endpoints.nodes.get(id) : endpoints.nodes.main),
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }
 
-    /** compatibility issue with node-fetch */
-    private async fetchDeployable(options: NodeDeploymentOptions): Promise<Dict<number, Node>> {
-        const data = await this.client.requests._make(
-            endpoints.nodes.deploy, options, 'GET'
+    async fetchDeployable(options: NodeDeploymentOptions): Promise<Dict<number, Node>> {
+        const data = await this.client.requests.get(
+            endpoints.nodes.deploy, undefined, options
         );
         return this._patch(data);
     }
@@ -110,14 +109,14 @@ export class NodeManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.nodes.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            this
+            null, this
         );
         return this._patch(data);
     }
 
     async getConfig(id: number): Promise<NodeConfiguration> {
         const data = await this.client.requests.get(
-            endpoints.nodes.config(id), {}, this
+            endpoints.nodes.config(id), {}, null, this
         );
         return caseConv.toCamelCase(data);
     }

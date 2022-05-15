@@ -133,7 +133,7 @@ export class Account extends BaseUser {
     }
 
     async fetch(): Promise<this> {
-        const data: any = await this.client.requests.get(endpoints.account.main, {});
+        const data = await this.client.requests.get(endpoints.account.main);
         super._patch(data.attributes);
 
         this.id = data.attributes.id;

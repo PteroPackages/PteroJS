@@ -51,7 +51,7 @@ export class NodeAllocationManager extends BaseManager {
 
         const data = await this.client.requests.get(
             endpoints.nodes.allocations.main(node),
-            options, this
+            options, null, this
         );
         return this._patch(node, data);
     }

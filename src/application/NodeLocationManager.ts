@@ -89,7 +89,9 @@ export class NodeLocationManager extends BaseManager {
         entity: string,
         options: Filter<Sort<{}>>
     ): Promise<Dict<number, NodeLocation>> {
-        if (!options.sort && !options.filter) throw new Error('Sort or filter is required.');
+        if (!options.sort && !options.filter) throw new Error(
+            'Sort or filter is required.'
+        );
 
         const payload: FilterArray<Sort<{}>> = {};
         if (options.filter) payload.filter = [options.filter, entity];
@@ -98,7 +100,7 @@ export class NodeLocationManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.locations.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            this
+            null, this
         );
         return this._patch(data);
     }

@@ -64,7 +64,7 @@ export class NestEggsManager extends BaseManager {
 
         const data = await this.client.requests.get(
             id ? endpoints.nests.eggs.get(nest, id) : endpoints.nests.eggs.main(nest),
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }

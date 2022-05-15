@@ -39,21 +39,21 @@ export class FileManager {
     async fetch(dir: string = '/'): Promise<Dict<string, File>> {
         const data = await this.client.requests.get(
             endpoints.servers.files.main(this.serverId) +
-            `?directory=${this.clean(dir)}`, {}
+            `?directory=${this.clean(dir)}`
         );
         return this._patch(dir, data);
     }
 
     async getContents(path: string): Promise<string> {
         const data = await this.client.requests.get(
-            endpoints.servers.files.contents(this.serverId, this.clean(path)), {}
+            endpoints.servers.files.contents(this.serverId, this.clean(path))
         );
         return data.toString();
     }
 
     async getDownloadURL(path: string): Promise<string> {
-        const data: any = await this.client.requests.get(
-            endpoints.servers.files.download(this.serverId, this.clean(path)), {}
+        const data = await this.client.requests.get(
+            endpoints.servers.files.download(this.serverId, this.clean(path))
         );
         return data.attributes.url;
     }
@@ -64,14 +64,14 @@ export class FileManager {
         );
 
         const url = await this.getDownloadURL(path);
-        const data: any = await this.client.requests._raw(url, undefined, {}, 'GET');
+        const data = await this.client.requests.raw('GET', url);
         writeFileSync(dest, data.toString(), { encoding: 'utf-8' });
     }
 
     async getUploadURL(dir: string = '/'): Promise<string> {
-        const data: any = await this.client.requests.get(
+        const data = await this.client.requests.get(
             endpoints.servers.files.upload(this.serverId) +
-            `?directory=${this.clean(dir)}`, {}
+            `?directory=${this.clean(dir)}`
         );
         return data.attributes.url;
     }

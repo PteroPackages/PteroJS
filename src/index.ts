@@ -27,7 +27,7 @@ export * from './common';
 export * from './common/app';
 
 // HTTP
-export { RestRequestManager } from './http/RestRequestManager';
+export { RequestManager } from './http/RequestManager';
 
 // Structures
 export { ApplicationServer } from './structures/ApplicationServer';

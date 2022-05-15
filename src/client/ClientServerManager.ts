@@ -65,14 +65,14 @@ export class ClientServerManager extends BaseManager {
 
         const data = await this.client.requests.get(
             id ? endpoints.servers.get(id) : endpoints.servers.main,
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }
 
     async fetchResources(id: string): Promise<ClientResources> {
         const data: any = await this.client.requests.get(
-            endpoints.servers.resources(id), {}
+            endpoints.servers.resources(id)
         );
         return caseConv.toCamelCase(data.attributes);
     }

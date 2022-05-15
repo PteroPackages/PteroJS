@@ -1,6 +1,6 @@
 import { Account } from '../structures/User';
 import { ClientServerManager } from './ClientServerManager';
-import { RestRequestManager } from '../http/RestRequestManager';
+import { RequestManager } from '../http/RequestManager';
 import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
 import loader from '../util/config';
@@ -12,7 +12,7 @@ export class PteroClient {
     public account: Account;
 
     public servers: ClientServerManager;
-    public requests: RestRequestManager;
+    public requests: RequestManager;
     public ws: WebSocketManager;
 
     constructor(
@@ -32,7 +32,7 @@ export class PteroClient {
         this.account = new Account(this);
 
         this.servers = new ClientServerManager(this);
-        this.requests = new RestRequestManager('Client', domain, auth);
+        this.requests = new RequestManager('Client', domain, auth);
         this.ws = new WebSocketManager(this);
     }
 

@@ -35,7 +35,7 @@ export class NetworkManager {
 
     async fetch(): Promise<Dict<number, NetworkAllocation>> {
         const data = await this.client.requests.get(
-            endpoints.servers.network.main(this.serverId), {}
+            endpoints.servers.network.main(this.serverId)
         );
         return this._patch(data);
     }

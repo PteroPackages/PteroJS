@@ -113,7 +113,7 @@ export class ApplicationServerManager extends BaseManager {
 
         const data = await this.client.requests.get(
             (id ? endpoints.servers.get(id) : endpoints.servers.main),
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }
@@ -135,7 +135,7 @@ export class ApplicationServerManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.servers.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            this
+            null, this
         );
         return this._patch(data);
     }

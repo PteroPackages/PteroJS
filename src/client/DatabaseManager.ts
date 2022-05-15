@@ -45,7 +45,7 @@ export class DatabaseManager extends BaseManager {
     async fetch(options: Include<FetchOptions> = {}): Promise<Dict<number, Database>> {
         const data = await this.client.requests.get(
             endpoints.servers.databases.main(this.serverId),
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }

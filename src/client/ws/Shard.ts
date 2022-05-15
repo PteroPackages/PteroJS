@@ -70,7 +70,7 @@ export class Shard extends EventEmitter {
 
         this.status = ShardStatus.CONNECTING;
         const auth = await this.client.requests.get(
-            endpoints.servers.ws(this.uuid), {}
+            endpoints.servers.ws(this.uuid)
         ) as WebSocketAuth;
         this.socket = new WebSocket(auth.data.socket);
 
@@ -85,7 +85,7 @@ export class Shard extends EventEmitter {
             throw new Error('Shard is not connected.');
 
         const auth = await this.client.requests.get(
-            endpoints.servers.ws(this.uuid), {}
+            endpoints.servers.ws(this.uuid)
         ) as WebSocketAuth;
         this.send('auth', [auth.data.token]);
     }

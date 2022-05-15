@@ -59,7 +59,7 @@ export class NestManager extends BaseManager {
         const data = await this.client.requests.get(
             id ? endpoints.nests.get(id) : endpoints.nests.main,
             { include } as Include<FetchOptions>,
-            this
+            null, this
         );
         return this._patch(data);
     }

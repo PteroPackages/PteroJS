@@ -3,7 +3,7 @@ import { NestManager } from './NestManager';
 import { NodeAllocationManager } from './NodeAllocationManager';
 import { NodeLocationManager } from './NodeLocationManager';
 import { NodeManager } from './NodeManager';
-import { RestRequestManager } from '../http/RestRequestManager';
+import { RequestManager } from '../http/RequestManager';
 import { UserManager } from './UserManager';
 import { OptionSpec } from '../common';
 import loader from '../util/config';
@@ -38,7 +38,7 @@ export class PteroApp {
     public nodes: NodeManager;
     public servers: ApplicationServerManager;
     public users: UserManager;
-    public requests: RestRequestManager;
+    public requests: RequestManager;
 
     constructor(
         domain: string,
@@ -61,7 +61,7 @@ export class PteroApp {
         this.nodes = new NodeManager(this);
         this.servers = new ApplicationServerManager(this);
         this.users = new UserManager(this);
-        this.requests = new RestRequestManager('Application', domain, auth);
+        this.requests = new RequestManager('Application', domain, auth);
     }
 
     get ping(): number {

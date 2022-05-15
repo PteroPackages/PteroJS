@@ -70,7 +70,7 @@ export class BackupManager extends BaseManager {
             id
                 ? endpoints.servers.backups.get(this.serverId, id)
                 : endpoints.servers.backups.main(this.serverId),
-            options, this
+            options, null, this
         );
         return this._patch(data);
     }
@@ -91,8 +91,8 @@ export class BackupManager extends BaseManager {
     }
 
     async getDownloadURL(id: string): Promise<string> {
-        const data: any = await this.client.requests.get(
-            endpoints.servers.backups.download(this.serverId, id), {}
+        const data = await this.client.requests.get(
+            endpoints.servers.backups.download(this.serverId, id)
         );
         return data.attributes.url;
     }
@@ -103,7 +103,7 @@ export class BackupManager extends BaseManager {
         );
 
         const url = await this.getDownloadURL(id);
-        const data: any = await this.client.requests._raw(url, undefined, {}, 'GET');
+        const data = await this.client.requests.raw('GET', url);
         writeFileSync(dest, data.toString(), { encoding: 'utf-8' });
     }
 
