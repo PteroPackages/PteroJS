@@ -1,7 +1,6 @@
 # General directories
 node_modules/
 dist/
-docs/
 test/
 
 # General / Testing files
