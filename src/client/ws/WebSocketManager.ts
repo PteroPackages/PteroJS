@@ -16,12 +16,14 @@ export class WebSocketManager {
         if (this.shards.has(id)) return this.shards.get(id)!;
         const shard = new Shard(this.client, id);
         this.shards.set(id, shard);
+        this.active = true;
         return shard;
     }
 
     deleteShard(id: string): boolean {
         if (!this.shards.has(id)) return false;
         this.shards.get(id)!.disconnect();
+        this.active = !!this.shards.size;
         return this.shards.delete(id);
     }
 
@@ -35,5 +37,6 @@ export class WebSocketManager {
     destroy(): void {
         for (let s of this.shards.values()) s.disconnect();
         this.shards.clear();
+        this.active = false;
     }
 }
