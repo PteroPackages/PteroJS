@@ -17,6 +17,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Implement helper functions for all the managers
 - [X] Implement `ClientUser` required fetch on startup
 - [ ] Document all functions
+- [ ] Implement `?type=` for `ClientServerManager#fetch()`
 
 ## Global Managers
 - [X] Implement helper functions for all the managers
@@ -38,7 +39,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Remove deprecated `PteroUser#tfa`
 - [X] Remove deprecated `Presets` util
 - [ ] Rewrite in TypeScript
-- [ ] Switch `node-fetch` to a different library
+- [X] Switch `node-fetch` to a different library
 - [ ] Implement builder classes
 - [ ] Remove deprecated `UserManager#fetchExternal`
 

@@ -15,9 +15,10 @@ All changes to PteroJS as of v2.
 - `FileChmodData` type for chmod requests
 - `NodeManager#fetchDeployable()` method with types
 - `BackupManager#getDownloadURL()` replaces old `download()` method
+- `WebSocketManager#active` for checking active created shards
+- `ClientServerManager#fetchResources()` method
 
 ### Changed
-- `RequestManager` -> `RestRequestManager`
 - all application and client managers now extend `BaseManager`
 - renamed user classes to reflect the API
 - `PteroUser` is now `User`
@@ -27,6 +28,8 @@ All changes to PteroJS as of v2.
 - `PteroFile` -> `File` (typing change)
 - `FileManager#download()` now downloads the file
 - `BackupManager#download()` now downloads the backup
+- `RequestManager` uses axios with internal parsing
+- most structures now use its manager for API requests in its group
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead
@@ -36,6 +39,7 @@ All changes to PteroJS as of v2.
 - most union string/number & instance type parameters
 - `ClientServer#addWebsocket()`: use the client directly instead
 - `File#isEditable`: never existed in the API, issue from the docs
+- `WebSocketManager#readyAt`: no longer centralised, replaced by `#active`
 
 ### Fixed
 - export all endpoints properly
