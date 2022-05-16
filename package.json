@@ -1,10 +1,10 @@
 {
   "name": "@devnote-dev/pterojs",
-  "version": "1.4.1",
-  "description": "A flexibile API wrapper for Pterodactyl",
+  "version": "2.0.0",
+  "description": "A verbose API library for Pterodactyl",
   "main": "src/index.ts",
   "scripts": {
-    "build":"npx typedoc --out docs src/index.ts",
+    "build":"npx typedoc --out docs --excludePrivate src/index.ts",
     "tests": "node tests/index"
   },
   "repository": {
@@ -12,18 +12,20 @@
     "url": "git+https://github.com/PteroPackages/PteroJS.git"
   },
   "keywords": [
-    "pterodactyl",
-    "pterodactyl-api",
+    "api",
+    "library",
     "wrapper",
     "javascript",
-    "typescript"
+    "typescript",
+    "pterodactyl",
+    "pterodactyl-api"
   ],
   "author": "Devonte <https://github.com/devnote-dev>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PteroPackages/PteroJS/issues"
   },
-  "homepage": "https://github.com/PteroPackages/PteroJS#readme",
+  "homepage": "https://pteropackages.github.io/PteroJS/",
   "dependencies": {
     "axios": "^0.27.2",
     "form-data": "^4.0.0",

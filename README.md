@@ -1,15 +1,27 @@
 <h1 align="center">PteroJS</h1>
-<h3 align="center"><strong>A better API wrapper for Pterodactyl</strong></h3>
-<p align="center"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/version-1.4.1-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/devnote-dev/PteroJS.svg?style=for-the-badge"> <img src="https://img.shields.io/badge/docs-coming_soon-e67e22?style=for-the-badge"></p>
+<h3 align="center"><strong>A verbose API library for Pterodactyl</strong></h3>
+<p align="center"><a href="https://discord.com/invite/dwcfTjgn7S" type="_blank"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"></a> <img src="https://img.shields.io/badge/version-2.0.0-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/PteroPackages/PteroJS.svg?style=for-the-badge"> <a href="https://pteropackages.github.io/PteroJS/" type="_blank"><img src="https://img.shields.io/badge/docs-typedoc-e67e22?style=for-the-badge"></a></p>
 
 ## About
-PteroJS is a flexible API wrapper designed to give developers full access over the Pterodactyl API. The library uses a class-based management structure often seen in popular packages like Discord.js which keeps code clean, efficient and practical for any use-case.
+PteroJS is a verbose API library for the [Pterodactyl Game Panel](https://pterodactyl.io) designed to give developers full access and control over the API without having to compromise on code quality or efficiency.
 
 ## Installing
+If you are using Node.js (v14.x and above):
 ```
 npm install @devnote-dev/pterojs
+yarn add @devnote-dev/pterojs
 ```
-Please join the [support server](https://discord.gg/rmRw4W5XXz) if you experience package installation issues.
+or if you are using Deno:
+```js
+import pterojs from 'https://cdn.skypack.dev/@devnote-dev/pterojs';
+```
+Please join the [support server](https://discord.com/invite/dwcfTjgn7S) if you experience any issues with installing the package.
+
+## Compatibility
+Pterodactyl API | Wings API | Support
+----------------|-----------|--------
+`<=0.7` | `<=1.5` | ❌
+`^1.6.5` | `^1.6` | ✅
 
 ## Setting Up
 PteroJS uses separate classes for the client and application sides of the Pterodactyl API.
@@ -19,7 +31,7 @@ PteroJS uses separate classes for the client and application sides of the Pterod
 const { PteroApp } = require('@devnote-dev/pterojs');
 
 // Initialising the application
-const client = new PteroApp('your.domain.here', 'pterodactyl_api_key');
+const client = new PteroApp('your.domain.name', 'pterodactyl_api_key');
 
 // Accessing information
 client.servers.fetch('evuk98yu').then(console.log);
@@ -31,7 +43,7 @@ const { PteroClient } = require('@devnote-dev/pterojs');
 
 // Initialising the client
 const client = new PteroClient(
-    'your.domain.here',
+    'your.domain.name',
     'pterodactyl_api_key',
     { ws: true }
 );
@@ -49,9 +61,9 @@ shard.connect();
 ```
 
 ## Contributing
-Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TODO.md) or [issues](https://github.com/PteroPackages/PteroJS/issues) section for contributing ideas. New ideas are also welcome.
+Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TODO.md) or [issues](https://github.com/PteroPackages/PteroJS/issues) section for contributing ideas. New ideas/features are also welcome.
 
-1. [Fork this repo](https://github.com/PteroPackages/pterojs/fork)!
+1. [Fork this repo](https://github.com/PteroPackages/PteroJS/fork)!
 2. Make a branch from `main` (`git branch -b <new-feature>`)
 3. Commit your changes (`git commit -am "..."`)
 4. Open a PR here (`git push origin <new-feature>`)
@@ -60,9 +72,7 @@ Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TO
 * [Devonte](https://github.com/devnote-dev) - Owner, maintainer
 * [Chelog](https://github.com/chelog) - Code contributor
 * [Cain](https://github.com/cainthebest) - Code contributor
-* [Zumo](https://github.com/ZumoDev) - Tester
-* [Dino](https://github.com/DinoTheDevOfficial) - Tester
 
 This repository is managed under the MIT license.
 
-© 2021-2022 devnote-dev
+© 2021-2022 PteroPackages
