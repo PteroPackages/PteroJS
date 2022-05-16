@@ -1,3 +1,4 @@
+import type { Shard } from './ws/Shard';
 import { Account } from '../structures/User';
 import { ClientServerManager } from './ClientServerManager';
 import { RequestManager } from '../http/RequestManager';
@@ -38,5 +39,35 @@ export class PteroClient {
 
     get ping(): number {
         return this.requests._ping;
+    }
+
+    /** Performs preload requests to Pterodactyl. */
+    async connect(): Promise<void> {
+        if (this.options.fetchClient) await this.account.fetch();
+        if (this.options.servers.fetch && this.options.servers.cache)
+            await this.servers.fetch();
+    }
+
+    /**
+     * Adds one or more servers to be connected to websockets.
+     * @param ids The server identifiers to add.
+     * @returns The websocket shards.
+     */
+    addSocketServer(...ids: string[]): Shard[] {
+        return ids.map(i => this.ws.createShard(i));
+    }
+
+    /**
+     * Removes a server from websocket connections.
+     * @param id The identifier of the server.
+     * @returns Whether the shard was removed.
+     */
+    removeSocketServer(id: string): boolean {
+        return this.ws.deleteShard(id);
+    }
+
+    /** Closes any existing websocket connections. */
+    disconnect(): void {
+        if (this.ws.active) this.ws.destroy();
     }
 }
