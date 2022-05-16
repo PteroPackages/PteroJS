@@ -12,13 +12,16 @@ export class BackupManager extends BaseManager {
     public cache: Dict<string, Backup>;
     public serverId: string;
 
+    /** Allowed filter arguments for backups. */
     get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
-
+    /** Allowed include arguments for backups. */
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze(['password']);
     }
+
+    /** Allowed sort arguments for backups. */
+    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroClient, serverId: string) {
         super();
@@ -57,6 +60,12 @@ export class BackupManager extends BaseManager {
         return b;
     }
 
+    /**
+     * Fetches a backup or a list of backups from the Pterodactyl API.
+     * @param [id] The UUID of the backup.
+     * @param [options] Additional fetch options.
+     * @returns The fetched backup(s).
+     */
     async fetch<T extends string | undefined>(
         id?: T,
         options: Include<FetchOptions> = {}
@@ -75,6 +84,12 @@ export class BackupManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Creates a new backup on the server.
+     * @param options Create backup options.
+     * @see {@link CreateBackupOptions}.
+     * @returns The new backup.
+     */
     async create(options: CreateBackupOptions = {}): Promise<Backup> {
         const data = await this.client.requests.post(
             endpoints.servers.backups.main(this.serverId),
@@ -83,6 +98,11 @@ export class BackupManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Toggles the locked status of a backup.
+     * @param id The UUID of the backup.
+     * @returns The updated backup.
+     */
     async toggleLock(id: string): Promise<Backup> {
         const data = await this.client.requests.post(
             endpoints.servers.backups.lock(this.serverId, id)
@@ -90,6 +110,11 @@ export class BackupManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Fetches the download URL for a specified backup.
+     * @param id The UUID of the backup.
+     * @returns The download URL.
+     */
     async getDownloadURL(id: string): Promise<string> {
         const data = await this.client.requests.get(
             endpoints.servers.backups.download(this.serverId, id)
@@ -97,6 +122,11 @@ export class BackupManager extends BaseManager {
         return data.attributes.url;
     }
 
+    /**
+     * Fetches and saves a backup to a specified path on the system.
+     * @param id The UUID of the backup.
+     * @param dest The file path to save the backup to.
+     */
     async download(id: string, dest: string): Promise<void> {
         if (existsSync(dest)) throw new Error(
             'A file or directory exists at this path.'
@@ -107,12 +137,20 @@ export class BackupManager extends BaseManager {
         writeFileSync(dest, data.toString(), { encoding: 'utf-8' });
     }
 
+    /**
+     * Restores a specified backup to the server.
+     * @param id The UUID of the backup.
+     */
     async restore(id: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.backups.restore(this.serverId, id)
         );
     }
 
+    /**
+     * Deletes a specified backup.
+     * @param id The UUID of the backup.
+     */
     async delete(id: string): Promise<void> {
         await this.client.requests.delete(
             endpoints.servers.backups.get(this.serverId, id)

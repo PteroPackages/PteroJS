@@ -17,12 +17,15 @@ export class ClientServerManager extends BaseManager {
      */
     public meta: ClientMeta | undefined;
 
+    /** Allowed filter arguments for servers. */
     get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
+    /** Allowed include arguments for servers. */
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze(['egg', 'subusers']);
     }
 
+    /** Allowed sort arguments for servers. */
     get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroClient) {
@@ -50,10 +53,20 @@ export class ClientServerManager extends BaseManager {
         return s;
     }
 
+    /**
+     * @param id The ID of the server.
+     * @returns The formatted URL to the server.
+     */
     panelURLFor(id: string): string {
         return `${this.client.domain}/server/${id}`;
     }
 
+    /**
+     * Fetches a server or a list of servers from the Pterodactyl API.
+     * @param [id] The ID of the server.
+     * @param [options] Additional fetch options.
+     * @returns The fetched server(s).
+     */
     async fetch<T extends string | undefined>(
         id?: T,
         options: Include<FetchOptions> = {}
@@ -70,6 +83,11 @@ export class ClientServerManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Fetches the server resources data of a server.
+     * @param id The identifier of the server.
+     * @returns The server resources.
+     */
     async fetchResources(id: string): Promise<ClientResources> {
         const data: any = await this.client.requests.get(
             endpoints.servers.resources(id)
@@ -77,12 +95,22 @@ export class ClientServerManager extends BaseManager {
         return caseConv.toCamelCase(data.attributes);
     }
 
+    /**
+     * Sends a command to the console of a server.
+     * @param id The identifier of the server.
+     * @param command The command to send.
+     */
     async sendCommand(id: string, command: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.command(id), { command }
         );
     }
 
+    /**
+     * Sets the power state of a server.
+     * @param id The identifier of the server.
+     * @param state The power state to set.
+     */
     async setPowerState(
         id: string,
         state: 'start' | 'stop' | 'restart' | 'kill'

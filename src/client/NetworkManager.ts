@@ -33,6 +33,10 @@ export class NetworkManager {
         return a;
     }
 
+    /**
+     * Fetches the network allocations on the server.
+     * @returns The fetched network allocations.
+     */
     async fetch(): Promise<Dict<number, NetworkAllocation>> {
         const data = await this.client.requests.get(
             endpoints.servers.network.main(this.serverId)
@@ -40,6 +44,12 @@ export class NetworkManager {
         return this._patch(data);
     }
 
+    /**
+     * Sets the notes of a specified network allocation.
+     * @param id The ID of the network allocation.
+     * @param notes The notes to set.
+     * @returns The updated network allocation.
+     */
     async setNote(id: number, notes: string): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
             endpoints.servers.network.get(this.serverId, id),
@@ -48,6 +58,11 @@ export class NetworkManager {
         return this._patch(data);
     }
 
+    /**
+     * Sets the primary allocation of the server.
+     * @param id The ID of the network allocation.
+     * @returns The updated network allocation.
+     */
     async setPrimary(id: number): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
             endpoints.servers.network.primary(this.serverId, id)
@@ -55,6 +70,10 @@ export class NetworkManager {
         return this._patch(data);
     }
 
+    /**
+     * Unassigns the specified network allocation form the server.
+     * @param id The ID of the network allocation.
+     */
     async unassign(id: number): Promise<void> {
         await this.client.requests.delete(
             endpoints.servers.network.get(this.serverId, id)

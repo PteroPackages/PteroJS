@@ -11,13 +11,16 @@ export class DatabaseManager extends BaseManager {
     public cache: Dict<number, Database>;
     public serverId: string;
 
+    /** Allowed filter arguments for databases. */
     get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
 
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
-
+    /** Allowed include arguments for databases. */
     get INCLUDES(): Readonly<string[]> {
         return Object.freeze(['password']);
     }
+
+    /** Allowed sort arguments for databases. */
+    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
 
     constructor(client: PteroClient, serverId: string) {
         super();
@@ -42,6 +45,11 @@ export class DatabaseManager extends BaseManager {
         return d;
     }
 
+    /**
+     * Fetches a list of databases from the Pterodactyl API.
+     * @param [options] Additional fetch options.
+     * @returns The fetched databases.
+     */
     async fetch(options: Include<FetchOptions> = {}): Promise<Dict<number, Database>> {
         const data = await this.client.requests.get(
             endpoints.servers.databases.main(this.serverId),
@@ -50,6 +58,12 @@ export class DatabaseManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Creates a database on the server.
+     * @param database The name of the database.
+     * @param remote The connections allowed to the database.
+     * @returns The new database.
+     */
     async create(database: string, remote: string): Promise<Database> {
         const data = await this.client.requests.post(
             endpoints.servers.databases.main(this.serverId),
@@ -58,6 +72,11 @@ export class DatabaseManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Rotates the password of a specified database.
+     * @param id The ID of the database.
+     * @returns The updated database.
+     */
     async rotate(id: number): Promise<Database> {
         const data = await this.client.requests.post(
             endpoints.servers.databases.rotate(this.serverId, id)
@@ -65,6 +84,10 @@ export class DatabaseManager extends BaseManager {
         return this._patch(data);
     }
 
+    /**
+     * Deletes a database from the server.
+     * @param id The ID of the database.
+     */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(
             endpoints.servers.databases.get(this.serverId, id)
