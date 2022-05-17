@@ -25,6 +25,7 @@ export { WebSocketManager } from './client/ws/WebSocketManager';
 // Commons
 export * from './common';
 export * from './common/app';
+export * from './common/client';
 
 // HTTP
 export { RequestManager } from './http/RequestManager';
