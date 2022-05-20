@@ -11,10 +11,10 @@ export class NestEggsManager extends BaseManager {
     public cache: Dict<number, Egg>;
 
     /** Allowed filter arguments for eggs. */
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
+    get FILTERS() { return Object.freeze([]); }
 
     /** Allowed include arguments for eggs. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze([
             'nest', 'servers', 'config',
             'script', 'variables'
@@ -22,7 +22,7 @@ export class NestEggsManager extends BaseManager {
     }
 
     /** Allowed sort arguments for eggs. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();

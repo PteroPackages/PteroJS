@@ -13,15 +13,15 @@ export class BackupManager extends BaseManager {
     public serverId: string;
 
     /** Allowed filter arguments for backups. */
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
+    get FILTERS() { return Object.freeze([]); }
 
     /** Allowed include arguments for backups. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze(['password']);
     }
 
     /** Allowed sort arguments for backups. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroClient, serverId: string) {
         super();

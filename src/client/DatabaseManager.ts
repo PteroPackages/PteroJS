@@ -12,15 +12,15 @@ export class DatabaseManager extends BaseManager {
     public serverId: string;
 
     /** Allowed filter arguments for databases. */
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
+    get FILTERS() { return Object.freeze([]); }
 
     /** Allowed include arguments for databases. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze(['password']);
     }
 
     /** Allowed sort arguments for databases. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroClient, serverId: string) {
         super();

@@ -18,15 +18,15 @@ export class ClientServerManager extends BaseManager {
     public meta: ClientMeta | undefined;
 
     /** Allowed filter arguments for servers. */
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
+    get FILTERS() { return Object.freeze([]); }
 
     /** Allowed include arguments for servers. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze(['egg', 'subusers']);
     }
 
     /** Allowed sort arguments for servers. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroClient) {
         super();

@@ -1,7 +1,7 @@
 export abstract class BaseManager {
-    abstract get FILTERS(): Readonly<string[]>;
-    abstract get SORTS(): Readonly<string[]>;
-    abstract get INCLUDES(): Readonly<string[]>;
+    abstract get FILTERS(): readonly string[];
+    abstract get SORTS(): readonly string[];
+    abstract get INCLUDES(): readonly string[];
 
     getQueryOptions() {
         return {

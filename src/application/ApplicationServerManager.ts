@@ -25,7 +25,7 @@ export class ApplicationServerManager extends BaseManager {
     public cache: Dict<number, ApplicationServer>;
 
     /** Allowed filter arguments for servers. */
-    get FILTERS(): Readonly<string[]> {
+    get FILTERS() {
         return Object.freeze([
             'name', 'uuid', 'uuidShort',
             'externalId', 'image'
@@ -33,7 +33,7 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     /** Allowed include arguments for servers. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze([
             'allocations', 'user', 'subusers',
             'nest', 'egg', 'variables',
@@ -42,7 +42,7 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     /** Allowed sort arguments for servers. */
-    get SORTS(): Readonly<string[]> {
+    get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
 

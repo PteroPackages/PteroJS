@@ -21,7 +21,7 @@ export class UserManager extends BaseManager {
     public cache: Dict<number, User>;
 
     /** Allowed filter arguments for users. */
-    get FILTERS(): Readonly<string[]> {
+    get FILTERS() {
         return Object.freeze([
             'email', 'uuid', 'uuidShort',
             'username', 'image', 'external_id'
@@ -29,10 +29,10 @@ export class UserManager extends BaseManager {
     }
 
     /** Allowed include arguments for users. */
-    get INCLUDES(): Readonly<string[]> { return Object.freeze([]); }
+    get INCLUDES() { return Object.freeze([]); }
 
     /** Allowed sort arguments for users. */
-    get SORTS(): Readonly<string[]> {
+    get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
 

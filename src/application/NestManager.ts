@@ -13,15 +13,15 @@ export class NestManager extends BaseManager {
     public eggs: NestEggsManager;
 
     /** Allowed filter arguments for nests. */
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
+    get FILTERS() { return Object.freeze([]); }
 
     /** Allowed include arguments for nests. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze(['eggs', 'servers']);
     }
 
     /** Allowed sort arguments for nests. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();

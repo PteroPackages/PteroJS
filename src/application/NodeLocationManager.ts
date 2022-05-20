@@ -18,17 +18,17 @@ export class NodeLocationManager extends BaseManager {
     public cache: Dict<number, NodeLocation>;
 
     /** Allowed filter arguments for locations. */
-    get FILTERS(): Readonly<string[]> {
+    get FILTERS() {
         return Object.freeze(['short', 'long']);
     }
 
     /** Allowed include arguments for locations. */
-    get INCLUDES(): Readonly<string[]> {
+    get INCLUDES() {
         return Object.freeze(['nodes', 'servers']);
     }
 
     /** Allowed sort arguments for locations. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();

@@ -11,7 +11,7 @@ export class NodeAllocationManager extends BaseManager {
     public cache: Dict<number, Dict<number, Allocation>>;
 
     /** Allowed filter arguments for allocations. */
-    get FILTERS(): Readonly<string[]> { return Object.freeze([]); }
+    get FILTERS() { return Object.freeze([]); }
 
     /** Allowed include arguments for allocations. */
     get INCLUDES() {
@@ -19,7 +19,7 @@ export class NodeAllocationManager extends BaseManager {
     }
 
     /** Allowed sort arguments for allocations. */
-    get SORTS(): Readonly<string[]> { return Object.freeze([]); }
+    get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
         super();
