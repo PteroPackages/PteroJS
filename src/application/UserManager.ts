@@ -198,7 +198,17 @@ export class UserManager extends BaseManager {
      * @see {@link UpdateUserOptions}.
      * @returns The updated user.
      */
-    async update(id: number, options: UpdateUserOptions): Promise<User> {
+    async update(id: number, options: Partial<UpdateUserOptions>): Promise<User> {
+        if (!Object.keys(options).length)
+            throw new Error('Too few options to update user.');
+
+        const user = await this.fetch(id);
+        options.username ||= user.username;
+        options.firstname ||= user.firstname;
+        options.lastname ||= user.lastname;
+        options.email ||= user.email;
+        options.isAdmin ??= user.isAdmin;
+
         const payload = caseConv.toSnakeCase<object>(
             options,
             {
