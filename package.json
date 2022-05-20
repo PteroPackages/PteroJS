@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build":"npx typedoc --out docs --excludePrivate src/index.ts",
-    "tests": "node tests/index"
+    "tests": "ts-node tests/index.ts"
   },
   "repository": {
     "type": "git",
