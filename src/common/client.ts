@@ -29,6 +29,25 @@ export interface ClientResources {
     }
 }
 
+export interface CreateBackupOptions {
+    name?:      string;
+    isLocked?:  boolean;
+    ignored?:   string;
+}
+
+export interface CreateScheduleOptions extends Omit<Cron, 'month'> {
+    name:           string;
+    active:         boolean;
+}
+
+export interface Cron {
+    dayOfWeek:  string;
+    dayOfMonth: string;
+    month:      string;
+    hour:       string;
+    minute:     string;
+}
+
 export interface Database {
     id:                 number;
     name:               string;
@@ -40,12 +59,6 @@ export interface Database {
     connectionsFrom:    string;
     maxConnections:     string;
     password?:          string;
-}
-
-export interface CreateBackupOptions {
-    name?:      string;
-    isLocked?:  boolean;
-    ignored?:   string;
 }
 
 export interface File {
@@ -73,6 +86,19 @@ export interface NetworkAllocation {
     notes:      string | null;
     isDefault:  boolean;
 }
+
+export interface ScheduleTask {
+    id:         number;
+    sequenceId: number;
+    action:     string;
+    payload:    string;
+    offset:     number;
+    queued:     boolean;
+    createdAt:  Date;
+    updatedAt:  Date | undefined;
+}
+
+export type ScheduleTaskAction = 'backup' | 'command' | 'power';
 
 export enum ShardStatus {
     CLOSED,

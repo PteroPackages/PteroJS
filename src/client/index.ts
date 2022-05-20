@@ -2,6 +2,7 @@ import type { Shard } from './ws/Shard';
 import { Account } from '../structures/User';
 import { ClientServerManager } from './ClientServerManager';
 import { RequestManager } from '../http/RequestManager';
+import { ScheduleManager } from './ScheduleManager';
 import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
 import loader from '../util/config';
@@ -12,6 +13,7 @@ export class PteroClient {
     public options: Record<string, OptionSpec>;
     public account: Account;
 
+    public schedules: ScheduleManager;
     public servers: ClientServerManager;
     public requests: RequestManager;
     public ws: WebSocketManager;
@@ -32,6 +34,7 @@ export class PteroClient {
         this.options = loader.clientConfig({ client: options });
         this.account = new Account(this);
 
+        this.schedules = new ScheduleManager(this);
         this.servers = new ClientServerManager(this);
         this.requests = new RequestManager('Client', domain, auth);
         this.ws = new WebSocketManager(this);

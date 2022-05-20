@@ -30,10 +30,10 @@ export default {
         },
         schedules:{
             main: (s: string) => `/servers/${s}/schedules`,
-            get: (s: string, id: string) => `/servers/${s}/schedules/${id}`,
+            get: (s: string, id: number) => `/servers/${s}/schedules/${id}`,
             tasks:{
-                main: (s: string, id: string) => `/servers/${s}/schedules/${id}/tasks`,
-                get: (s: string, id: string, t: string) => `/servers/${s}/schedules/${id}/tasks/${t}`
+                main: (s: string, id: number) => `/servers/${s}/schedules/${id}/tasks`,
+                get: (s: string, id: number, t: number) => `/servers/${s}/schedules/${id}/tasks/${t}`
             }
         },
         network:{
