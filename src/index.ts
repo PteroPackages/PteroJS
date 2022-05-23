@@ -19,6 +19,7 @@ export { ClientServerManager } from './client/ClientServerManager';
 export { DatabaseManager } from './client/DatabaseManager';
 export { FileManager } from './client/FileManager';
 export { NetworkManager } from './client/NetworkManager';
+export { ScheduleManager } from './client/ScheduleManager';
 export { Shard } from './client/ws/Shard';
 export { WebSocketManager } from './client/ws/WebSocketManager';
 
@@ -38,6 +39,7 @@ export * from './structures/Dict';
 export * from './structures/Errors';
 export { Node } from './structures/Node';
 export * from './structures/Permissions';
+export { Schedule } from './structures/Schedule';
 export * from './structures/User';
 
 // Utilities
