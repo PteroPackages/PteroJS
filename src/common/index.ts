@@ -43,6 +43,7 @@ export interface FetchOptions {
      * Whether to skip cache checks and go straight to the request.
      * This does not apply to all managers that use FetchOptions,
      * check the specific method docs for more information.
+     * @default false
      */
     force?:     boolean;
     /**
