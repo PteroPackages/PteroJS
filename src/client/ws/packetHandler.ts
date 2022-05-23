@@ -1,7 +1,16 @@
 import type { Shard } from './Shard';
+import type { WebSocketManager } from './WebSocketManager';
 import { WebSocketPayload } from '../../common/client';
 import caseConv from '../../util/caseConv';
 
+/**
+ * Handles the event dispatching of websocket events for the shard.
+ * This is used interally by the {@link WebSocketManager} and should not be
+ * accessed externally.
+ * @param shard The websocket shard.
+ * @param payload The websocket event payload.
+ * @internal
+ */
 export default function (shard: Shard, payload: WebSocketPayload): void {
     const args = payload.args || [];
 

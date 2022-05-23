@@ -12,6 +12,11 @@ export class WebSocketManager {
         this.active = false;
     }
 
+    /**
+     * Creates a websocket shard instance for a specified server.
+     * @param id The identifier of the server.
+     * @returns The server websocket shard.
+     */
     createShard(id: string): Shard {
         if (this.shards.has(id)) return this.shards.get(id)!;
         const shard = new Shard(this.client, id);
@@ -20,6 +25,11 @@ export class WebSocketManager {
         return shard;
     }
 
+    /**
+     * Disconnects a server shard's websocket connection and removes it.
+     * @param id The identifier of the server.
+     * @returns Whether the websocket shard was disconnected and/or removed.
+     */
     deleteShard(id: string): boolean {
         if (!this.shards.has(id)) return false;
         this.shards.get(id)!.disconnect();
@@ -34,6 +44,7 @@ export class WebSocketManager {
         return sum / this.shards.size;
     }
 
+    /** Disconnects all active websocket shards and removes them. */
     destroy(): void {
         for (let s of this.shards.values()) s.disconnect();
         this.shards.clear();

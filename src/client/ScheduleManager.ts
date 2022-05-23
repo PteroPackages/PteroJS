@@ -31,6 +31,13 @@ export class ScheduleManager {
         return s;
     }
 
+    /**
+     * Fetches a schedule or a list of schedules from the Pterodactyl API.
+     * @param server The identifier of the server.
+     * @param [id] The ID of the schedule.
+     * @param [options] Additional fetch options.
+     * @returns The fetched schedule(s).
+     */
     async fetch<T extends number | undefined>(
         server: string,
         id?: T,
@@ -50,6 +57,13 @@ export class ScheduleManager {
         return this._patch(server, data);
     }
 
+    /**
+     * Creates a schedule for a specified server.
+     * @param server The identifier of the server.
+     * @param options Create schedule options.
+     * @see {@link CreateScheduleOptions}.
+     * @returns The new schedule.
+     */
     async create(server: string, options: CreateScheduleOptions): Promise<Schedule> {
         options.dayOfWeek ??= '*';
         options.dayOfMonth ??= '*';
@@ -63,6 +77,14 @@ export class ScheduleManager {
         return this._patch(server, data);
     }
 
+    /**
+     * Updates a schedule on the specified server.
+     * @param server The identifier of the server.
+     * @param id The ID of the schedule.
+     * @param options Update schedule options.
+     * @see {@link CreateScheduleOptions}.
+     * @returns The updated schedule.
+     */
     async update(
         server: string,
         id: number,
@@ -86,6 +108,11 @@ export class ScheduleManager {
         return this._patch(server, data);
     }
 
+    /**
+     * Deletes a schedule from a specified server.
+     * @param server The identifier of the server.
+     * @param id The ID of the schedule.
+     */
     async delete(server: string, id: number): Promise<void> {
         await this.client.requests.delete(
             endpoints.servers.schedules.get(server, id)

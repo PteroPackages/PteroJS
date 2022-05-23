@@ -1,3 +1,4 @@
+/** Represents a server backup object. */
 export interface Backup {
     uuid:           string;
     name:           string;
@@ -11,11 +12,13 @@ export interface Backup {
     completedAt:    Date | undefined;
 }
 
+/** Represents the client metedata from a client servers request. */
 export interface ClientMeta {
     isServerOwner?:     boolean;
     userPermissions?:   Record<string, string>;
 }
 
+/** Represents the currently used resources of a server. */
 export interface ClientResources {
     currentState:       string;
     isSuspended:        boolean;
@@ -29,6 +32,7 @@ export interface ClientResources {
     }
 }
 
+/** Options for creating a server backup. */
 export interface CreateBackupOptions {
     name?:      string;
     isLocked?:  boolean;
@@ -40,6 +44,7 @@ export interface CreateScheduleOptions extends Omit<Cron, 'month'> {
     active:         boolean;
 }
 
+/** Represents a schedule cronjob object. */
 export interface Cron {
     dayOfWeek:  string;
     dayOfMonth: string;
@@ -48,6 +53,7 @@ export interface Cron {
     minute:     string;
 }
 
+/** Represents a server database object. */
 export interface Database {
     id:                 number;
     name:               string;
@@ -61,6 +67,7 @@ export interface Database {
     password?:          string;
 }
 
+/** Represents a file or file-like object on the server. */
 export interface File {
     name:       string;
     mode:       string;
@@ -73,11 +80,13 @@ export interface File {
     modifiedAt: Date | undefined;
 }
 
+/** Options for changing file permissions. */
 export interface FileChmodData {
     file: string;
     mode: number;
 }
 
+/** Represents a network allocation object for a server. */
 export interface NetworkAllocation {
     id:         number;
     ip:         string;
@@ -87,6 +96,7 @@ export interface NetworkAllocation {
     isDefault:  boolean;
 }
 
+/** Represents a task for a schedule. */
 export interface ScheduleTask {
     id:         number;
     sequenceId: number;

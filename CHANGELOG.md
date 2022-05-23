@@ -40,6 +40,7 @@ All changes to PteroJS as of v2.
 - `ClientServer#addWebsocket()`: use the client directly instead
 - `File#isEditable`: never existed in the API, issue from the docs
 - `WebSocketManager#readyAt`: no longer centralised, replaced by `#active`
+- `NestEggsManager#for()`: use cache methods instead
 
 ### Fixed
 - export all endpoints properly

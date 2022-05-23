@@ -12,17 +12,17 @@ import handle from './packetHandler';
 
 export class Shard extends EventEmitter {
     public client: PteroClient;
-    private uuid: string;
+    public id: string;
     private socket: WebSocket | null;
     private status: ShardStatus;
     public readyAt: number;
     public ping: number;
     public lastPing: number;
 
-    constructor(client: PteroClient, uuid: string) {
+    constructor(client: PteroClient, id: string) {
         super();
         this.client = client;
-        this.uuid = uuid;
+        this.id = id;
         this.socket = null;
         this.status = ShardStatus.CLOSED;
         this.readyAt = 0;
@@ -62,15 +62,16 @@ export class Shard extends EventEmitter {
     }
 
     private debug(message: string): void {
-        super.emit('debug',`[Shard ${this.uuid}] ${message}`);
+        super.emit('debug',`[Shard ${this.id}] ${message}`);
     }
 
+    /** Initializes the connection to the server websocket after authentication. */
     async connect(): Promise<void> {
         if (![0, 1].includes(this.status)) return;
 
         this.status = ShardStatus.CONNECTING;
         const auth = await this.client.requests.get(
-            endpoints.servers.ws(this.uuid)
+            endpoints.servers.ws(this.id)
         ) as WebSocketAuth;
         this.socket = new WebSocket(auth.data.socket);
 
@@ -85,17 +86,23 @@ export class Shard extends EventEmitter {
             throw new Error('Shard is not connected.');
 
         const auth = await this.client.requests.get(
-            endpoints.servers.ws(this.uuid)
+            endpoints.servers.ws(this.id)
         ) as WebSocketAuth;
         this.send('auth', [auth.data.token]);
     }
 
+    /**
+     * Sends a websocket event to the server (with optional payload args).
+     * @param event The event to send to the server.
+     * @param args Additional arguements to pass with to the event.
+     */
     send(event: string, args: string[] = []): void {
         if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         this.debug(`sending event '${event}'`);
         this.socket.send(JSON.stringify({ event, args }));
     }
 
+    /** Disconnects the websocket from the API. */
     disconnect(): void {
         this.socket?.close(1000);
         this.socket = null;
@@ -109,7 +116,7 @@ export class Shard extends EventEmitter {
         this.readyAt = Date.now();
         this.send('auth', [token]);
         this.debug('connection opened');
-        super.emit('serverConnect', this.uuid);
+        super.emit('serverConnect', this.id);
 
         process.on('SIGINT', () => this.disconnect());
         process.on('SIGTERM', () => this.disconnect());

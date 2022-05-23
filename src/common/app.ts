@@ -1,5 +1,6 @@
 import { FeatureLimits, Limits } from '../common';
 
+/** Represents an allocation object. */
 export interface Allocation {
     id:         number;
     ip:         string;
@@ -9,6 +10,7 @@ export interface Allocation {
     assigned:   boolean;
 }
 
+/** Options for creating a node. */
 export interface CreateNodeOptions {
     name:                   string;
     location:               string;
@@ -25,6 +27,7 @@ export interface CreateNodeOptions {
     uploadSize?:            number;
 }
 
+/** Options for creating a user account. */
 export interface CreateUserOptions {
     email:      string;
     username:   string;
@@ -34,6 +37,7 @@ export interface CreateUserOptions {
     isAdmin?:   boolean;
 }
 
+/** Options for creating a server. */
 export interface CreateServerOptions {
     name:           string;
     egg:            number;
@@ -45,6 +49,7 @@ export interface CreateServerOptions {
     featureLimits:  Partial<FeatureLimits>;
 }
 
+/** Represents a nest egg object. */
 export interface Egg {
     id:                 number;
     uuid:               string;
@@ -52,8 +57,12 @@ export interface Egg {
     name:               string;
     description:        string;
     author:             string;
+    /**
+     * @deprecated Will be removed in Pterodactyl v2 in favour of
+     * {@link dockerImages}.
+     */
     dockerImage:        string;
-    dockerImages:       string[]; // not sure why this is here
+    dockerImages:       string[];
     config:{
         files:          Record<string, any>;
         startup:        Record<string, any>;
@@ -74,6 +83,7 @@ export interface Egg {
     updatedAt:          Date | undefined;
 }
 
+/** Represents a nest object. */
 export interface Nest {
     id:             number;
     uuid:           string;
@@ -84,6 +94,7 @@ export interface Nest {
     updatedAt:      Date | undefined;
 }
 
+/** Represents a node configuration object (from Wings). */
 export interface NodeConfiguration {
     uuid:               string;
     tokenId:            string;
@@ -109,6 +120,7 @@ export interface NodeConfiguration {
     remote:             string;
 }
 
+/** Query options for fetching deployable nodes. */
 export interface NodeDeploymentOptions {
     memory:         number;
     disk:           number;
