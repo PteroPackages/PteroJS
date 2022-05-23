@@ -17,6 +17,8 @@ All changes to PteroJS as of v2.
 - `BackupManager#getDownloadURL()` replaces old `download()` method
 - `WebSocketManager#active` for checking active created shards
 - `ClientServerManager#fetchResources()` method
+- support for `skipScripts`, `oomDisabled`, `allocation.additional`, `deploy`, and `startOnCompletion` with server creation
+- added warning doc for `oomDisabled` broken behaviour
 
 ### Changed
 - all application and client managers now extend `BaseManager`
@@ -30,6 +32,8 @@ All changes to PteroJS as of v2.
 - `BackupManager#download()` now downloads the backup
 - `RequestManager` uses axios with internal parsing
 - most structures now use its manager for API requests in its group
+- changeed "env" to "environment" for server creation
+- changed "image" to "dockerImage" for server creation
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead

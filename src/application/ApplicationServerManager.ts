@@ -13,6 +13,7 @@ import {
     Sort
 } from '../common';
 import {
+    CreateServerOptions,
     UpdateBuildOptions,
     UpdateDetailsOptions,
     UpdateStartupOptions
@@ -184,6 +185,33 @@ export class ApplicationServerManager extends BaseManager {
             endpoints.servers.main,
             payload as FilterArray<Sort<FetchOptions>>,
             null, this
+        );
+        return this._patch(data);
+    }
+
+    /**
+     * Creates a server with the specified options.
+     * @param options Create server options.
+     * @see {@link CreateServerOptions}.
+     * @returns The new server.
+     */
+    async create(options: CreateServerOptions): Promise<ApplicationServer> {
+        options.limits = Object.assign(
+            this.defaultLimits,
+            options.limits || {}
+        );
+        options.featureLimits = Object.assign(
+            this.defaultFeatureLimits,
+            options.featureLimits || {}
+        );
+
+        const payload = caseConv.toSnakeCase<any>(
+            options, { ignore:['environment'] }
+        );
+        payload.environment = options.environment;
+
+        const data = await this.client.requests.post(
+            endpoints.servers.main, payload
         );
         return this._patch(data);
     }

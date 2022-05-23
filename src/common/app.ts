@@ -39,14 +39,55 @@ export interface CreateUserOptions {
 
 /** Options for creating a server. */
 export interface CreateServerOptions {
-    name:           string;
-    egg:            number;
-    image:          string;
-    startup:        string;
-    env:            Record<string, string>;
-    allocation:     number;
-    limits:         Partial<Limits>;
-    featureLimits:  Partial<FeatureLimits>;
+    /** The name of the server. */
+    name:               string;
+    /**
+     * A description of the server.
+     * @default undefined
+     */
+    description?:       string;
+    /** The ID of the user that will own the server. */
+    user:               number;
+    /** The egg to use for the server. */
+    egg:                number;
+    /** The default docker image for the server. */
+    dockerImage:        string;
+    /** The server startup command. */
+    startup:            string;
+    /** An environment variables object. */
+    environment:        Record<string, string | number | boolean>;
+    /**
+     * Whether to skip the egg installation script.
+     * @default false
+     */
+    skipScripts?:       boolean;
+    /** Doesn't work, don't use this. */
+    oomDisabled?:       boolean;
+    /** The server limits. */
+    limits?:            Partial<Limits>;
+    /** The server's feature limits. */
+    featureLimits?:     Partial<FeatureLimits>;
+    /** The server allocation details. */
+    allocation:{
+        /** The default server allocation. */
+        default:        number;
+        /** Additional allocations for the server. */
+        additional?:    number[];
+    }
+    /**
+     * Node deployment options. This is for more control over where the
+     * server is deployed within the location and port ranges specified.
+     */
+    deploy?:{
+        locations:      number[];
+        dedicatedIp:    boolean;
+        portRange:      string[];
+    }
+    /**
+     * Whether to start the server after the installation process is complete.
+     * @default false
+     */
+    startOnCompletion?: boolean;
 }
 
 /** Represents a nest egg object. */
