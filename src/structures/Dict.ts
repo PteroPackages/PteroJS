@@ -145,6 +145,7 @@ export class Dict<K, V> extends Map<K, V> {
      * Applies the function to each entry in the dict and returns an array of
      * the results.
      * @param fn The function to apply to the dict.
+     * @returns The mapped results.
      */
     map<T>(fn: (value: V, key: K, dict: this) => T): T[] {
         const res: T[] = [];
@@ -156,6 +157,7 @@ export class Dict<K, V> extends Map<K, V> {
      * Applies the function to each entry in the dict and returns a dict of the
      * results that passed.
      * @param fn The function to apply to the dict.
+     * @returns The filtered dict.
      */
     filter(fn: (value: V, key: K, dict: this) => boolean): Dict<K, V>;
     filter<k extends K>(fn: (value: V, key: K, dict: this) => key is k): Dict<K, V> {
@@ -179,6 +181,7 @@ export class Dict<K, V> extends Map<K, V> {
      * Applies a function to each entry in the dict and returns the number of
      * items removed.
      * @param fn The function to apply to the dict.
+     * @returns The number of sweeped entries.
      */
     sweep(fn: (value: V, key: K, dict: this) => boolean): number {
         let res = 0;
@@ -191,6 +194,7 @@ export class Dict<K, V> extends Map<K, V> {
      * containing entries that passed the function and the second containing
      * the failed entries.
      * @param fn The function to apply to the dict.
+     * @returns The passed and failed dicts.
      */
     part(fn: (value: V, key: K, dict: this) => boolean): Dict<K, V>[] {
         const pass = new Dict<K, V>();
@@ -202,6 +206,7 @@ export class Dict<K, V> extends Map<K, V> {
     /**
      * Reduces each entry in the dict to a single value.
      * @param fn The function to apply to the dict.
+     * @returns The reduced value.
      */
     reduce<T>(fn: (value: V, key: K, dict: this) => T, acc: T): T {
         for (const [k, v] of this) acc = fn(v, k, this);
@@ -211,22 +216,28 @@ export class Dict<K, V> extends Map<K, V> {
     /**
      * Joins one or more dicts with the current one and returns the value.
      * @param dict The dicts to join.
+     * @returns The joined dicts.
      */
     join(...dict: Dict<K, V>[]): Dict<K, V>;
     join<k extends K, v extends V>(...dict: Dict<k, v>[]): Dict<k, v> {
-        const res = new Dict<k, v>();
+        const res = this.clone() as Dict<k, v>;
         for (const d of dict) for (const [k, v] of d) res.set(k, v);
         return res;
     }
 
     /**
-     * Returns a dict containing the different entries between both dicts.
      * @param dict The dict to compare differences to.
+     * @returns A dict containing the different entries between both dicts.
      */
     difference(dict: Dict<K, V>): Dict<K, V> {
         const res = new Dict<K, V>();
         for (const [k, v] of this) if (!dict.has(k)) res.set(k, v);
         for (const [k, v] of dict) if (!super.has(k)) res.set(k, v);
         return res;
+    }
+
+    /** @returns A clone of the dict. */
+    clone(): Dict<K, V> {
+        return new Dict(super.entries());
     }
 }

@@ -28,6 +28,7 @@ All changes to PteroJS as of v2.
 - `ClientServer#reinstall()` method
 - `ValidationError` class (implemented in managers), will come with additional uses in future versions
 - guard API requests from unexpected `null_resource` response objects
+- `Dict#clone()` method for deep cloning the existing dict
 
 ### Changed
 - all application and client managers now extend `BaseManager`
@@ -60,3 +61,4 @@ All changes to PteroJS as of v2.
 
 ### Fixed
 - export all endpoints properly
+- `Dict#join()` now actually joins the other dicts to the existing dict
