@@ -66,12 +66,14 @@ export class Schedule {
         if('next_run_at' in data) this.nextRunAt = new Date(data.next_run_at);
         if ('relationships' in data) {
             if ('tasks' in data.relationships)
-                data.relationships.tasks.data.forEach(this._resolveTask);
+                data.relationships.tasks.data.forEach(
+                    (t: any) => this._resolveTask(t)
+                );
         }
     }
 
     _resolveTask(data: any): ScheduleTask {
-        const t = caseConv.toCamelCase<ScheduleTask>(data, {
+        const t = caseConv.toCamelCase<ScheduleTask>(data.attributes, {
             map:{
                 time_offset: 'offset',
                 is_queued: 'queued'
@@ -82,6 +84,14 @@ export class Schedule {
 
         this.tasks.set(t.id, t);
         return t;
+    }
+
+    /** Executes the schedule immediately. */
+    async execute(): Promise<void> {
+        await this.client.requests.post(
+            endpoints.servers.schedules.exec(this.serverId, this.id)
+        );
+        this.processing = true;
     }
 
     /**
@@ -124,17 +134,20 @@ export class Schedule {
     async updateTask(
         id: number,
         options:{
-            actions?: ScheduleTaskAction,
-            payload?: string,
-            offset?: number
+            action: ScheduleTaskAction,
+            payload: string,
+            offset: number
         }
     ): Promise<ScheduleTask> {
         if (!Object.keys(options).length)
             throw new Error('Too few options to update schedule task.');
 
+        const payload = caseConv.toSnakeCase(
+            options, { map:{ offset: 'time_offset' }}
+        );
         const data = await this.client.requests.post(
             endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
-            options
+            payload
         );
         return this._resolveTask(data);
     }

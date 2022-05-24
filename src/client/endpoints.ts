@@ -31,6 +31,7 @@ export default {
         schedules:{
             main: (s: string) => `/servers/${s}/schedules`,
             get: (s: string, id: number) => `/servers/${s}/schedules/${id}`,
+            exec: (s: string, id: number) => `/servers/${s}/schedules/${id}/execute`,
             tasks:{
                 main: (s: string, id: number) => `/servers/${s}/schedules/${id}/tasks`,
                 get: (s: string, id: number, t: number) => `/servers/${s}/schedules/${id}/tasks/${t}`

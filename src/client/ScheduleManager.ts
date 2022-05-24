@@ -65,8 +65,8 @@ export class ScheduleManager {
      * @returns The new schedule.
      */
     async create(server: string, options: CreateScheduleOptions): Promise<Schedule> {
-        options.dayOfWeek ??= '*';
-        options.dayOfMonth ??= '*';
+        options.dayOfWeek ||= '*';
+        options.dayOfMonth ||= '*';
         const payload = caseConv.toSnakeCase(options, {
             map:{ active: 'is_active' }
         });

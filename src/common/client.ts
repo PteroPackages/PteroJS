@@ -39,9 +39,16 @@ export interface CreateBackupOptions {
     ignored?:   string;
 }
 
-export interface CreateScheduleOptions extends Omit<Cron, 'month'> {
+/** Options for creating a server schedule. */
+export interface CreateScheduleOptions {
     name:           string;
     active:         boolean;
+    dayOfWeek?:     string;
+    dayOfMonth?:    string;
+    month:          string;
+    hour:           string;
+    minute:         string;
+    onlyWhenOnline: boolean;
 }
 
 /** Represents a schedule cronjob object. */
