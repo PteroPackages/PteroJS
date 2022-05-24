@@ -1,74 +1,62 @@
-export type PermissionResolvable = string | number;
-
 /**
  * Represents all the Pterodactyl server permissions as flags.
  */
 export enum Flags {
-    WEBSOCKET_CONNECT,
+    WEBSOCKET_CONNECT = 'websocket.connect',
 
-    CONTROL_CONSOLE,
-    CONTROL_START,
-    CONTROL_STOP,
-    CONTROL_RESTART,
+    CONTROL_CONSOLE = 'control.console',
+    CONTROL_START = 'control.start',
+    CONTROL_STOP = 'control.stop',
+    CONTROL_RESTART = 'control.restart',
 
-    USER_CREATE,
-    USER_READ,
-    USER_UPDATE,
-    USER_DELETE,
+    USER_CREATE = 'user.create',
+    USER_READ = 'user.read',
+    USER_UPDATE = 'user.update',
+    USER_DELETE = 'user.delete',
 
-    FILE_CREATE,
-    FILE_READ,
-    'FILE_READ-CONTENT',
-    FILE_UPDATE,
-    FILE_DELETE,
-    FILE_ARCHIVE,
-    FILE_SFTP,
+    FILE_CREATE = 'file.create',
+    FILE_READ = 'file.read',
+    FILE_READ_CONTENT = 'file.read-content',
+    FILE_UPDATE = 'file.update',
+    FILE_DELETE = 'file.delete',
+    FILE_ARCHIVE = 'file.archive',
+    FILE_SFTP = 'file.sftp',
 
-    BACKUP_CREATE,
-    BACKUP_READ,
-    BACKUP_UPDATE,
-    BACKUP_DELETE,
+    BACKUP_CREATE = 'backup.create',
+    BACKUP_READ = 'backup.read',
+    BACKUP_UPDATE = 'backup.update',
+    BACKUP_DELETE = 'backup.delete',
 
-    ALLOCATION_READ,
-    ALLOCATION_CREATE,
-    ALLOCATION_UPDATE,
-    ALLOCATION_DELETE,
+    ALLOCATION_READ = 'allocation.read',
+    ALLOCATION_CREATE = 'allocation.create',
+    ALLOCATION_UPDATE = 'allocation.update',
+    ALLOCATION_DELETE = 'allocation.delete',
 
-    STARTUP_READ,
-    STARTUP_UPDATE,
+    STARTUP_READ = 'startup.read',
+    STARTUP_UPDATE = 'startup.update',
 
-    DATABASE_CREATE,
-    DATABASE_READ,
-    DATABASE_UPDATE,
-    DATABASE_DELETE,
-    DATABASE_VIEW_PASSWORD,
+    DATABASE_CREATE = 'database.create',
+    DATABASE_READ = 'database.read',
+    DATABASE_UPDATE = 'database.update',
+    DATABASE_DELETE = 'database.delete',
+    DATABASE_VIEW_PASSWORD = 'database.view_password',
 
-    SCHEDULE_CREATE,
-    SCHEDULE_READ,
-    SCHEDULE_UPDATE,
-    SCHEDULE_DELETE,
+    SCHEDULE_CREATE = 'schedule.create',
+    SCHEDULE_READ = 'schedule.read',
+    SCHEDULE_UPDATE = 'schedule.update',
+    SCHEDULE_DELETE = 'schedule.delete',
 
-    SETTINGS_RENAME,
-    SETTINGS_REINSTALL,
+    SETTINGS_RENAME = 'settings.rename',
+    SETTINGS_REINSTALL = 'settings.reinstall',
 
-    ADMIN_WEBSOCKET_ERRORS = 40,
-    ADMIN_WEBSOCKET_INSTALL,
-    ADMIN_WEBSOCKET_TRANSFER
-}
-
-function objectFlags(): Record<string, number> {
-    return Object
-        .entries(Flags)
-        .filter(f => typeof f[1] === 'number')
-        .reduce<Record<string, number>>((a, b) => {
-            a[b[0]] = b[1] as number;
-            return a;
-        }, {});
+    ADMIN_WEBSOCKET_ERRORS = 'admin.websocket.errors',
+    ADMIN_WEBSOCKET_INSTALL = 'admin.websocket.install',
+    ADMIN_WEBSOCKET_TRANSFER = 'admin.websocket.transfer'
 }
 
 export class Permissions {
     /** @returns All the server control permissions. */
-    static get CONTROL(): Readonly<Flags[]> {
+    static get CONTROL(): readonly Flags[] {
         return Object.freeze([
             Flags.CONTROL_CONSOLE,
             Flags.CONTROL_START,
@@ -78,7 +66,7 @@ export class Permissions {
     }
 
     /** @returns All of the user/subuser permissions. */
-    static get USERS(): Readonly<Flags[]> {
+    static get USERS(): readonly Flags[] {
         return Object.freeze([
             Flags.USER_CREATE,
             Flags.USER_READ,
@@ -88,11 +76,11 @@ export class Permissions {
     }
 
     /** @returns All of the server file permissions. */
-    static get FILES(): Readonly<Flags[]> {
+    static get FILES(): readonly Flags[] {
         return Object.freeze([
             Flags.FILE_CREATE,
             Flags.FILE_READ,
-            Flags['FILE_READ-CONTENT'],
+            Flags.FILE_READ_CONTENT,
             Flags.FILE_UPDATE,
             Flags.FILE_DELETE,
             Flags.FILE_ARCHIVE,
@@ -101,7 +89,7 @@ export class Permissions {
     }
 
     /** @returns All the server backup permissions. */
-    static get BACKUPS(): Readonly<Flags[]> {
+    static get BACKUPS(): readonly Flags[] {
         return Object.freeze([
             Flags.BACKUP_CREATE,
             Flags.BACKUP_READ,
@@ -111,7 +99,7 @@ export class Permissions {
     }
 
     /** @returns All the server allocation permissions. */
-    static get ALLOCATIONS(): Readonly<Flags[]> {
+    static get ALLOCATIONS(): readonly Flags[] {
         return Object.freeze([
             Flags.ALLOCATION_READ,
             Flags.ALLOCATION_CREATE,
@@ -121,7 +109,7 @@ export class Permissions {
     }
 
     /** @returns All the server startup permissions. */
-    static get STARTUPS(): Readonly<Flags[]> {
+    static get STARTUPS(): readonly Flags[] {
         return Object.freeze([
             Flags.STARTUP_READ,
             Flags.STARTUP_UPDATE
@@ -129,7 +117,7 @@ export class Permissions {
     }
 
     /** @returns All the server database permissions. */
-    static get DATABASES(): Readonly<Flags[]> {
+    static get DATABASES(): readonly Flags[] {
         return Object.freeze([
             Flags.DATABASE_CREATE,
             Flags.DATABASE_READ,
@@ -140,7 +128,7 @@ export class Permissions {
     }
 
     /** @returns All the server schedule permissions. */
-    static get SCHEDULES(): Readonly<Flags[]> {
+    static get SCHEDULES(): readonly Flags[] {
         return Object.freeze([
             Flags.SCHEDULE_CREATE,
             Flags.SCHEDULE_READ,
@@ -150,7 +138,7 @@ export class Permissions {
     }
 
     /** @returns All the server settings permissions. */
-    static get SETTINGS(): Readonly<Flags[]> {
+    static get SETTINGS(): readonly Flags[] {
         return Object.freeze([
             Flags.SETTINGS_RENAME,
             Flags.SETTINGS_REINSTALL
@@ -158,7 +146,7 @@ export class Permissions {
     }
 
     /** @returns The admin permissions. */
-    static get ADMIN(): Readonly<Flags[]> {
+    static get ADMIN(): readonly Flags[] {
         return Object.freeze([
             Flags.ADMIN_WEBSOCKET_ERRORS,
             Flags.ADMIN_WEBSOCKET_INSTALL,
@@ -166,35 +154,30 @@ export class Permissions {
         ]);
     }
 
-    /** The raw permission value. */
-    public raw: number[];
+    /** The string permission value. */
+    public value: string[];
 
     /**
      * @param perms The data to resolve permissions from.
      */
-    constructor(...perms: PermissionResolvable[]) {
-        this.raw = Permissions.resolve(...perms);
+    constructor(...perms: string[]) {
+        this.value = Permissions.resolve(...perms);
     }
 
     /**
      * Resolves a permissions object from a specified source.
      * @param perms The permissions to resolve.
-     * @see {@link PermissionResolvable}.
      * @returns The resolved permissions.
      */
-    static resolve(...perms: PermissionResolvable[]): number[] {
-        const res: number[] = [];
-        const sorted = objectFlags();
+    static resolve(...perms: string[]): string[] {
+        const res: string[] = [];
+        const values = Object.values<string>(Flags);
 
         for (const p of perms) {
-            if (p in Flags) {
-                if (typeof p === 'number') {
-                    res.push(p);
-                } else {
-                    res.push(sorted[p]);
-                }
+            if (p in Flags || values.includes(p)) {
+                res.push(p);
             } else {
-                throw new Error(`unknown permission value '${p}'`);
+                throw new Error(`unknown permission '${p}'`);
             }
         }
 
@@ -205,27 +188,29 @@ export class Permissions {
      * @param perms The permissions to check for.
      * @returns True if the current value has any of the specified permissions.
      */
-    hasAny(...perms: PermissionResolvable[]): boolean {
+    hasAny(...perms: string[]): boolean {
         const res = Permissions.resolve(...perms);
-        for (let p of res) if (p in this.raw) return true;
-        return false;
+        return res.some(p => this.value.includes(p));
     }
 
     /**
      * @param perms The permissions to check for.
      * @returns True if the current value has all of the specified permissions.
      */
-    hasAll(...perms: PermissionResolvable[]): boolean {
+    hasAll(...perms: string[]): boolean {
         const res = Permissions.resolve(...perms);
-        for (let p in res) if (!(p in this.raw)) return false;
-        return true;
+        return res.every(p => this.value.includes(p));
     }
 
     /**
      * @returns True if the current value includes administrative permissions.
      */
     isAdmin(): boolean {
-        return this.raw.some(p => [40, 41, 42].includes(p));
+        return this.value.some((p: Flags) => [
+            Flags.ADMIN_WEBSOCKET_ERRORS,
+            Flags.ADMIN_WEBSOCKET_INSTALL,
+            Flags.ADMIN_WEBSOCKET_TRANSFER
+        ].includes(p));
     }
 
     /**
@@ -233,8 +218,8 @@ export class Permissions {
      * @param perms The permissions to add.
      * @returns The updated permissions instance.
      */
-    add(...perms: PermissionResolvable[]): this {
-        this.raw = this.raw.concat(new Permissions(...perms).raw);
+    add(...perms: string[]): this {
+        this.value = this.value.concat(Permissions.resolve(...perms));
         return this;
     }
 
@@ -243,9 +228,9 @@ export class Permissions {
      * @param perms The permissions to remove.
      * @returns The updated permissions instance.
      */
-    remove(...perms: PermissionResolvable[]): this {
-        const res = new Permissions(...perms);
-        this.raw = this.raw.filter(p => !res.raw.includes(p));
+    remove(...perms: string[]): this {
+        const res = Permissions.resolve(...perms);
+        this.value = this.value.filter(p => !res.includes(p));
         return this;
     }
 
@@ -255,14 +240,9 @@ export class Permissions {
      */
     serialize(): Record<string, boolean> {
         const res: Record<string, boolean> = {};
-        for (let [k, v] of Object.entries(objectFlags()))
-            res[k] = this.raw.includes(v);
+        for (let [k, v] of Object.entries(Flags))
+            res[k] = this.value.includes(v);
 
         return res;
-    }
-
-    /** @returns An array of the current permissions in string form. */
-    toString(): string[] {
-        return this.raw.map(p => Flags[p].toLowerCase().replaceAll('_', '.'));
     }
 }
