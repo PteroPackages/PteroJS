@@ -4,5 +4,6 @@ dist/
 test/
 
 # General / Testing files
+src/remote/
 package-lock.json
 auth.json

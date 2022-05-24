@@ -19,6 +19,9 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [ ] Document all functions
 - [ ] Implement `?type=` for `ClientServerManager#fetch()`
 
+## Remote
+- [ ] Get working remote classes
+
 ## Global Managers
 - [X] Implement helper functions for all the managers
 - [X] Create and implement all necessary submanagers ([Dashflo](https://dashflo.net/docs/api/pterodactyl/v1/#req_dc39cc65e67d47bd8fb37449a8559935))
