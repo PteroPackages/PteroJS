@@ -122,4 +122,41 @@ export class ClientServerManager extends BaseManager {
             endpoints.servers.power(id), { signal: state }
         );
     }
+
+    /**
+     * Updates the docker image of a server.
+     * @param id The identifier of the server.
+     * @param image The docker image.
+     */
+    async setDockerImage(id: string, image: string): Promise<void> {
+        await this.client.requests.put(
+            endpoints.servers.settings.image(id), { docker_image: image }
+        );
+    }
+
+    /**
+     * Updates the name of a server.
+     * @param id The identifier of the server.
+     * @param name The new server name.
+     */
+    async rename(id: string, name: string): Promise<void> {
+        await this.client.requests.post(
+            endpoints.servers.settings.rename(id), { name }
+        );
+        if (this.cache.has(id)) {
+            const s = this.cache.get(id)!;
+            s.name = name;
+            this.cache.set(id, s);
+        }
+    }
+
+    /**
+     * Triggers the reinstall process of a server.
+     * @param id The identifier of the server.
+     */
+    async reinstall(id: string): Promise<void> {
+        await this.client.requests.post(
+            endpoints.servers.settings.reinstall(id)
+        );
+    }
 }

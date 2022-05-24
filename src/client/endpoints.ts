@@ -57,6 +57,7 @@ export default {
             var: (s: string) => `/servers/${s}/startup/variable`
         },
         settings:{
+            image: (s: string) => `/servers/${s}/settings/docker-image`,
             rename: (s: string) => `/servers/${s}/settings/rename`,
             reinstall: (s: string) => `/servers/${s}/settings/reinstall`
         },
