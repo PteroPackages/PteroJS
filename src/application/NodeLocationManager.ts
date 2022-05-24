@@ -1,6 +1,7 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
+import { ValidationError } from '../structures/Errors';
 import {
     FetchOptions,
     Filter,
@@ -123,7 +124,7 @@ export class NodeLocationManager extends BaseManager {
         entity: string,
         options: Filter<Sort<{}>> // might remove sort in future
     ): Promise<Dict<number, NodeLocation>> {
-        if (!options.sort && !options.filter) throw new Error(
+        if (!options.sort && !options.filter) throw new ValidationError(
             'Sort or filter is required.'
         );
 
@@ -163,7 +164,9 @@ export class NodeLocationManager extends BaseManager {
         options:{ short?: string; long?: string }
     ): Promise<NodeLocation> {
         if (!options.short && !options.long)
-            throw new Error('Either short or long is required to update the location');
+            throw new ValidationError(
+                'Either short or long is required to update the location'
+            );
 
         const data = await this.client.requests.patch(
             endpoints.locations.get(id), options

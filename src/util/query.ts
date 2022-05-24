@@ -1,4 +1,5 @@
 import { FetchOptions, Include, Sort, FilterArray } from '../common';
+import { ValidationError } from '../structures/Errors';
 export interface AllowedQueryOptions {
     filters:    readonly string[];
     includes:   readonly string[];
@@ -26,7 +27,9 @@ export const buildQuery = (
 
     if (args.filter) {
         if (!allowed.filters?.includes(args.filter[0]))
-            throw new SyntaxError(`Invalid filter argument '${args.filter[0]}'.`);
+            throw new ValidationError(
+                `Invalid filter argument '${args.filter[0]}'.`
+            );
 
         parsed.push(`filter[${args.filter[0]}]=${args.filter[1]}`);
     }
@@ -34,14 +37,16 @@ export const buildQuery = (
     if (args.include) {
         for (const arg of args.include) {
             if (!allowed.includes.includes(arg))
-                throw new SyntaxError(`Invalid include argument '${arg}'.`);
+                throw new ValidationError(
+                    `Invalid include argument '${arg}'.`
+                );
         }
         if (args.include?.length) parsed.push(`include=${args.include}`);
     }
 
     if (args.sort) {
         if (!allowed.sorts.includes(args.sort))
-            throw new SyntaxError(`Invalid sort argument '${args.sort}'.`);
+            throw new ValidationError(`Invalid sort argument '${args.sort}'.`);
 
         parsed.push(`sort=${args.sort}`);
     }

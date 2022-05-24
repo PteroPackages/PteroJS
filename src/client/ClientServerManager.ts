@@ -2,6 +2,7 @@ import type { PteroClient } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { ClientServer } from '../structures/ClientServer';
 import { Dict } from '../structures/Dict';
+import { ValidationError } from '../structures/Errors';
 import { FetchOptions, Include } from '../common';
 import { ClientMeta, ClientResources } from '../common/client';
 import caseConv from '../util/caseConv';
@@ -116,7 +117,9 @@ export class ClientServerManager extends BaseManager {
         state: 'start' | 'stop' | 'restart' | 'kill'
     ): Promise<void> {
         if (!['start', 'stop', 'restart', 'kill'].includes(state))
-            throw new Error('Invalid power state, must be: start, stop, restart, or kill.');
+            throw new ValidationError(
+                'Invalid power state, must be: start, stop, restart, or kill.'
+            );
 
         await this.client.requests.post(
             endpoints.servers.power(id), { signal: state }

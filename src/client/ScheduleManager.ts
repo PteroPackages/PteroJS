@@ -1,6 +1,7 @@
 import type { PteroClient } from '.';
 import { Dict } from '../structures/Dict';
 import { Schedule } from '../structures/Schedule';
+import { ValidationError } from '../structures/Errors';
 import { FetchOptions } from '../common';
 import { CreateScheduleOptions } from '../common/client';
 import caseConv from '../util/caseConv';
@@ -91,7 +92,7 @@ export class ScheduleManager {
         options: Partial<CreateScheduleOptions>
     ): Promise<Schedule> {
         if (!Object.keys(options).length)
-            throw new Error('Too few options to update schedule.');
+            throw new ValidationError('Too few options to update schedule.');
 
         const s = await this.fetch(server, id);
         options.name ||= s.name;

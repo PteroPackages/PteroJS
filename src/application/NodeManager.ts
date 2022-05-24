@@ -2,6 +2,7 @@ import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { Node } from '../structures/Node';
+import { ValidationError } from '../structures/Errors';
 import {
     CreateNodeOptions,
     NodeConfiguration,
@@ -117,7 +118,9 @@ export class NodeManager extends BaseManager {
      * @see {@link NodeDeploymentOptions}.
      * @returns The deployable nodes.
      */
-    async fetchDeployable(options: NodeDeploymentOptions): Promise<Dict<number, Node>> {
+    async fetchDeployable(
+        options: NodeDeploymentOptions
+    ): Promise<Dict<number, Node>> {
         const data = await this.client.requests.get(
             endpoints.nodes.deploy, undefined, options
         );
@@ -148,7 +151,9 @@ export class NodeManager extends BaseManager {
         entity: string,
         options: Filter<Sort<{}>>
     ): Promise<Dict<number, Node>> {
-        if (!options.sort && !options.filter) throw new Error('Sort or filter is required.');
+        if (!options.sort && !options.filter) throw new ValidationError(
+            'Sort or filter is required.'
+        );
         if (options.filter === 'daemonTokenId') options.filter = 'daemon_token_id';
 
         const payload: FilterArray<Sort<{}>> = {};
@@ -170,7 +175,7 @@ export class NodeManager extends BaseManager {
      */
     async getConfig(id: number): Promise<NodeConfiguration> {
         const data = await this.client.requests.get(
-            endpoints.nodes.config(id), {}, null, this
+            endpoints.nodes.config(id)
         );
         return caseConv.toCamelCase(data);
     }
@@ -201,7 +206,7 @@ export class NodeManager extends BaseManager {
         options: Partial<CreateNodeOptions>
     ): Promise<Node> {
         if (!Object.keys(options).length)
-            throw new Error('Too few options to update the node.');
+            throw new ValidationError('Too few options to update the node.');
 
         const _node = await this.fetch(id);
         options = Object.assign(options, _node);

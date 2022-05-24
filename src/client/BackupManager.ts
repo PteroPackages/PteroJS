@@ -2,6 +2,7 @@ import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
+import { ValidationError } from '../structures/Errors';
 import { FetchOptions, Include } from '../common';
 import { Backup, CreateBackupOptions } from '../common/client';
 import caseConv from '../util/caseConv';
@@ -128,7 +129,7 @@ export class BackupManager extends BaseManager {
      * @param dest The file path to save the backup to.
      */
     async download(id: string, dest: string): Promise<void> {
-        if (existsSync(dest)) throw new Error(
+        if (existsSync(dest)) throw new ValidationError(
             'A file or directory exists at this path.'
         );
 

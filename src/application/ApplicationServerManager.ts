@@ -2,6 +2,7 @@ import type { PteroApp } from '.';
 import { ApplicationServer } from '../structures/ApplicationServer';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
+import { ValidationError } from '../structures/Errors';
 import {
     FeatureLimits,
     FetchOptions,
@@ -172,7 +173,7 @@ export class ApplicationServerManager extends BaseManager {
         options: Filter<Sort<{}>>
     ): Promise<Dict<number, ApplicationServer>> {
         if (!options.sort && !options.filter)
-            throw new Error('Sort or filter is required.');
+            throw new ValidationError('Sort or filter is required.');
 
         if (options.filter === 'identifier') options.filter = 'uuidShort';
         if (options.filter === 'externalId') options.filter = 'external_id';
@@ -228,7 +229,7 @@ export class ApplicationServerManager extends BaseManager {
         options: UpdateDetailsOptions
     ): Promise<ApplicationServer> {
         if (!Object.keys(options).length)
-            throw new Error('Too few options to update the server.');
+            throw new ValidationError('Too few options to update the server.');
 
         const server = await this.fetch(id, { force: true });
         options.name ||= server.name;
@@ -255,7 +256,7 @@ export class ApplicationServerManager extends BaseManager {
         options: UpdateBuildOptions
     ): Promise<ApplicationServer> {
         if (!Object.keys(options).length)
-            throw new Error('Too few options to update the server.');
+            throw new ValidationError('Too few options to update the server.');
 
         const server = await this.fetch(id, { force: true });
         options = Object.assign(server.limits, options);

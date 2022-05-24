@@ -4,6 +4,7 @@ import { Dict } from '../structures/Dict';
 import { CreateUserOptions } from '../common/app';
 import { User } from '../structures/User';
 import { UpdateUserOptions } from '../common/app';
+import { ValidationError } from '../structures/Errors';
 import {
     External,
     FetchOptions,
@@ -108,7 +109,9 @@ export class UserManager extends BaseManager {
         }
 
         if (typeof id === 'string' && !options.external)
-            throw new TypeError("The 'external' option must be set to fetch externally");
+            throw new ValidationError(
+                "The 'external' option must be set to fetch externally"
+            );
 
         const data = await this.client.requests.get(
             options.external && id
@@ -151,7 +154,9 @@ export class UserManager extends BaseManager {
         entity: string,
         options: Filter<Sort<{}>>
     ): Promise<Dict<number, User>> {
-        if (!options.sort && !options.filter) throw new Error('Sort or filter is required.');
+        if (!options.sort && !options.filter) throw new ValidationError(
+            'Sort or filter is required.'
+        );
         if (options.filter === 'identifier') options.filter = 'uuidShort';
         if (options.filter === 'externalId') options.filter = 'external_id';
 

@@ -5,6 +5,7 @@ import { RequestManager } from '../http/RequestManager';
 import { ScheduleManager } from './ScheduleManager';
 import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
+import { ValidationError } from '../structures/Errors';
 import loader from '../util/config';
 
 export class PteroClient {
@@ -24,7 +25,7 @@ export class PteroClient {
         options: Record<string, OptionSpec> = {}
     ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
-            throw new SyntaxError(
+            throw new ValidationError(
                 "Domain URL must start with 'http://' or 'https://' and "+
                 'must be bound to a port if using localhost.'
             );

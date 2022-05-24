@@ -1,6 +1,7 @@
 import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
 import { Dict } from '../structures/Dict';
+import { ValidationError } from '../structures/Errors';
 import { File, FileChmodData } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -85,7 +86,7 @@ export class FileManager {
      * @param dest The file path to save the file to.
      */
     async download(path: string, dest: string): Promise<void> {
-        if (existsSync(dest)) throw new Error(
+        if (existsSync(dest)) throw new ValidationError(
             'A file or directory exists at this path.'
         );
 

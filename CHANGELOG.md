@@ -26,6 +26,7 @@ All changes to PteroJS as of v2.
 - `ClientServer#rename()` method
 - `ClientServerManager#reinstall()` method
 - `ClientServer#reinstall()` method
+- `ValidationError` class (implemented in managers), will come with additional uses in future versions
 
 ### Changed
 - all application and client managers now extend `BaseManager`
