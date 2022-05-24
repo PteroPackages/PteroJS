@@ -6,11 +6,11 @@ import {
     PteroAPIError,
     RequestError
 } from '../structures/Errors';
-import { FetchOptions } from '../common';
+import { FetchOptions, RequestEvents } from '../common';
 import { buildQuery } from '../util/query';
 import { version } from '../../package.json';
 
-export type Method =
+type Method =
     | 'GET'
     | 'POST'
     | 'PATCH'
@@ -35,9 +35,40 @@ export class RequestManager extends EventEmitter {
         this._start = 0;
     }
 
+    emit<E extends keyof RequestEvents>(
+        event: E,
+        ...args: RequestEvents[E]
+    ): boolean {
+        return super.emit(event, ...args);
+    }
+
+    on<E extends keyof RequestEvents>(
+        event: E,
+        listener: (...args: RequestEvents[E]) => void
+    ): this {
+        super.on(event, listener);
+        return this;
+    }
+
+    once<E extends keyof RequestEvents>(
+        event: E,
+        listener: (...args: RequestEvents[E]) => void
+    ): this {
+        super.once(event, listener);
+        return this;
+    }
+
+    off<E extends keyof RequestEvents>(
+        event: E,
+        listener: (...args: RequestEvents[E]) => void
+    ): this {
+        super.off(event, listener);
+        return this;
+    }
+
     getHeaders(): Record<string, string> {
         return {
-            'User-Agent': `${this._type} PteroJS v${version}`,
+            'User-Agent': `PteroJS ${this._type} v${version}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json, text/plain',
             'Authorization': `Bearer ${this._auth}`
@@ -58,6 +89,7 @@ export class RequestManager extends EventEmitter {
             } else {
                 body = JSON.stringify(body);
             }
+            super.emit('preRequest', body);
         }
 
         this.debug(
@@ -83,6 +115,7 @@ export class RequestManager extends EventEmitter {
             } else {
                 body = JSON.stringify(body);
             }
+            super.emit('preRequest', body);
         }
 
         this.debug(
@@ -108,6 +141,8 @@ export class RequestManager extends EventEmitter {
         );
 
         if ([202, 204].includes(res.status)) return;
+        super.emit('postRequest', res.data);
+
         if (res.data.object && res.data.object === 'null_resource')
             // TODO: retry request instead of throwing an error
             throw new RequestError('Request returned a null resource object');
@@ -127,14 +162,18 @@ export class RequestManager extends EventEmitter {
         );
 
         if (err.response!.status >= 500) throw new RequestError(
-            `Received an unexpected response from the API (code ${err.response.status})`
+            `Received an unexpected response from the API `+
+            `(code ${err.response.status})`
         );
 
         throw new PteroAPIError(err.response.data as APIErrorResponse);
     }
 
     get(path: string, params?: FetchOptions, body?: any, cls?: BaseManager) {
-        const query = params && cls ? buildQuery(params, cls.getQueryOptions()) : '';
+        const query = params && cls
+            ? buildQuery(params, cls.getQueryOptions())
+            : '';
+
         return this._make('GET', path + query, body);
     }
 
@@ -150,7 +189,7 @@ export class RequestManager extends EventEmitter {
         return this._make('PUT', path, body);
     }
 
-    delete(path: string, body?: any) {
+    delete(path: string, body?: any): Promise<void> {
         return this._make('DELETE', path, body);
     }
 }

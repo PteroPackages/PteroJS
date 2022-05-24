@@ -129,3 +129,9 @@ export interface PaginationMeta {
     totalPages: number;
     links?:     string[];
 }
+
+export interface RequestEvents {
+    debug:          [message: string];
+    preRequest:     [data: any];
+    postRequest:    [data: any];
+}

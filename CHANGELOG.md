@@ -29,6 +29,7 @@ All changes to PteroJS as of v2.
 - `ValidationError` class (implemented in managers), will come with additional uses in future versions
 - guard API requests from unexpected `null_resource` response objects
 - `Dict#clone()` method for deep cloning the existing dict
+- typings for `RequestManager` events
 
 ### Changed
 - all application and client managers now extend `BaseManager`
