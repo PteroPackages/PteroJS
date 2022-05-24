@@ -1,7 +1,11 @@
 import axios, { Axios, AxiosError, AxiosResponse } from 'axios';
 import { EventEmitter } from 'events';
 import type { BaseManager } from '../structures/BaseManager';
-import { APIErrorResponse, PteroAPIError, RequestError } from '../structures/Errors';
+import {
+    APIErrorResponse,
+    PteroAPIError,
+    RequestError
+} from '../structures/Errors';
 import { FetchOptions } from '../common';
 import { buildQuery } from '../util/query';
 import { version } from '../../package.json';
@@ -104,6 +108,10 @@ export class RequestManager extends EventEmitter {
         );
 
         if ([202, 204].includes(res.status)) return;
+        if (res.data.object && res.data.object === 'null_resource')
+            // TODO: retry request instead of throwing an error
+            throw new RequestError('Request returned a null resource object');
+
         return res.data;
     }
 
