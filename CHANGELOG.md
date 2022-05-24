@@ -17,8 +17,15 @@ All changes to PteroJS as of v2.
 - `BackupManager#getDownloadURL()` replaces old `download()` method
 - `WebSocketManager#active` for checking active created shards
 - `ClientServerManager#fetchResources()` method
+- `ClientServer#fetchResources()` method
 - support for `skipScripts`, `oomDisabled`, `allocation.additional`, `deploy`, and `startOnCompletion` with server creation
 - added warning doc for `oomDisabled` broken behaviour
+- `ClientServerManager#setDockerImage()` method
+- `ClientServer#setDockerImage()` method
+- `ClientServerManager#rename()` method
+- `ClientServer#rename()` method
+- `ClientServerManager#reinstall()` method
+- `ClientServer#reinstall()` method
 
 ### Changed
 - all application and client managers now extend `BaseManager`
@@ -32,8 +39,8 @@ All changes to PteroJS as of v2.
 - `BackupManager#download()` now downloads the backup
 - `RequestManager` uses axios with internal parsing
 - most structures now use its manager for API requests in its group
-- changeed "env" to "environment" for server creation
-- changed "image" to "dockerImage" for server creation
+- changeed `env` to `environment` for server creation
+- changed `image` to `dockerImage` for server creation
 
 ### Deprecated
 - `UserManager#fetchExternal`: use `UserManager#fetch` with the "external" option instead
@@ -45,6 +52,9 @@ All changes to PteroJS as of v2.
 - `File#isEditable`: never existed in the API, issue from the docs
 - `WebSocketManager#readyAt`: no longer centralised, replaced by `#active`
 - `NestEggsManager#for()`: use cache methods instead
+- `ApplicationServer#delete()`: conflicts with cache; use manager instead
+- `Node#delete()`: conflicts with cache; use manager instead
+- `Schedule#delete()`: conflicts with cache; use manager instead.
 
 ### Fixed
 - export all endpoints properly

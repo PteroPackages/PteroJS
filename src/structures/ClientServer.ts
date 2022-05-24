@@ -81,25 +81,69 @@ export class ClientServer {
         if ('is_installing' in data) this.installing = data.is_installing;
     }
 
+    /**
+     * Returns a formatted URL to the server.
+     * @returns The formatted URL.
+     */
     get panelURL(): string {
         return `${this.client.domain}/server/${this.identifier}`;
     }
 
+    /**
+     * Fetches the server resources data.
+     * @returns The server resources.
+     */
     async fetchResources(): Promise<ClientResources> {
         return await this.client.servers.fetchResources(this.identifier);
     }
 
+    /**
+     * Sends a command to the server console.
+     * @param command The command to send.
+     */
     async sendCommand(command: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.command(this.identifier), { command }
         );
     }
 
+    /**
+     * Sets the power state of the server.
+     * @param state The power state.
+     */
     async setPowerState(state: 'start' | 'stop' | 'restart' | 'kill'): Promise<void> {
         this.client.servers.setPowerState(this.identifier, state);
         this.state = state;
     }
 
+    /**
+     * Updates the server's docker image.
+     * @param image The docker image.
+     */
+    async setDockerImage(image: string): Promise<void> {
+        await this.client.servers.setDockerImage(this.identifier, image);
+    }
+
+    /**
+     * Updates the server's name.
+     * @param name The new server name.
+     */
+    async rename(name: string): Promise<void> {
+        await this.client.servers.rename(this.identifier, name);
+        this.name = name;
+    }
+
+    /** Triggers the reinstall process for the server. */
+    async reinstall(): Promise<void> {
+        await this.client.servers.reinstall(this.identifier);
+        this.installing = true;
+    }
+
+    /**
+     * Converts the server into a JSON object, relative to the API
+     * response object.
+     * @returns The JSON object.
+     */
     toJSON(): object {
         return caseConv.toSnakeCase(this, {
             ignore:['client'],
@@ -110,6 +154,7 @@ export class ClientServer {
         });
     }
 
+    /** @returns The string representation of the server. */
     toString(): string {
         return this.name;
     }

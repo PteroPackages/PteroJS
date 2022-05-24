@@ -8,42 +8,64 @@ import caseConv from '../util/caseConv';
 export class Node {
     public readonly client: PteroApp;
 
+    /** The internal ID of the node (separate from UUID). */
     public readonly id: number;
 
+    /** The UUID of the node. */
     public readonly uuid: string;
 
+    /** The date the node was created. */
     public readonly createdAt: Date;
 
+    /** Whether the node is public. */
     public public: boolean;
 
+    /** The name of the node. */
     public name: string;
 
+    /** The description of the server (if set). */
     public description: string | undefined;
 
+    /** The ID of the location the node is on. */
     public locationId: number;
 
+    /**
+     * The location object the node is on. This is not fetched by default
+     * and must be retrieved by including 'location' in `NodeManager#fetch`.
+     */
     public location: NodeLocation | undefined;
 
+    /** A dict of servers on the node. */
     public servers: Dict<number, ApplicationServer>;
 
+    /** The FQDN of the node. */
     public fqdn: string;
 
+    /** The HTTP scheme of the node. */
     public scheme: string;
 
+    /** Whether the node is behind a proxy. */
     public behindProxy: boolean;
 
+    /** Whether the node is in maintenance mode. */
     public maintenance: boolean;
 
+    /** The amount of memory the node has. */
     public memory: number;
 
+    /** The amount of memory the node has overallocated. */
     public overallocatedMemory: number;
 
+    /** The amount of disk the node has. */
     public disk: number;
 
+    /** The amount of disk the node has overallocated. */
     public overallocatedDisk: number;
 
+    /** The maximum upload size for the node. */
     public uploadSize: number;
 
+    /** The Wings daemon information. */
     public daemon: DaemonData;
 
     constructor(client: PteroApp, data: any) {
@@ -80,16 +102,31 @@ export class Node {
         return `${this.client.domain}/admin/nodes/view/${this.id}`;
     }
 
+    /**
+     * Fetches the configuration of the node.
+     * @returns The node configuration.
+     */
     async getConfig(): Promise<NodeConfiguration> {
         return await this.client.nodes.getConfig(this.id);
     }
 
+    /**
+     * Updates the node with the specified options.
+     * @param options Update node options.
+     * @see {@link CreateNodeOptions UpdateNodeOptions}.
+     * @returns The updated instance.
+     */
     async update(options: Partial<CreateNodeOptions>): Promise<this> {
         const data = await this.client.nodes.update(this.id, options);
         this._patch(data.toJSON());
         return this;
     }
 
+    /**
+     * Converts the node into a JSON object, relative to the API
+     * response object.
+     * @returns The JSON object.
+     */
     toJSON(): object {
         return caseConv.toSnakeCase(this, {
             ignore:['client', 'location', 'servers'],
@@ -99,5 +136,10 @@ export class Node {
                 overallocatedDisk: 'disk_overallocate'
             }
         });
+    }
+
+    /** @returns The string representation of the node. */
+    toString(): string {
+        return this.name;
     }
 }

@@ -67,6 +67,7 @@ function objectFlags(): Record<string, number> {
 }
 
 export class Permissions {
+    /** @returns All the server control permissions. */
     static get CONTROL(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.CONTROL_CONSOLE,
@@ -76,6 +77,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All of the user/subuser permissions. */
     static get USERS(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.USER_CREATE,
@@ -85,6 +87,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All of the server file permissions. */
     static get FILES(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.FILE_CREATE,
@@ -97,6 +100,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All the server backup permissions. */
     static get BACKUPS(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.BACKUP_CREATE,
@@ -106,6 +110,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All the server allocation permissions. */
     static get ALLOCATIONS(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.ALLOCATION_READ,
@@ -115,6 +120,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All the server startup permissions. */
     static get STARTUPS(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.STARTUP_READ,
@@ -122,6 +128,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All the server database permissions. */
     static get DATABASES(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.DATABASE_CREATE,
@@ -132,6 +139,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All the server schedule permissions. */
     static get SCHEDULES(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.SCHEDULE_CREATE,
@@ -141,6 +149,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns All the server settings permissions. */
     static get SETTINGS(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.SETTINGS_RENAME,
@@ -148,6 +157,7 @@ export class Permissions {
         ]);
     }
 
+    /** @returns The admin permissions. */
     static get ADMIN(): Readonly<Flags[]> {
         return Object.freeze([
             Flags.ADMIN_WEBSOCKET_ERRORS,
@@ -156,6 +166,7 @@ export class Permissions {
         ]);
     }
 
+    /** The raw permission value. */
     public raw: number[];
 
     /**
@@ -167,7 +178,8 @@ export class Permissions {
 
     /**
      * Resolves a permissions object from a specified source.
-     * @see {@link PermissionResolvable}
+     * @param perms The permissions to resolve.
+     * @see {@link PermissionResolvable}.
      * @returns The resolved permissions.
      */
     static resolve(...perms: PermissionResolvable[]): number[] {
@@ -228,7 +240,7 @@ export class Permissions {
 
     /**
      * Removes the specified permissions from the current value.
-     * @param perms The permissions to add.
+     * @param perms The permissions to remove.
      * @returns The updated permissions instance.
      */
     remove(...perms: PermissionResolvable[]): this {

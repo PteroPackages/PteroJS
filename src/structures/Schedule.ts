@@ -10,25 +10,37 @@ import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
 export class Schedule {
+    /** The ID of the schedule. */
     public readonly id: number;
+
+    /** The date the schedule was created. */
     public readonly createdAt: Date;
 
+    /** The name of the schedule. */
     public name: string;
 
+    /** The schedule cronjob data. */
     public cron: Cron;
 
+    /** Whether the schedule is active. */
     public active: boolean;
 
+    /** Whether the schedule is currently being processed. */
     public processing: boolean;
 
+    /** Whether the schedule should only run when the server is online. */
     public onlyWhenOnline: boolean;
 
+    /** The date the schedule was last updated. */
     public updatedAt: Date | undefined;
 
+    /** The date the schedule last ran. */
     public lastRunAt: Date | undefined;
 
+    /** The date the scheduls is supposed to run next. */
     public nextRunAt: Date;
 
+    /** A dict of tasks that will be executed when the schedule is running. */
     public tasks: Dict<number, ScheduleTask>;
 
     constructor(
@@ -72,12 +84,25 @@ export class Schedule {
         return t;
     }
 
+    /**
+     * Updates the schedule with the specified options.
+     * @param options Update schedule options.
+     * @see {@link CreateScheduleOptions UpdateScheduleOptions}.
+     * @returns The updated instance.
+     */
     async update(options: CreateScheduleOptions): Promise<this> {
         const data = await this.client.schedules.update(this.serverId, this.id, options);
         this._patch(data.toJSON());
         return this;
     }
 
+    /**
+     * Creates a task on the schedule.
+     * @param action The action the task will perform.
+     * @param payload The task payload.
+     * @param offset The execution time offset.
+     * @returns The new task.
+     */
     async createTask(
         action: ScheduleTaskAction,
         payload: string,
@@ -90,6 +115,12 @@ export class Schedule {
         return this._resolveTask(data);
     }
 
+    /**
+     * Updates a specified task in the schedule.
+     * @param id The ID of the task.
+     * @param options Update task options.
+     * @returns The updated task.
+     */
     async updateTask(
         id: number,
         options:{
@@ -108,6 +139,10 @@ export class Schedule {
         return this._resolveTask(data);
     }
 
+    /**
+     * Deletes a task from the schedule.
+     * @param id The ID of the task.
+     */
     async deleteTask(id: number): Promise<void> {
         await this.client.requests.delete(
             endpoints.servers.schedules.tasks.get(this.serverId, this.id, id)
@@ -115,10 +150,11 @@ export class Schedule {
         this.tasks.delete(id);
     }
 
-    async delete(): Promise<void> {
-        await this.client.schedules.delete(this.serverId, this.id);
-    }
-
+    /**
+     * Converts the schedule into a JSON object, relative to the API
+     * response object.
+     * @returns The JSON object.
+     */
     toJSON(): object {
         const o = caseConv.toSnakeCase<any>(this, {
             ignore:['client', 'cron']
@@ -130,5 +166,10 @@ export class Schedule {
             }
         });
         return o;
+    }
+
+    /** @returns The string representation of the schedule. */
+    toString(): string {
+        return this.name;
     }
 }

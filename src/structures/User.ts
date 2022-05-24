@@ -9,16 +9,22 @@ import endpoints from '../client/endpoints';
 export abstract class BaseUser {
     public client: PteroApp | PteroClient;
 
+    /** The internal ID of the user. */
     public readonly id: number;
 
+    /** The username of the user. */
     public username: string;
 
+    /** The email of the user. */
     public email: string;
 
+    /** The firstname of the user. */
     public firstname: string;
 
+    /** The lastname of the user. */
     public lastname: string;
 
+    /** The language set for the user. */
     public language: string;
 
     constructor(client: PteroApp | PteroClient, data: any) {
@@ -36,10 +42,11 @@ export abstract class BaseUser {
         if ('language' in data) this.language = data.language;
     }
 
-    toString(): string {
-        return this.firstname +' '+ this.lastname;
-    }
-
+    /**
+     * Converts the user into a JSON object, relative to the API
+     * response object.
+     * @returns The JSON object.
+     */
     toJSON(): object {
         return caseConv.toSnakeCase(
             this,
@@ -49,22 +56,34 @@ export abstract class BaseUser {
             }
         );
     }
+
+    /** @returns The string representation of the user. */
+    toString(): string {
+        return this.firstname +' '+ this.lastname;
+    }
 }
 
 export class User extends BaseUser {
+    /** The UUID of the user. */
     public readonly uuid: string;
 
+    /** The date the user account was created. */
     public readonly createdAt: Date;
     public readonly createdTimestamp: number;
 
+    /** The external ID of the user (if set). */
     public externalId: string | null;
-    
+
+    /** Whether the user is an admin. */
     public isAdmin: boolean;
 
+    /** Whether the user has two-factor authentication enabled. */
     public twoFactor: boolean;
 
+    /** A dict of the servers associated with the user. */
     public servers: Dict<number, ApplicationServer> | undefined;
 
+    /** The date the user account was last updated. */
     public updatedAt: Date | undefined;
     public updatedTimestamp: number | undefined;
 
@@ -87,22 +106,32 @@ export class User extends BaseUser {
         if ('2fa' in data) this.twoFactor = data['2fa'];
     }
 
+    /**
+     * Returns a formatted URL to the user.
+     * @returns The formatted URL.
+     */
     get adminURL(): string {
         return `${this.client.domain}/admin/users/view/${this.id}`;
     }
 }
 
 export class SubUser extends BaseUser {
+    /** The UUID of the user. */
     public readonly uuid: string;
+
     private _server: string;
 
+    /** The date the subuser account was created. */
     public readonly createdAt: Date;
     public readonly createdTimestamp: number;
 
+    /** The permissions the subuser has. */
     public permissions: Permissions;
 
+    /** The URL of the user account image. */
     public image: string;
 
+    /** Whether the subuser has two-factor authentication enabled. */
     public enabled: boolean;
 
     _patch(data: any): void {
@@ -113,15 +142,26 @@ export class SubUser extends BaseUser {
         if ('2fa_enabled' in data) this.enabled = data['2fa_enabled'];
     }
 
-    get panelURL() {
+    /**
+     * Returns a formatted URL to the subuser.
+     * @returns The formatted URL.
+     */
+    get panelURL(): string {
         return `${this.client.domain}/server/${this._server}/users`;
     }
 }
 
 export class Account extends BaseUser {
+    /** The internal ID of the account. */
     public override id: number;
+
+    /** Whether the account has administrative permissions. */
     public isAdmin: boolean;
+
+    /** The two-factor authentication tokens for the account. */
     public tokens: string[];
+
+    /** The identifiers of API keys associated with the account. */
     public apikeys: any[];
 
     constructor(public client: PteroClient) {
@@ -132,6 +172,10 @@ export class Account extends BaseUser {
         this.apikeys = [];
     }
 
+    /**
+     * Fetches any missing/partial account information.
+     * @returns The updated instance.
+     */
     async fetch(): Promise<this> {
         const data = await this.client.requests.get(endpoints.account.main);
         super._patch(data.attributes);

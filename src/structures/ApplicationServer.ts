@@ -57,7 +57,7 @@ export class ApplicationServer {
 
     /**
      * The node the server is on. This is not fetched by default and must be
-     * retrieved by including 'node' in ApplicationServerManager#fetch.
+     * retrieved by including 'node' in `ApplicationServerManager#fetch`.
      */
     public node: Node | undefined;
 
@@ -133,32 +133,60 @@ export class ApplicationServer {
         return user;
     }
 
+    /**
+     * Updates the details of the server.
+     * @param options Update details options.
+     * @see {@link UpdateDetailsOptions}.
+     * @returns The updated instance.
+     */
     async updateDetails(options: UpdateDetailsOptions): Promise<this> {
         const data = await this.client.servers.updateDetails(this.id, options);
         this._patch(data.toJSON());
         return this;
     }
 
+    /**
+     * Updates the build configuration of the server.
+     * @param options Update build options.
+     * @returns The updated instance.
+     */
     async updateBuild(options: UpdateBuildOptions): Promise<this> {
         const data = await this.client.servers.updateBuild(this.id, options);
         this._patch(data);
         return this;
     }
 
-    async updateStartup(options: UpdateStartupOptions) {}
+    /**
+     * Updates the startup configuration of the server.
+     * @param options Update startup options.
+     * @see {@link UpdateStartupOptions}.
+     * @todo
+     */
+    private async updateStartup(options: UpdateStartupOptions) {}
 
+    /** Suspends the server. */
     async suspend(): Promise<void> {
         await this.client.servers.suspend(this.id);
     }
 
+    /** Unsuspends the server. */
     async unsuspend(): Promise<void> {
         await this.client.servers.unsuspend(this.id);
     }
 
+    /**
+     * Triggers the reinstall process for the server.
+     * Note: most endpoints will be unavailable until this is complete.
+     */
     async reinstall(): Promise<void> {
         await this.client.servers.reinstall(this.id);
     }
 
+    /**
+     * Converts the server into a JSON object, relative to the API
+     * response object.
+     * @returns The JSON object.
+     */
     toJSON(): object {
         return caseConv.toSnakeCase(this, {
             ignore:['client', 'user', 'node'],
@@ -166,6 +194,7 @@ export class ApplicationServer {
         });
     }
 
+    /** @returns The string representation of the server. */
     toString(): string {
         return this.name;
     }
