@@ -21,6 +21,7 @@ export { FileManager } from './client/FileManager';
 export { NetworkManager } from './client/NetworkManager';
 export { ScheduleManager } from './client/ScheduleManager';
 export { Shard } from './client/ws/Shard';
+export { SubUserManager } from './client/SubUserManager';
 export { WebSocketManager } from './client/ws/WebSocketManager';
 
 // Commons

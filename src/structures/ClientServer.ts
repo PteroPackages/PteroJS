@@ -3,6 +3,7 @@ import { BackupManager } from '../client/BackupManager';
 import { DatabaseManager } from '../client/DatabaseManager';
 import { FileManager } from '../client/FileManager';
 import { NetworkManager } from '../client/NetworkManager';
+import { SubUserManager } from '../client/SubUserManager';
 import { FeatureLimits, Limits } from '../common';
 import { ClientResources } from '../common/client';
 import endpoints from '../client/endpoints';
@@ -52,8 +53,9 @@ export class ClientServer {
 
     public backups: BackupManager;
     public databases: DatabaseManager;
-    public network: NetworkManager;
     public files: FileManager;
+    public network: NetworkManager;
+    public users: SubUserManager;
 
     constructor(client: PteroClient, data: any) {
         this.client = client;
@@ -62,8 +64,9 @@ export class ClientServer {
 
         this.backups = new BackupManager(client, data.identifier);
         this.databases = new DatabaseManager(client, data.identifier);
-        this.network = new NetworkManager(client, data.identifier);
         this.files = new FileManager(client, data.identifier);
+        this.network = new NetworkManager(client, data.identifier);
+        this.users = new SubUserManager(client, data.identifier);
 
         this._patch(data);
     }

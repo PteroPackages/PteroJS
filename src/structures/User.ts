@@ -3,6 +3,7 @@ import type { PteroApp } from '../application';
 import type { PteroClient } from '../client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
+import { ValidationError } from './Errors';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -115,31 +116,48 @@ export class User extends BaseUser {
     }
 }
 
-export class SubUser extends BaseUser {
+export class SubUser {
     /** The UUID of the user. */
     public readonly uuid: string;
 
-    private _server: string;
+    /** The identifier of the server the subuser belongs to. */
+    public readonly serverId: string;
 
     /** The date the subuser account was created. */
     public readonly createdAt: Date;
     public readonly createdTimestamp: number;
 
-    /** The permissions the subuser has. */
-    public permissions: Permissions;
+    /** The username of the subuser. */
+    public username: string;
 
-    /** The URL of the user account image. */
+    /** The email of the subuser. */
+    public email: string;
+
+    /** The URL of the subuser account image. */
     public image: string;
 
     /** Whether the subuser has two-factor authentication enabled. */
     public enabled: boolean;
 
-    _patch(data: any): void {
-        super._patch(data);
+    /** The permissions the subuser has. */
+    public permissions: Permissions;
 
-        this.permissions = new Permissions(data.permissions ?? {});
+    constructor(public client: PteroClient, serverId: string, data: any) {
+        this.uuid = data.uuid;
+        this.serverId = serverId;
+        this.createdAt = new Date(data.created_at);
+        this.createdTimestamp = this.createdAt.getTime();
+
+        this._patch(data);
+    }
+
+    _patch(data: any): void {
+        if ('username' in data) this.username = data.username;
+        if ('email' in data) this.email = data.email;
         if ('image' in data) this.image = data.image;
         if ('2fa_enabled' in data) this.enabled = data['2fa_enabled'];
+        if ('permissions' in data)
+            this.permissions = new Permissions(...data.permissions ?? []);
     }
 
     /**
@@ -147,7 +165,26 @@ export class SubUser extends BaseUser {
      * @returns The formatted URL.
      */
     get panelURL(): string {
-        return `${this.client.domain}/server/${this._server}/users`;
+        return `${this.client.domain}/server/${this.serverId}/users`;
+    }
+
+    /**
+     * Updates the permissions of the subuser.
+     * @param permissions The permissions to set.
+     * @returns The updated subuser instance.
+     */
+    async setPermissions(...permissions: string[]): Promise<this> {
+        const perms = Permissions.resolve(...permissions);
+        if (!perms.length) throw new ValidationError(
+            'No permissions specified for the subuser.'
+        );
+
+        const data = await this.client.requests.post(
+            endpoints.servers.users.get(this.serverId, this.uuid),
+            { permissions: perms }
+        );
+        this._patch(data);
+        return this;
     }
 }
 
