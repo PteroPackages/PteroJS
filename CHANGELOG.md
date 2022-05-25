@@ -1,7 +1,9 @@
 # Changelog
-All changes to PteroJS as of v2.
+Tracking changes for PteroJS and extensions from v2 onwards (using [SemVer 2](http://semver.org/)).
 
-## [2.0.0] - 05-2022
+## [2.0.0] - 27-05-2022
+A huge turning point for the PteroJS library, having a new TypeScript look, updated classes/methods, and proper documentation. Thanks to everyone that contributed! :D
+
 ### Added
 - global types and interfaces to `/src/common`
 - expandable query option types

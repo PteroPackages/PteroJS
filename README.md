@@ -11,10 +11,13 @@ If you are using Node.js (v14.x and above):
 npm install @devnote-dev/pterojs
 yarn add @devnote-dev/pterojs
 ```
+<!-- Deno isn't fully supported yet.
+
 or if you are using Deno:
 ```js
 import pterojs from 'https://cdn.skypack.dev/@devnote-dev/pterojs';
 ```
+-->
 Please join the [support server](https://discord.com/invite/dwcfTjgn7S) if you experience any issues with installing the package.
 
 ## Compatibility

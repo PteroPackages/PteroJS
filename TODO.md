@@ -16,7 +16,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Implement 201 and 204 response handling ([RequestManager](https://github.com/devnote-dev/PteroJS/blob/main/src/client/managers/RequestManager.js))
 - [X] Implement helper functions for all the managers
 - [X] Implement `ClientUser` required fetch on startup
-- [ ] Document all functions
+- [X] Document all functions
 - [ ] Implement `?type=` for `ClientServerManager#fetch()`
 
 ## Remote
@@ -39,9 +39,9 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] TypeScript support (`index.d.ts`)
 - [X] Investigate incorrectly documented endpoints
 - [X] Implement tests in `/tests` (or move from `/test`)
-- [ ] Remove deprecated `PteroUser#tfa`
+- [X] Remove deprecated `PteroUser#tfa`
 - [X] Remove deprecated `Presets` util
-- [ ] Rewrite in TypeScript
+- [X] Rewrite in TypeScript
 - [X] Switch `node-fetch` to a different library
 - [ ] Implement builder classes
 - [ ] Remove deprecated `UserManager#fetchExternal`

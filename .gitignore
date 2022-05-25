@@ -1,9 +1,11 @@
 # General directories
-node_modules/
-dist/
-test/
+/node_modules
+/dist
 
-# General / Testing files
-src/remote/
+# General files
 package-lock.json
 auth.json
+
+# test files/directories
+/test
+/src/remote

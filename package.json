@@ -2,14 +2,33 @@
   "name": "@devnote-dev/pterojs",
   "version": "2.0.0",
   "description": "A verbose API library for Pterodactyl",
-  "main": "src/index.ts",
-  "scripts": {
-    "build":"npx typedoc --out docs --excludePrivate src/index.ts",
-    "tests": "ts-node tests/index.ts"
+  "author": "Devonte <https://github.com/devnote-dev>",
+  "contributors": [
+    "Chelog <https://github.com/chelog>",
+    "Cain <https://github.com/cainthebest>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PteroPackages/PteroJS/issues"
   },
+  "homepage": "https://pteropackages.github.io/PteroJS/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PteroPackages/PteroJS.git"
+  },
+  "main": "dist/src/index.js",
+  "files": [
+    "./dist/src",
+    "./dist/types"
+  ],
+  "types": "./dist/types",
+  "engines": {
+    "node": ">=14.16"
+  },
+  "scripts": {
+    "prepublish": "tsc",
+    "build":"npx typedoc --out docs --excludePrivate src/index.ts",
+    "tests": "ts-node tests/index.ts"
   },
   "keywords": [
     "api",
@@ -20,12 +39,6 @@
     "pterodactyl",
     "pterodactyl-api"
   ],
-  "author": "Devonte <https://github.com/devnote-dev>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/PteroPackages/PteroJS/issues"
-  },
-  "homepage": "https://pteropackages.github.io/PteroJS/",
   "dependencies": {
     "axios": "^0.27.2",
     "form-data": "^4.0.0",
