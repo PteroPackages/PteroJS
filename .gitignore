@@ -1,8 +1,11 @@
 # General directories
-node_modules/
-test/
-src/extensions/Jexactyl
+/node_modules
+/dist
 
-# General / Testing files
+# General files
 package-lock.json
 auth.json
+
+# Test files/directories
+/test
+/src/remote
