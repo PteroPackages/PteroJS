@@ -5,7 +5,7 @@ import { FileManager } from '../client/FileManager';
 import { NetworkManager } from '../client/NetworkManager';
 import { SubUserManager } from '../client/SubUserManager';
 import { FeatureLimits, Limits } from '../common';
-import { ClientResources } from '../common/client';
+import { ClientResources, EggVariable, StartupData } from '../common/client';
 import endpoints from '../client/endpoints';
 import caseConv from '../util/caseConv';
 
@@ -101,6 +101,15 @@ export class ClientServer {
     }
 
     /**
+     * Fetches the server startup and egg variables data.
+     * @returns The startup and egg variable data.
+     * @see {@link StartupData}.
+     */
+    async fetchStartup(): Promise<StartupData> {
+        return await this.client.servers.fetchStartup(this.identifier);
+    }
+
+    /**
      * Sends a command to the server console.
      * @param command The command to send.
      */
@@ -115,7 +124,7 @@ export class ClientServer {
      * @param state The power state.
      */
     async setPowerState(state: 'start' | 'stop' | 'restart' | 'kill'): Promise<void> {
-        this.client.servers.setPowerState(this.identifier, state);
+        await this.client.servers.setPowerState(this.identifier, state);
         this.state = state;
     }
 
@@ -125,6 +134,20 @@ export class ClientServer {
      */
     async setDockerImage(image: string): Promise<void> {
         await this.client.servers.setDockerImage(this.identifier, image);
+    }
+
+    /**
+     * Updates a specified environment variable on the server. The key must be
+     * the environment variable name in capital letters, not the normal
+     * variable name.
+     * @param key The environment variable key.
+     * @param value The value of the environment variable.
+     * @returns The updated egg variable.
+     */
+    async setVariable(key: string, value: string): Promise<EggVariable> {
+        return await this.client.servers.setVariable(
+            this.identifier, key, value
+        );
     }
 
     /**

@@ -4,7 +4,12 @@ import { ClientServer } from '../structures/ClientServer';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import { FetchOptions, Include } from '../common';
-import { ClientMeta, ClientResources } from '../common/client';
+import {
+    ClientMeta,
+    ClientResources,
+    EggVariable,
+    StartupData
+} from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -97,6 +102,24 @@ export class ClientServerManager extends BaseManager {
     }
 
     /**
+     * Fetches the server startup and egg variables data.
+     * @param id The identifier of the server.
+     * @returns The startup and egg variable data.
+     * @see {@link StartupData}.
+     */
+    async fetchStartup(id: string): Promise<StartupData> {
+        const data = await this.client.requests.get(
+            endpoints.servers.startup.get(id)
+        );
+
+        const parsed = caseConv.toCamelCase<StartupData>(data.meta);
+        parsed.variables = data.data.map(
+            (v: any) => caseConv.toCamelCase(v.attributes)
+        );
+        return parsed;
+    }
+
+    /**
      * Sends a command to the console of a server.
      * @param id The identifier of the server.
      * @param command The command to send.
@@ -135,6 +158,41 @@ export class ClientServerManager extends BaseManager {
         await this.client.requests.put(
             endpoints.servers.settings.image(id), { docker_image: image }
         );
+    }
+
+    /**
+     * Updates a specified environment variable on a server. The key must be
+     * the environment variable name in capital letters, not the normal
+     * variable name.
+     * @example
+     * ```
+     * await client.servers
+     *     .setVariable('b8f32a45', 'SERVER_JARFILE', 'latest.jar')
+     *     .then(console.log);
+     * ```
+     * 
+     * @param id The identifier of the server.
+     * @param key The environment variable key.
+     * @param value The value of the environment variable.
+     * @returns The updated egg variable.
+     */
+    async setVariable(
+        id: string,
+        key: string,
+        value: string
+    ): Promise<EggVariable> {
+        if (typeof key !== 'string') throw new ValidationError(
+            'variable key', 'string', typeof key
+        );
+        if (typeof value !== 'string') throw new ValidationError(
+            'variable value', 'string', typeof value
+        );
+
+        const data = await this.client.requests.put(
+            endpoints.servers.startup.var(id),
+            { key, value }
+        );
+        return caseConv.toCamelCase(data.attributes);
     }
 
     /**

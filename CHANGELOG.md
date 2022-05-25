@@ -31,6 +31,11 @@ All changes to PteroJS as of v2.
 - `Dict#clone()` method for deep cloning the existing dict
 - typings for `RequestManager` events
 - static getters for grouped permissions
+- support startup viewing and modification endpoints
+- `ClientServerManager#fetchStartup()` method
+- `ClientServer#fetchStartup()` method
+- `ClientServerManager#setVariable()` method
+- `ClientServer#setVariable()` method
 
 ### Changed
 - all application and client managers now extend `BaseManager`

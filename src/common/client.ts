@@ -74,6 +74,17 @@ export interface Database {
     password?:          string;
 }
 
+/** Represents an egg variable. */
+export interface EggVariable {
+    name:           string;
+    description:    string;
+    envVariable:    string;
+    defaultValue:   string | number;
+    serverValue:    string | number;
+    isEditable:     boolean;
+    rules:          string;
+}
+
 /** Represents a file or file-like object on the server. */
 export interface File {
     name:       string;
@@ -121,6 +132,13 @@ export enum ShardStatus {
     CLOSED,
     CONNECTING,
     CONNECTED
+}
+
+export interface StartupData {
+    variables:          EggVariable[];
+    startupCommand:     string;
+    dockerImages?:      string[];
+    rawStartupCommand:  string;
 }
 
 export interface WebSocketAuth {
