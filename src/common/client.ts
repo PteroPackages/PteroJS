@@ -114,6 +114,25 @@ export interface NetworkAllocation {
     isDefault:  boolean;
 }
 
+/**
+ * Represents a permission descriptor for grouped permissions.
+ * Available permission groups:
+ * * websocket
+ * * control
+ * * user
+ * * file
+ * * backup
+ * * allocation
+ * * startup
+ * * database
+ * * schedule
+ * * settings
+ */
+export interface PermissionDescriptor {
+    description:    string;
+    keys:           Record<string, string>;
+}
+
 /** Represents a task for a schedule. */
 export interface ScheduleTask {
     id:         number;

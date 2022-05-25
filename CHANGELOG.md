@@ -37,6 +37,7 @@ All changes to PteroJS as of v2.
 - `ClientServerManager#setVariable()` method
 - `ClientServer#setVariable()` method
 - support `external` option for fetching application servers by external ID
+- `PteroClient#fetchPermissions()` method to return the raw permission group descriptors (separate from the `Permissions` utility class).
 
 ### Changed
 - all application and client managers now extend `BaseManager`

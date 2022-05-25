@@ -5,7 +5,9 @@ import { RequestManager } from '../http/RequestManager';
 import { ScheduleManager } from './ScheduleManager';
 import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
+import { PermissionDescriptor } from '../common/client';
 import { ValidationError } from '../structures/Errors';
+import endpoints from './endpoints';
 import loader from '../util/config';
 
 export class PteroClient {
@@ -43,6 +45,15 @@ export class PteroClient {
 
     get ping(): number {
         return this.requests._ping;
+    }
+
+    /**
+     * @see {@link PermissionDescriptor}.
+     * @returns The raw permission descriptors.
+     */
+    async fetchPermissions(): Promise<Record<string, PermissionDescriptor>> {
+        const data = await this.requests.get(endpoints.permissions);
+        return data.attributes.permissions;
     }
 
     /** Performs preload requests to Pterodactyl. */
