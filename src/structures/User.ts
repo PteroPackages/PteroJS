@@ -232,6 +232,40 @@ export class Account extends BaseUser {
     }
 
     /**
+     * Updates the email for the account.
+     * @param email The new email.
+     * @param password The password for the account.
+     * @returns The updated account instance.
+     */
+    async updateEmail(email: string, password: string): Promise<this> {
+        if (this.email === email) return Promise.resolve(this);
+        await this.client.requests.put(
+            endpoints.account.email, { email, password }
+        );
+        this.email = email;
+        return this;
+    }
+
+    /**
+     * Updates the password for the account.
+     * Note: the password is **not** stored in the account instance.
+     * @param oldPass The account's current password.
+     * @param newPass The new password for the account.
+     * @returns The updated account instance (no change).
+     */
+    async updatePassword(oldPass: string, newPass: string): Promise<this> {
+        if (oldPass === newPass) return Promise.resolve(this);
+        await this.client.requests.put(
+            endpoints.account.password, {
+                current_password: oldPass,
+                password: newPass,
+                password_confirmation: newPass
+            }
+        );
+        return this;
+    }
+
+    /**
      * Fetches the 2FA image URL code.
      * @returns The two-factor image URL code.
      */
@@ -264,6 +298,7 @@ export class Account extends BaseUser {
         this.tokens = [];
     }
 
+    /** @returns A list of API keys associated with the account. */
     async fetchKeys(): Promise<APIKey[]> {
         const data = await this.client.requests.get(
             endpoints.account.apikeys.main
