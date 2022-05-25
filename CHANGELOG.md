@@ -56,6 +56,9 @@ All changes to PteroJS as of v2.
 - `Permissions#has()` is now split into `hasAny()` and `hasAll()`
 - refactored `Permissions` and `Flags` to only use the API's string-based permissions. Numbers wont be parsed anymore
 - `Permissions#raw` -> `Permissions#value`
+- `Account#get2faCode()` -> `Account#get2FACode()`
+- `Account#enable2fa()` -> `Account#enable2FA()`
+- `Account#disable2fa()` -> `Account#disable2FA()`
 
 ### Deprecated
 - `UserManager#fetchExternal()`: use `UserManager#fetch()` with the `external` option instead

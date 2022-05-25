@@ -4,7 +4,10 @@ export default {
         tfa: '/account/two-factor',
         email: '/account/email',
         password: '/account/password',
-        apikeys: '/account/api-keys'
+        apikeys:{
+            main: '/account/api-keys',
+            get: (k: string) => `/account/api-keys/${k}`
+        }
     },
     servers:{
         main: '',

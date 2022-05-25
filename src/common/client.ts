@@ -1,3 +1,12 @@
+/** Represents a client API key. */
+export interface APIKey {
+    identifier:     string;
+    description:    string;
+    allowedIps:     string[];
+    createdAt:      Date;
+    lastUsedAt:     Date | undefined;
+}
+
 /** Represents a server backup object. */
 export interface Backup {
     uuid:           string;

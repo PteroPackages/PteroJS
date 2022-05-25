@@ -4,6 +4,7 @@ import type { PteroClient } from '../client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
 import { ValidationError } from './Errors';
+import { APIKey } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -199,7 +200,7 @@ export class Account extends BaseUser {
     public tokens: string[];
 
     /** The identifiers of API keys associated with the account. */
-    public apikeys: any[];
+    public apikeys: APIKey[];
 
     constructor(public client: PteroClient) {
         super(client, {});
@@ -207,6 +208,14 @@ export class Account extends BaseUser {
         this.isAdmin = false;
         this.tokens = [];
         this.apikeys = [];
+    }
+
+    /**
+     * Returns a formatted URL to the client account.
+     * @returns The formatted URL.
+     */
+    get panelURL(): string {
+        return `${this.client.domain}/account`;
     }
 
     /**
@@ -220,5 +229,83 @@ export class Account extends BaseUser {
         this.id = data.attributes.id;
         this.isAdmin = data.attributes.admin;
         return this;
+    }
+
+    /**
+     * Fetches the 2FA image URL code.
+     * @returns The two-factor image URL code.
+     */
+    async get2FACode(): Promise<string> {
+        const data = await this.client.requests.get(endpoints.account.tfa);
+        return data.data.image_url_data;
+    }
+
+    /**
+     * Enables 2FA for the account.
+     * @param code The 2FA code.
+     * @returns A list of 2FA codes.
+     */
+    async enable2FA(code: string): Promise<string[]> {
+        const data = await this.client.requests.post(
+            endpoints.account.tfa, { code }
+        );
+        this.tokens.push(...data.attributes.tokens);
+        return this.tokens;
+    }
+
+    /**
+     * Disables 2FA on the account and removes existing authentication tokens.
+     * @param password The account password.
+     */
+    async disable2FA(password: string): Promise<void> {
+        await this.client.requests.delete(
+            endpoints.account.tfa, { password }
+        );
+        this.tokens = [];
+    }
+
+    async fetchKeys(): Promise<APIKey[]> {
+        const data = await this.client.requests.get(
+            endpoints.account.apikeys.main
+        );
+        this.apikeys = data.data.map((o: any) => {
+            let k = caseConv.toCamelCase<APIKey>(o.attributes);
+            k.createdAt = new Date(k.createdAt);
+            k.lastUsedAt &&= new Date(k.lastUsedAt);
+            return k;
+        });
+        return this.apikeys;
+    }
+
+    /**
+     * Creates an API key associated with the account.
+     * @param description The description (or memo) for the key.
+     * @param allowedIps A list of IP addresses that can use this key.
+     * @returns The new API key.
+     */
+    async createKey(
+        description: string,
+        allowedIps: string[] = []
+    ): Promise<APIKey> {
+        const data = await this.client.requests.post(
+            endpoints.account.apikeys.main,
+            { description, allowed_ips: allowedIps }
+        );
+
+        const key = caseConv.toCamelCase<APIKey>(data.attributes);
+        key.createdAt = new Date(key.createdAt);
+        key.lastUsedAt &&= new Date(key.lastUsedAt);
+
+        this.apikeys.push(key);
+        return key;
+    }
+
+    /**
+     * Deletes an API key from the account.
+     * @param id The identifier of the key.
+     */
+    async deleteKey(id: string): Promise<void> {
+        await this.client.requests.delete(endpoints.account.apikeys.get(id));
+        this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 }
