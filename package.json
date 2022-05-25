@@ -23,12 +23,13 @@
     "node": ">=14.16"
   },
   "scripts": {
-    "prepublish": "tsc",
-    "build":"npx typedoc --out docs --excludePrivate src/index.ts",
-    "tests": "ts-node tests/index.ts"
+    "prepublish": "npx tsc",
+    "docs": "npx typedoc --out docs --excludePrivate src/index.ts",
+    "test": "ts-node tests/index.ts"
   },
   "keywords": [
     "api",
+    "nodejs",
     "library",
     "wrapper",
     "javascript",
