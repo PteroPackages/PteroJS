@@ -11,7 +11,7 @@
         "resolveJsonModule": true,
         "moduleResolution": "Node",
         "preserveConstEnums": true,
-        "declarationDir": "./dist/types"
+        "declarationDir": "./dist/src/types"
     },
     "include": [
         "./src"

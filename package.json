@@ -16,12 +16,9 @@
     "type": "git",
     "url": "git+https://github.com/PteroPackages/PteroJS.git"
   },
-  "main": "dist/src/index.js",
-  "files": [
-    "./dist/src",
-    "./dist/types"
-  ],
-  "types": "./dist/types",
+  "main": "./dist/src/index.js",
+  "files": ["./dist/src"],
+  "types": "./dist/src/types/src",
   "engines": {
     "node": ">=14.16"
   },

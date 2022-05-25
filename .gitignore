@@ -6,6 +6,6 @@
 package-lock.json
 auth.json
 
-# test files/directories
+# Test files/directories
 /test
 /src/remote
