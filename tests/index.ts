@@ -10,8 +10,8 @@ if (!args.length) throw new Error(
     "Test must specify 'app', 'client' or 'all'."
 );
 
-if (!args.some(a => ['app', 'client', 'all'].includes(a))) throw new Error(
-    "Invalid test argument; must be 'app', 'client', or 'all'."
+if (!args.some(a => ['app', 'client', 'util', 'all'].includes(a))) throw new Error(
+    "Invalid test argument; must be 'app', 'client', 'util' or 'all'."
 );
 
 if (!existsSync(join(__dirname, 'auth.json')))
@@ -36,5 +36,13 @@ if (args.includes('client') || args.includes('all')) {
     .forEach(async file => {
         const { test } = await import(`./client/${file}`);
         (<ClientTest> test)(client);
+    });
+}
+
+if (args.includes('util') || args.includes('all')) {
+    readdirSync(join(__dirname, 'util'))
+    .forEach(async file => {
+        const { test } = await import(`./util/${file}`);
+        (<() => void> test)();
     });
 }
