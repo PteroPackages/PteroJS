@@ -36,6 +36,7 @@ All changes to PteroJS as of v2.
 - `ClientServer#fetchStartup()` method
 - `ClientServerManager#setVariable()` method
 - `ClientServer#setVariable()` method
+- support `external` option for fetching application servers by external ID
 
 ### Changed
 - all application and client managers now extend `BaseManager`

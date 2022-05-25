@@ -1,4 +1,4 @@
-// May be removed in future
+/** Applies an external option to the request. */
 export type External<T> = { external?: boolean } & T;
 
 /** Applies a filter option to the request. */

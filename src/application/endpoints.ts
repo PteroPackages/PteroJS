@@ -17,7 +17,7 @@ export default {
     servers:{
         main: '/servers',
         get: (s: number) => `/servers/${s}`,
-        ext: (s: number) => `/servers/external/${s}`,
+        ext: (s: string) => `/servers/external/${s}`,
         details: (s: number) => `/servers/${s}/details`,
         build: (s: number) => `/servers/${s}/build`,
         startup: (s: number) => `/servers/${s}/startup`,

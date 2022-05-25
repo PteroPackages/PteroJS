@@ -4,6 +4,7 @@ import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import {
+    External,
     FeatureLimits,
     FetchOptions,
     Filter,
@@ -124,25 +125,36 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Fetches a server or a list of servers from the Pterodactyl API.
-     * @param [id] The ID of the server.
+     * @param [id] The ID or external ID of the server.
      * @param [options] Additional fetch options.
      * @returns The fetched server(s).
      */
-    async fetch<T extends number | undefined>(
+    async fetch<T extends number | string | undefined>(
         id?: T,
-        options: Include<FetchOptions> = {}
+        options: External<Include<FetchOptions>> = {}
     ): Promise<
         T extends undefined ? Dict<number, ApplicationServer> : ApplicationServer
     > {
         if (id && !options.force) {
-            const s = this.cache.get(id);
-            if (s) return Promise.resolve<any>(s);
+            if (typeof id === 'number') {
+                if (this.cache.has(id)) return Promise.resolve<any>(this.cache.get(id)!);
+            } else {
+                const s = this.cache.find(s => s.externalId === id);
+                if (s) return Promise.resolve<any>(s);
+            }
         }
 
-        const data = await this.client.requests.get(
-            (id ? endpoints.servers.get(id) : endpoints.servers.main),
-            options, null, this
-        );
+        if (typeof id === 'string' && !options.external)
+            throw new ValidationError(
+                "The 'external' option must be set to fetch externally"
+            );
+
+            const data = await this.client.requests.get(
+                options.external && id
+                    ? endpoints.servers.ext(id as string)
+                    : (id ? endpoints.servers.get(id as number) : endpoints.servers.main),
+                options, null, this
+            );
         return this._patch(data);
     }
 
