@@ -173,6 +173,7 @@ export class Permissions {
         const res: string[] = [];
         const values = Object.values<string>(Flags);
 
+        if (perms.some(p => p === '*')) return values;
         for (const p of perms) {
             if (p in Flags || values.includes(p)) {
                 res.push(p);
