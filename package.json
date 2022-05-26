@@ -20,7 +20,6 @@
   "types": "./dist/src/types/src",
   "files": [
     "dist",
-    "tests",
     "CHANGELOG.md",
     "LICENSE",
     "pterojs.json",
@@ -30,7 +29,8 @@
     "node": ">=14.16"
   },
   "scripts": {
-    "prepublish": "tsc",
+    "prepublish": "npm install && tsc",
+    "build": "tsc",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
     "test": "ts-node tests/index.ts"
   },
