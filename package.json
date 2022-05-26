@@ -29,7 +29,7 @@
     "node": ">=14.16"
   },
   "scripts": {
-    "prepublish": "npm install && tsc",
+    "prepublish": "tsc",
     "build": "tsc",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
     "test": "ts-node tests/index.ts"
