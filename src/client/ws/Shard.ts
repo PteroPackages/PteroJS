@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { WebSocket } from 'ws';
 import type { PteroClient } from '..';
+import { WebSocketError } from '../../structures/Errors';
 import {
     ShardStatus,
     WebSocketAuth,
@@ -100,6 +101,45 @@ export class Shard extends EventEmitter {
         if (!this.socket) throw new Error('Socket for this shard is unavailable.');
         this.debug(`sending event '${event}'`);
         this.socket.send(JSON.stringify({ event, args }));
+    }
+
+    /**
+     * Sends an event to the server and waits for a response.
+     * @param event The event to send.
+     * @param [args] The arguments to send with the event.
+     * @returns The event's response, if any.
+     */
+    async request(event: string, args?: string): Promise<any>;
+    async request(event: 'sendCommand', command: string): Promise<void>;
+    async request(event: 'sendLogs'): Promise<void>;
+    async request(event: 'sendStats'): Promise<void>;
+    async request(event: 'setState', state: string): Promise<void>;
+    async request(event: string, args: string = ''): Promise<any> {
+        switch (event) {
+            case 'auth':{
+                this.send('auth', [args]);
+                return new Promise<void>(res => this.once('authSuccess', res));
+            }
+            case 'sendCommand':{
+                this.send('send command', [args]);
+                // unsafe to return response
+                return Promise.resolve();
+            }
+            case 'sendLogs':{
+                this.send('send logs');
+                return new Promise(res => this.once('serverOutput', res));
+            }
+            case 'sendStats':{
+                this.send('send stats');
+                return new Promise(res => this.once('statsUpdate', res));
+            }
+            case 'setState':{
+                this.send('set state', [args]);
+                return new Promise(res => this.once('statusUpdate', res));
+            }
+            default:
+                throw new WebSocketError('Invalid sendable websocket event');
+        }
     }
 
     /** Disconnects the websocket from the API. */
