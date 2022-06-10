@@ -23,7 +23,7 @@ export class NetworkManager {
                 a.notes ||= null;
                 res.set(a.id, a);
             }
-            this.cache = this.cache.join(res);
+            this.cache.update(res);
             return res;
         }
 

@@ -50,7 +50,7 @@ export class ClientServerManager extends BaseManager {
                 const s = new ClientServer(this.client, o.attributes);
                 res.set(s.identifier, s);
             }
-            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.servers.cache) this.cache.update(res);
             return res;
         }
 

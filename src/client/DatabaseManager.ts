@@ -36,7 +36,7 @@ export class DatabaseManager extends BaseManager {
                 const d = caseConv.toCamelCase<Database>(o.attributes);
                 res.set(d.id, d);
             }
-            this.cache = this.cache.join(res);
+            this.cache.update(res);
             return res;
         }
 

@@ -236,6 +236,15 @@ export class Dict<K, V> extends Map<K, V> {
         return res;
     }
 
+    /**
+     * Updates the values of the current dict with the specified dict, settings the
+     * values in place.
+     * @param dict The dict to update with.
+     */
+    update(dict: Dict<K, V>): void {
+        for (const [k, v] of dict) this.set(k, v);
+    }
+
     /** @returns A clone of the dict. */
     clone(): Dict<K, V> {
         return new Dict(super.entries());

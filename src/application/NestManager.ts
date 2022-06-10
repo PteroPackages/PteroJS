@@ -40,7 +40,7 @@ export class NestManager extends BaseManager {
                 res.set(n.id, n);
             }
 
-            if (this.client.options.nests.cache) this.cache = this.cache.join(res);
+            if (this.client.options.nests.cache) this.cache.update(res);
             return res;
         }
 

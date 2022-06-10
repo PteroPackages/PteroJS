@@ -40,7 +40,7 @@ export class NestEggsManager extends BaseManager {
                 res.set(e.id, e);
             }
 
-            this.cache = this.cache.join(res);
+            this.cache.update(res);
             return res;
         }
 
@@ -67,8 +67,15 @@ export class NestEggsManager extends BaseManager {
      * @returns The fetched egg(s).
      */
     async fetch(nest: number, id: number, options?: Include<FetchOptions>): Promise<Egg>;
-    async fetch(nest: number, options?: Include<FetchOptions>): Promise<Dict<number, Egg>>;
-    async fetch(nest: number, op1?: number | Include<FetchOptions>, op2: Include<FetchOptions> = {}): Promise<any> {
+    async fetch(
+        nest: number,
+        options?: Include<FetchOptions>
+    ): Promise<Dict<number, Egg>>;
+    async fetch(
+        nest: number,
+        op1?: number | Include<FetchOptions>,
+        op2: Include<FetchOptions> = {}
+    ): Promise<any> {
         let path = endpoints.nests.eggs.main(nest);
 
         if (typeof op1 === 'number') {

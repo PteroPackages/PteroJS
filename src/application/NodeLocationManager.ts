@@ -47,7 +47,7 @@ export class NodeLocationManager extends BaseManager {
                 res.set(n.id, n);
             }
 
-            if (this.client.options.locations.cache) this.cache = this.cache.join(res);
+            if (this.client.options.locations.cache) this.cache.update(res);
             return res;
         }
 

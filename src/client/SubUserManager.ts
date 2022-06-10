@@ -20,7 +20,7 @@ export class SubUserManager {
                 const s = new SubUser(this.client, this.serverId, o.attributes);
                 res.set(s.uuid, s);
             }
-            if (this.client.options.subUsers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.subUsers.cache) this.cache.update(res);
             return res;
         }
 

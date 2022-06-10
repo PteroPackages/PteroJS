@@ -45,7 +45,7 @@ export class BackupManager extends BaseManager {
                 b.completedAt &&= new Date(b.completedAt);
                 res.set(b.uuid, b);
             }
-            this.cache = this.cache.join(res);
+            this.cache.update(res);
             return res;
         }
 

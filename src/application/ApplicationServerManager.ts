@@ -80,7 +80,7 @@ export class ApplicationServerManager extends BaseManager {
                 const s = new ApplicationServer(this.client, o.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.servers.cache) this.cache.update(res);
             return res;
         }
 
@@ -130,7 +130,9 @@ export class ApplicationServerManager extends BaseManager {
      */
     async fetch(id: number, options?: Include<FetchOptions>): Promise<ApplicationServer>;
     async fetch(id: string, options?: Include<FetchOptions>): Promise<ApplicationServer>;
-    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ApplicationServer>>;
+    async fetch(
+        options?: Include<FetchOptions>
+    ): Promise<Dict<number, ApplicationServer>>;
     async fetch(
         op?: number | string | Include<FetchOptions>,
         ops: Include<FetchOptions> = {}

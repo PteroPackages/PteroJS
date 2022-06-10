@@ -51,7 +51,7 @@ export class NodeManager extends BaseManager {
                 const s = new Node(this.client, obj.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.servers.cache) this.cache.update(res);
             return res;
         }
 
