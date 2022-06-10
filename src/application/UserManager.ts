@@ -94,37 +94,50 @@ export class UserManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched user(s).
      */
-    async fetch<T extends number | string | undefined>(
-        id?: T,
-        options: External<Include<FetchOptions>> = {}
-    ): Promise<T extends undefined ? Dict<number, User> : User> {
-        if (!options.force) {
-            if (typeof id === 'number') {
-                const u = this.cache.get(id);
-                if (u) return Promise.resolve<any>(u);
-            } else {
-                const u = this.cache.find(u => u.externalId === id);
-                if (u) return Promise.resolve<any>(u);
+    async fetch(id: number, options?: Include<FetchOptions>): Promise<User>;
+    async fetch(id: string, options?: Include<FetchOptions>): Promise<User>;
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, User>>;
+    async fetch(
+        op?: number | string | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path: string;
+        switch (typeof op) {
+            case 'number':{
+                if (!ops.force && this.cache.has(op))
+                    return this.cache.get(op);
+
+                path = endpoints.users.get(op);
+                break;
             }
+            case 'string':{
+                if (!ops.force) {
+                    const u = this.cache.find(u => u.externalId === op);
+                    if (u) return u;
+                }
+
+                path = endpoints.users.ext(op);
+                break;
+            }
+            case 'undefined':
+            case 'object':{
+                path = endpoints.users.main;
+                if (op) ops = op;
+                break;
+            }
+            default:
+                throw new ValidationError(
+                    `expected user id, external id or fetch options; got ${typeof op}`
+                );
         }
 
-        if (typeof id === 'string' && !options.external)
-            throw new ValidationError(
-                "The 'external' option must be set to fetch externally"
-            );
-
-        const data = await this.client.requests.get(
-            options.external && id
-                ? endpoints.users.ext(id as string)
-                : (id ? endpoints.users.get(id as number) : endpoints.users.main),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 
-    /** @deprecated Use {@link UserManager.fetch} with `options.external`. */
+    /** @deprecated Use {@link UserManager.fetch}. */
     async fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
-        return this.fetch(id, { ...options, external: true });
+        return this.fetch(id, options);
     }
 
     /**

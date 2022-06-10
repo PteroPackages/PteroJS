@@ -4,7 +4,6 @@ import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import {
-    External,
     FeatureLimits,
     FetchOptions,
     Filter,
@@ -129,32 +128,44 @@ export class ApplicationServerManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched server(s).
      */
-    async fetch<T extends number | string | undefined>(
-        id?: T,
-        options: External<Include<FetchOptions>> = {}
-    ): Promise<
-        T extends undefined ? Dict<number, ApplicationServer> : ApplicationServer
-    > {
-        if (id && !options.force) {
-            if (typeof id === 'number') {
-                if (this.cache.has(id)) return Promise.resolve<any>(this.cache.get(id)!);
-            } else {
-                const s = this.cache.find(s => s.externalId === id);
-                if (s) return Promise.resolve<any>(s);
+    async fetch(id: number, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    async fetch(id: string, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ApplicationServer>>;
+    async fetch(
+        op?: number | string | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path: string;
+        switch (typeof op) {
+            case 'number':{
+                if (!ops.force && this.cache.has(op))
+                    return this.cache.get(op);
+
+                path = endpoints.servers.get(op);
+                break;
             }
+            case 'string':{
+                if (!ops.force) {
+                    const u = this.cache.find(u => u.externalId === op);
+                    if (u) return u;
+                }
+
+                path = endpoints.servers.ext(op);
+                break;
+            }
+            case 'undefined':
+            case 'object':{
+                path = endpoints.servers.main;
+                if (op) ops = op;
+                break;
+            }
+            default:
+                throw new ValidationError(
+                    `expected server id, external id or fetch options; got ${typeof op}`
+                );
         }
 
-        if (typeof id === 'string' && !options.external)
-            throw new ValidationError(
-                "The 'external' option must be set to fetch externally"
-            );
-
-            const data = await this.client.requests.get(
-                options.external && id
-                    ? endpoints.servers.ext(id as string)
-                    : (id ? endpoints.servers.get(id as number) : endpoints.servers.main),
-                options, null, this
-            );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 

@@ -92,19 +92,23 @@ export class NodeLocationManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched locations(s).
      */
-    async fetch<T extends number | undefined>(
-        id?: T,
-        options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? Dict<number, NodeLocation> : NodeLocation> {
-        if (id && !options.force) {
-            const loc = this.cache.get(id);
-            if (loc) return Promise.resolve<any>(loc);
+    async fetch(id: number, options?: Include<FetchOptions>): Promise<NodeLocation>;
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, NodeLocation>>;
+    async fetch(
+        op?: number | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path = endpoints.locations.main;
+        if (typeof op === 'number') {
+            if (!ops.force && this.cache.has(op))
+                return this.cache.get(op);
+
+            path = endpoints.locations.get(op);
+        } else {
+            if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(
-            (id ? endpoints.locations.get(id) : endpoints.locations.main),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 

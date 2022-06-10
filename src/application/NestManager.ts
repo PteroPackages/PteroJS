@@ -65,12 +65,18 @@ export class NestManager extends BaseManager {
      * @param [include] Optional include arguments.
      * @returns The fetched nest(s).
      */
-    async fetch<T extends number | undefined>(
-        id?: T,
-        include: string[] = []
-    ): Promise<T extends undefined ? Dict<number, Nest> : Nest> {
+    async fetch(id: number, include?: string[]): Promise<Nest>;
+    async fetch(include?: string[]): Promise<Dict<number, Nest>>;
+    async fetch(op?: number | string[], include: string[] = []): Promise<any> {
+        let path = endpoints.nests.main;
+        if (typeof op === 'number') {
+            path = endpoints.nests.get(op);
+        } else {
+            include.push(...op || []);
+        }
+
         const data = await this.client.requests.get(
-            id ? endpoints.nests.get(id) : endpoints.nests.main,
+            path,
             { include } as Include<FetchOptions>,
             null, this
         );

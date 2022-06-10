@@ -55,7 +55,7 @@ export class NodeAllocationManager extends BaseManager {
      */
     async fetch(
         node: number,
-        options: Include<FetchOptions>
+        options: Include<FetchOptions> = {}
     ): Promise<Dict<number, Allocation>> {
         if (!options.force) {
             const a = this.cache.get(node);
@@ -75,14 +75,13 @@ export class NodeAllocationManager extends BaseManager {
      * @param single Whether to return a single allocation.
      * @returns The available allocation(s).
      */
-    async fetchAvailable<T extends true | false>(
-        node: number,
-        single: T
-    ): Promise<T extends true ? Allocation | undefined : Dict<number, Allocation>> {
-        const allocs = await this.fetch(node, { include:['server'] });
+    async fetchAvailable(node: number, single: true): Promise<Allocation | undefined>;
+    async fetchAvailable(node: number, single: false): Promise<Dict<number, Allocation>>;
+    async fetchAvailable(node: number, single: boolean): Promise<any> {
+        const all = await this.fetch(node);
         return single
-            ? allocs.filter(a => !a.assigned).first()
-            : allocs.filter(a => !a.assigned) as any;
+            ? all.filter(a => !a.assigned).first()
+            : all.filter(a => !a.assigned);
     }
 
     /**

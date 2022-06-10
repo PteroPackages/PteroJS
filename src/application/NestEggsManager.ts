@@ -66,20 +66,21 @@ export class NestEggsManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched egg(s).
      */
-    async fetch<T extends number | undefined>(
-        nest: number,
-        id?: T,
-        options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? Dict<number, Egg> : Egg> {
-        if (id && !options.force) {
-            const e = this.cache.get(id);
-            if (e) return Promise.resolve<any>(e);
+    async fetch(nest: number, id: number, options?: Include<FetchOptions>): Promise<Egg>;
+    async fetch(nest: number, options?: Include<FetchOptions>): Promise<Dict<number, Egg>>;
+    async fetch(nest: number, op1?: number | Include<FetchOptions>, op2: Include<FetchOptions> = {}): Promise<any> {
+        let path = endpoints.nests.eggs.main(nest);
+
+        if (typeof op1 === 'number') {
+            if (!op2.force && this.cache.has(op1))
+                return this.cache.get(op1);
+
+            path = endpoints.nests.eggs.get(nest, op1);
+        } else {
+            if (op1) op2 = op1;
         }
 
-        const data = await this.client.requests.get(
-            id ? endpoints.nests.eggs.get(nest, id) : endpoints.nests.eggs.main(nest),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, op2, null, this);
         return this._patch(data);
     }
 }
