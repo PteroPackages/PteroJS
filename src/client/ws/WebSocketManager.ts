@@ -27,6 +27,7 @@ export class WebSocketManager {
 
     /**
      * Disconnects a server shard's websocket connection and removes it.
+     * If some shards do not return a value, `undefined` will be set in place.
      * @param id The identifier of the server.
      * @returns Whether the websocket shard was disconnected and/or removed.
      */
@@ -42,6 +43,21 @@ export class WebSocketManager {
         let sum = 0;
         for (let s of this.shards.values()) sum += s.ping;
         return sum / this.shards.size;
+    }
+
+    /**
+     * Broadcasts an event to all shards and waits for the responses.
+     * @param event The event to broadcast.
+     * @param args Arguments to send with the event.
+     * @returns A list of the returned values, if any.
+     */
+    async broadcast<T>(event: string, args?: string): Promise<T[]> {
+        const res = [] as T[];
+        for (const shard of this.shards.values()) {
+            let data = await shard.request(event, args);
+            res.push(data);
+        }
+        return res;
     }
 
     /** Disconnects all active websocket shards and removes them. */
