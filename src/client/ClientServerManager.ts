@@ -73,19 +73,23 @@ export class ClientServerManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched server(s).
      */
-    async fetch<T extends string | undefined>(
-        id?: T,
-        options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? Dict<string, ClientServer> : ClientServer> {
-        if (id && !options.force) {
-            const s = this.cache.get(id);
-            if (s) return Promise.resolve<any>(s);
+    async fetch(id: string, options?: Include<FetchOptions>): Promise<ClientServer>;
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ClientServer>>;
+    async fetch(
+        op?: string | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path = endpoints.servers.main;
+        if (typeof op === 'string') {
+            if (!ops.force && this.cache.has(op))
+                return this.cache.get(op);
+
+            path = endpoints.servers.get(op);
+        } else {
+            if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(
-            id ? endpoints.servers.get(id) : endpoints.servers.main,
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 

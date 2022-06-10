@@ -67,21 +67,23 @@ export class BackupManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched backup(s).
      */
-    async fetch<T extends string | undefined>(
-        id?: T,
-        options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? Dict<string, Backup> : Backup> {
-        if (id && !options.force) {
-            const b = this.cache.get(id);
-            if (b) return Promise.resolve<any>(b);
+    async fetch(id: string, options?: Include<FetchOptions>): Promise<Backup>;
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, Backup>>;
+    async fetch(
+        op?: string | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path = endpoints.servers.backups.main(this.serverId);
+        if (typeof op === 'string') {
+            if (!ops.force && this.cache.has(op))
+                return this.cache.get(op);
+
+            path = endpoints.servers.backups.get(this.serverId, op);
+        } else {
+            if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(
-            id
-                ? endpoints.servers.backups.get(this.serverId, id)
-                : endpoints.servers.backups.main(this.serverId),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 

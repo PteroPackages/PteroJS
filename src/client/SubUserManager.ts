@@ -63,21 +63,20 @@ export class SubUserManager {
      * @param [options] Additional fetch options.
      * @returns The fetched subuser(s).
      */
-    async fetch<T extends string | undefined>(
-        id?: T,
-        options: FetchOptions = {}
-    ): Promise<T extends undefined ? Dict<string, SubUser> : SubUser> {
-        if (id && !options.force) {
-            if (this.cache.has(id))
-                return Promise.resolve<any>(this.cache.get(id)!);
+    async fetch(id: string, options?: FetchOptions): Promise<SubUser>;
+    async fetch(options?: FetchOptions): Promise<Dict<number, SubUser>>;
+    async fetch(op?: string | FetchOptions, ops: FetchOptions = {}): Promise<any> {
+        let path = endpoints.servers.users.main(this.serverId);
+        if (typeof op === 'string') {
+            if (!ops.force && this.cache.has(op))
+                return this.cache.get(op);
+
+            path = endpoints.servers.users.get(this.serverId, op);
+        } else {
+            if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(
-            id
-                ? endpoints.servers.users.get(this.serverId, id)
-                : endpoints.servers.users.main(this.serverId),
-            options
-        );
+        const data = await this.client.requests.get(path, ops);
         return this._patch(data);
     }
 

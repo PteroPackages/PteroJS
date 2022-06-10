@@ -39,22 +39,24 @@ export class ScheduleManager {
      * @param [options] Additional fetch options.
      * @returns The fetched schedule(s).
      */
-    async fetch<T extends number | undefined>(
+    async fetch(server: string, id: number, options?: FetchOptions): Promise<Schedule>;
+    async fetch(server: string, options?: FetchOptions): Promise<Dict<number, Schedule>>;
+    async fetch(
         server: string,
-        id?: T,
-        options: FetchOptions = {}
-    ): Promise<T extends undefined ? Dict<number, Schedule> : Schedule> {
-        if (id && !options.force) {
-            if (this.cache.get(server)?.has(id))
-                return this.cache.get(server)!.get(id) as any;
+        op1?: number | FetchOptions,
+        op2: FetchOptions = {}
+    ): Promise<any> {
+        let path = endpoints.servers.schedules.main(server);
+        if (typeof op1 === 'number') {
+            if (!op2.force && this.cache.get(server)?.has(op1))
+                return this.cache.get(server)!.get(op1);
+
+            path = endpoints.servers.schedules.get(server, op1);
+        } else {
+            if (op1) op2 = op1;
         }
 
-        const data = await this.client.requests.get(
-            id
-                ? endpoints.servers.schedules.get(server, id)
-                : endpoints.servers.schedules.main(server),
-            options
-        );
+        const data = await this.client.requests.get(path, op2);
         return this._patch(server, data);
     }
 
