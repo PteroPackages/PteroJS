@@ -70,6 +70,13 @@ export class ApplicationServer {
     /** The ID of the egg the server uses. */
     public egg: number;
 
+    public container:{
+        startupCommand: string;
+        image:          string;
+        installed:      boolean;
+        environment:    Record<string, string>;
+    }
+
     constructor(client: PteroApp, data: any) {
         this.client = client;
         this.id = data.id;
@@ -93,13 +100,17 @@ export class ApplicationServer {
         if ('allocation' in data) this.allocation = data.allocation;
         if ('nest' in data) this.nest = data.nest;
         if ('egg' in data) this.egg = data.egg;
+        if ('container' in data) {
+            this.container = caseConv.toCamelCase(data.container);
+            this.container.installed = !!this.container.installed;
+        }
 
         if ('relationships' in data) {
-            this.owner = 'user' in data['relationships']
+            this.owner = 'user' in data.relationships
                 ? this.client.users.resolve(data)
                 : undefined;
 
-            this.node = 'node' in data['relationships']
+            this.node = 'node' in data.relationships
                 ? this.client.nodes.resolve(data)
                 : undefined;
         }
