@@ -1,6 +1,26 @@
 # Changelog
 Tracking changes for PteroJS and extensions from v2 onwards (using [SemVer 2](http://semver.org/)).
 
+## [2.0.2] - 06-2022
+Mainly bug fixes and minor additions to structures.
+
+### Added
+- `Dict#update()` updates the dict instance in place with another dict
+- `Shard#request()` method for making sendable requests to the server
+- `WebSocketManager#broadcast()` method to broadcast events to all shards and collect the responses
+- `ApplicationServer#container` property
+- `ClientServer#internalId` property
+- `ClientServer#eggFeatures` optional property
+- `ClientServer#invocation` property
+- `ClientServer#transferring` boolean property
+
+### Changed
+- all managers with caches now uses the `Dict#update()` method
+- `ClientServer#state` -> `ClientServer#status` matches API data
+
+### Fixed
+- `Node#daemon` now shows the actual daemon data object
+
 ## [2.0.0] - 26-05-2022
 A huge turning point for the PteroJS library, having a new TypeScript look, updated classes/methods, and proper documentation. Thanks to everyone that contributed! :D
 
