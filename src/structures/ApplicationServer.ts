@@ -34,6 +34,9 @@ export class ApplicationServer {
     /** The description of the server (if set). */
     public description: string | undefined;
 
+    /** The current processing status of the server. */
+    public status: string | null;
+
     /** Whether the server is suspended from action. */
     public suspended: boolean;
 
@@ -92,6 +95,7 @@ export class ApplicationServer {
         if ('external_id' in data) this.externalId = data.external_id;
         if ('name' in data) this.name = data.name;
         if ('description' in data) this.description = data.description || undefined;
+        if ('status' in data) this.status = data.status;
         if ('suspended' in data) this.suspended = data.suspended;
         if ('limits' in data) this.limits = caseConv.toCamelCase(data.limits);
         if ('feature_limits' in data) this.featureLimits = data.feature_limits;

@@ -18,6 +18,9 @@ export class ClientServer {
     /** A substring of the server's UUID. */
     public readonly identifier: string;
 
+    /** The internal ID of the server. */
+    public readonly internalId: number;
+
     /** The name of the server. */
     public name: string;
 
@@ -42,14 +45,26 @@ export class ClientServer {
     /** An object containing the server feature limits. */
     public featureLimits: FeatureLimits;
 
-    /** The current state of the server. */
-    public state: string | undefined;
+    /** A list of egg features the server uses. */
+    public eggFeatures: string[] | undefined;
+
+    /** The invocation (or startup command) for the server. */
+    public invocation: string | null;
+
+    /** The docker image the server uses. */
+    public dockerImage: string;
+
+    /** The current status of the server. */
+    public status: string | undefined;
 
     /** Whether the server is suspended. */
     public suspended: boolean;
 
-    /** Whether the server is transferring. */
+    /** Whether the server is installing. */
     public installing: boolean;
+
+    /** Whether the server is transferring. */
+    public transferring: boolean;
 
     public backups: BackupManager;
     public databases: DatabaseManager;
@@ -79,9 +94,13 @@ export class ClientServer {
         if ('sftp_details' in data) this.sftpDetails = data.sftp_details;
         if ('limits' in data) this.limits = caseConv.toCamelCase(data.limits);
         if ('feature_limits' in data) this.featureLimits = data.feature_limits;
-        if ('state' in data) this.state = data.state;
+        if ('egg_features' in data) this.eggFeatures = data.egg_features || undefined;
+        if ('invocation' in data) this.invocation = data.invocation;
+        if ('docker_image' in data) this.dockerImage = data.docker_image;
+        if ('status' in data) this.status = data.status || undefined;
         if ('is_suspended' in data) this.suspended = data.is_suspended;
         if ('is_installing' in data) this.installing = data.is_installing;
+        if ('is_transferring' in data) this.transferring = data.is_transferring;
     }
 
     /**
@@ -125,7 +144,7 @@ export class ClientServer {
      */
     async setPowerState(state: 'start' | 'stop' | 'restart' | 'kill'): Promise<void> {
         await this.client.servers.setPowerState(this.identifier, state);
-        this.state = state;
+        this.status = state;
     }
 
     /**
@@ -134,6 +153,7 @@ export class ClientServer {
      */
     async setDockerImage(image: string): Promise<void> {
         await this.client.servers.setDockerImage(this.identifier, image);
+        this.dockerImage = image;
     }
 
     /**
