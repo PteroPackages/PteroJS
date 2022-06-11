@@ -23,6 +23,7 @@ function camelCase(str: string): string {
 }
 
 function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
+    if (typeof obj !== 'object') return obj;
     const parsed: Record<string, any> = {};
 
     for (let [k, v] of Object.entries(obj)) {
@@ -37,7 +38,11 @@ function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
                 v = String(v);
             }
         }
-        if (typeof v === 'object' && !!v) v = toCamelCase(v);
+        if (Array.isArray(v)) {
+            v = v.map(i => toCamelCase(i));
+        } else if (typeof v === 'object' && !!v) {
+            v = toCamelCase(v);
+        }
         parsed[camelCase(k)] = v;
     }
 
@@ -58,6 +63,7 @@ function snakeCase(str: string): string {
 }
 
 function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
+    if (typeof obj !== 'object') return obj;
     const parsed: Record<string, any> = {};
 
     for (let [k, v] of Object.entries(obj)) {
@@ -72,7 +78,11 @@ function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
                 v = String(v);
             }
         }
-        if (typeof v === 'object' && !!v) v = toSnakeCase(v);
+        if (Array.isArray(v)) {
+            v = v.map(i => toSnakeCase(i));
+        } else if (typeof v === 'object' && !!v) {
+            v = toSnakeCase(v);
+        }
         parsed[snakeCase(k)] = v;
     }
 

@@ -20,6 +20,7 @@ Mainly bug fixes and minor additions to structures.
 
 ### Fixed
 - `Node#daemon` now shows the actual daemon data object
+- `caseConv` functions handling arrays incorrectly
 
 ## [2.0.0] - 26-05-2022
 A huge turning point for the PteroJS library, having a new TypeScript look, updated classes/methods, and proper documentation. Thanks to everyone that contributed! :D

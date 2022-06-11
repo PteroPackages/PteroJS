@@ -44,6 +44,6 @@ export { Schedule } from './structures/Schedule';
 export * from './structures/User';
 
 // Utilities
-export * from './util/caseConv';
-export * from './util/config';
+export { default as caseConv } from './util/caseConv';
+export { default as configLoader } from './util/config';
 export * from './util/query';
