@@ -184,7 +184,7 @@ export interface UpdateDetailsOptions {
 
 export interface UpdateStartupOptions {
     startup?:       string;
-    environment?:   Record<string, string>;
+    environment?:   Record<string, string | number | boolean>;
     egg?:           number;
     image?:         string;
     skipScripts?:   boolean;

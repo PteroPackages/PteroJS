@@ -105,7 +105,11 @@ export class ApplicationServer {
         if ('nest' in data) this.nest = data.nest;
         if ('egg' in data) this.egg = data.egg;
         if ('container' in data) {
-            this.container = caseConv.toCamelCase(data.container);
+            this.container = caseConv.toCamelCase(
+                data.container,
+                { ignore:['environment'] }
+            );
+            this.container.environment = data.container.environment;
             this.container.installed = !!this.container.installed;
         }
 
@@ -175,9 +179,13 @@ export class ApplicationServer {
      * Updates the startup configuration of the server.
      * @param options Update startup options.
      * @see {@link UpdateStartupOptions}.
-     * @todo
+     * @returns The updated instance.
      */
-    private async updateStartup(options: UpdateStartupOptions) {}
+    async updateStartup(options: UpdateStartupOptions): Promise<this> {
+        const data = await this.client.servers.updateStartup(this.id, options);
+        this._patch(data);
+        return this;
+    }
 
     /** Suspends the server. */
     async suspend(): Promise<void> {

@@ -300,12 +300,31 @@ export class ApplicationServerManager extends BaseManager {
      * @param id The ID of the server.
      * @param options Update startup options.
      * @see {@link UpdateStartupOptions}.
-     * @todo
+     * @returns The updated server.
      */
-    private async updateStartup(
+    async updateStartup(
         id: number,
         options: UpdateStartupOptions
-    ) {}
+    ): Promise<ApplicationServer> {
+        if (!Object.keys(options).length)
+            throw new ValidationError('Too few options to update the server.');
+
+        const server = await this.fetch(id, { force: true });
+        options.egg ??= server.egg;
+        options.environment ||= server.container.environment;
+        options.image ||= server.container.image;
+        options.skipScripts ??= false;
+        options.startup ||= server.container.startupCommand;
+
+        const payload = caseConv.toSnakeCase<any>(options, { ignore:['environment'] });
+        payload.environment = options.environment;
+
+        const data = await this.client.requests.patch(
+            endpoints.servers.startup(id),
+            payload
+        );
+        return this._patch(data);
+    }
 
     /**
      * Suspends a server.
