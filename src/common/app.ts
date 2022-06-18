@@ -10,6 +10,18 @@ export interface Allocation {
     assigned:   boolean;
 }
 
+export interface ApplicationDatabase {
+    id:             number;
+    serverId:       number;
+    hostId:         number;
+    database:       unknown;
+    username:       string;
+    remote:         string;
+    maxConnections: number;
+    createdAt:      Date;
+    updatedAt:      Date | undefined;
+}
+
 /** Options for creating a node. */
 export interface CreateNodeOptions {
     name:                   string;

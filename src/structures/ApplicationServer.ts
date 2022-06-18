@@ -1,6 +1,9 @@
 import type { Node } from './Node';
 import type { User } from './User';
 import type { PteroApp } from '../application';
+import {
+    ApplicationDatabaseManager
+} from '../application/ApplicationDatabaseManager';
 import { Limits, FeatureLimits } from '../common';
 import {
     UpdateBuildOptions,
@@ -11,6 +14,7 @@ import caseConv from '../util/caseConv';
 
 export class ApplicationServer {
     public client: PteroApp;
+    public databases: ApplicationDatabaseManager;
 
     /** The internal ID of the server (separate from UUID). */
     public readonly id: number;
@@ -82,6 +86,7 @@ export class ApplicationServer {
 
     constructor(client: PteroApp, data: any) {
         this.client = client;
+        this.databases = new ApplicationDatabaseManager(client, data.id);
         this.id = data.id;
         this.uuid = data.uuid;
         this.identifier = data.identifier;

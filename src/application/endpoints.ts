@@ -23,7 +23,12 @@ export default {
         startup: (s: number) => `/servers/${s}/startup`,
         suspend: (s: number) => `/servers/${s}/suspend`,
         unsuspend: (s: number) => `/servers/${s}/unsuspend`,
-        reinstall: (s: number) => `/servers/${s}/reinstall`
+        reinstall: (s: number) => `/servers/${s}/reinstall`,
+        databases:{
+            main: (s: number) => `/servers/${s}/databases`,
+            get: (s: number, id: number) => `/servers/${s}/databases/${id}`,
+            reset: (s: number, id: number) => `/servers/${s}/databases/${id}/reset-password`
+        }
     },
     locations:{
         main: '/locations',
