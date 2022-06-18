@@ -70,7 +70,7 @@ export interface Cron {
 }
 
 /** Represents a server database object. */
-export interface Database {
+export interface ClientDatabase {
     id:                 number;
     name:               string;
     username:           string;

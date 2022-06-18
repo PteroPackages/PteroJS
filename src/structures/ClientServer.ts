@@ -1,6 +1,6 @@
 import type { PteroClient } from '../client';
 import { BackupManager } from '../client/BackupManager';
-import { DatabaseManager } from '../client/DatabaseManager';
+import { ClientDatabaseManager } from '../client/ClientDatabaseManager';
 import { FileManager } from '../client/FileManager';
 import { NetworkManager } from '../client/NetworkManager';
 import { SubUserManager } from '../client/SubUserManager';
@@ -67,7 +67,7 @@ export class ClientServer {
     public transferring: boolean;
 
     public backups: BackupManager;
-    public databases: DatabaseManager;
+    public databases: ClientDatabaseManager;
     public files: FileManager;
     public network: NetworkManager;
     public users: SubUserManager;
@@ -78,7 +78,7 @@ export class ClientServer {
         this.identifier = data.identifier;
 
         this.backups = new BackupManager(client, data.identifier);
-        this.databases = new DatabaseManager(client, data.identifier);
+        this.databases = new ClientDatabaseManager(client, data.identifier);
         this.files = new FileManager(client, data.identifier);
         this.network = new NetworkManager(client, data.identifier);
         this.users = new SubUserManager(client, data.identifier);

@@ -2,13 +2,13 @@ import type { PteroClient } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
-import { Database } from '../common/client';
+import { ClientDatabase } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
-export class DatabaseManager extends BaseManager {
+export class ClientDatabaseManager extends BaseManager {
     public client: PteroClient;
-    public cache: Dict<number, Database>;
+    public cache: Dict<number, ClientDatabase>;
     public serverId: string;
 
     /** Allowed filter arguments for databases. */
@@ -31,16 +31,16 @@ export class DatabaseManager extends BaseManager {
 
     _patch(data: any): any {
         if (data.data) {
-            const res = new Dict<number, Database>();
+            const res = new Dict<number, ClientDatabase>();
             for (let o of data.data) {
-                const d = caseConv.toCamelCase<Database>(o.attributes);
+                const d = caseConv.toCamelCase<ClientDatabase>(o.attributes);
                 res.set(d.id, d);
             }
             this.cache.update(res);
             return res;
         }
 
-        const d = caseConv.toCamelCase<Database>(data.attributes);
+        const d = caseConv.toCamelCase<ClientDatabase>(data.attributes);
         this.cache.set(d.id, d);
         return d;
     }
@@ -50,7 +50,9 @@ export class DatabaseManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched databases.
      */
-    async fetch(options: Include<FetchOptions> = {}): Promise<Dict<number, Database>> {
+    async fetch(
+        options: Include<FetchOptions> = {}
+    ): Promise<Dict<number, ClientDatabase>> {
         const data = await this.client.requests.get(
             endpoints.servers.databases.main(this.serverId),
             options, null, this
@@ -64,7 +66,7 @@ export class DatabaseManager extends BaseManager {
      * @param remote The connections allowed to the database.
      * @returns The new database.
      */
-    async create(database: string, remote: string): Promise<Database> {
+    async create(database: string, remote: string): Promise<ClientDatabase> {
         const data = await this.client.requests.post(
             endpoints.servers.databases.main(this.serverId),
             { database, remote }
@@ -77,7 +79,7 @@ export class DatabaseManager extends BaseManager {
      * @param id The ID of the database.
      * @returns The updated database.
      */
-    async rotate(id: number): Promise<Database> {
+    async rotate(id: number): Promise<ClientDatabase> {
         const data = await this.client.requests.post(
             endpoints.servers.databases.rotate(this.serverId, id)
         );
