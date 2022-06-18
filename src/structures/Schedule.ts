@@ -116,11 +116,12 @@ export class Schedule {
     async createTask(
         action: ScheduleTaskAction,
         payload: string,
-        offset: number
+        offset: number,
+        sequenceId?: number
     ): Promise<ScheduleTask> {
         const data = await this.client.requests.post(
             endpoints.servers.schedules.tasks.main(this.serverId, this.id),
-            { action, payload, time_offset: offset }
+            { action, payload, time_offset: offset, sequence_id: sequenceId }
         );
         return this._resolveTask(data);
     }

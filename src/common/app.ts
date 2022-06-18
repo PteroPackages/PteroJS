@@ -23,22 +23,25 @@ export interface CreateNodeOptions {
     sftp:{
         port:               number;
         listener:           number;
-    };
+    }
     uploadSize?:            number;
 }
 
 /** Options for creating a user account. */
 export interface CreateUserOptions {
-    email:      string;
-    username:   string;
-    firstname:  string;
-    lastname:   string;
-    password?:  string;
-    isAdmin?:   boolean;
+    externalId?:    string;
+    email:          string;
+    username:       string;
+    firstname:      string;
+    lastname:       string;
+    password?:      string;
+    isAdmin?:       boolean;
 }
 
 /** Options for creating a server. */
 export interface CreateServerOptions {
+    /** The external identifier of the server. */
+    externalId?:        string;
     /** The name of the server. */
     name:               string;
     /**
@@ -111,7 +114,7 @@ export interface Egg {
         logs:           string[];
         fileDenylist:   string[];
         extends:        string | null;
-    };
+    }
     startup:            string;
     script:{
         privileged:     boolean;
@@ -148,15 +151,15 @@ export interface NodeConfiguration {
             enabled:    boolean;
             cert:       string;
             key:        string;
-        };
+        }
         uploadLimit:    number;
     };
     system:{
         data:           string;
         sftp:{
             bindPort:   number;
-        };
-    };
+        }
+    }
     allowedMounts:      string[];
     remote:             string;
 }
@@ -166,6 +169,15 @@ export interface NodeDeploymentOptions {
     memory:         number;
     disk:           number;
     locationIds?:   number[];
+}
+
+/** Represents a server status. If the server has no status, `NONE` is used. */
+export enum ServerStatus {
+    INSTALLING = 'installing',
+    INSTALL_FAILED = 'install_failed',
+    SUSPENDED = 'suspended',
+    RESTORING = 'restoring_backup',
+    NONE = ''
 }
 
 export interface UpdateBuildOptions extends Partial<Limits & FeatureLimits> {
@@ -190,6 +202,4 @@ export interface UpdateStartupOptions {
     skipScripts?:   boolean;
 }
 
-export interface UpdateUserOptions extends CreateUserOptions {
-    password: string;
-}
+export interface UpdateUserOptions extends CreateUserOptions {}
