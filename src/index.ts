@@ -44,6 +44,10 @@ export * from './structures/Permissions';
 export { Schedule } from './structures/Schedule';
 export * from './structures/User';
 
+// Builders
+export { Builder } from './builders/base';
+export { UserBuilder } from './builders/User';
+
 // Utilities
 export { default as caseConv } from './util/caseConv';
 export { default as configLoader } from './util/config';
