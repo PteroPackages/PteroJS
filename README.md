@@ -24,7 +24,8 @@ Please join the [support server](https://discord.com/invite/dwcfTjgn7S) if you e
 Pterodactyl API | Wings API | Support
 ----------------|-----------|--------
 `<=0.7` | `<=1.5` | ❌
-`^1.6.5` | `^1.6` | ✅
+`1.6.5 >= 1.8.0` | `^1.6` | ✅
+`1.8.1` || ❌
 
 ## Setting Up
 PteroJS uses separate classes for the client and application sides of the Pterodactyl API.
@@ -34,10 +35,10 @@ PteroJS uses separate classes for the client and application sides of the Pterod
 const { PteroApp } = require('@devnote-dev/pterojs');
 
 // Initialising the application
-const client = new PteroApp('your.domain.name', 'pterodactyl_api_key');
+const app = new PteroApp('your.domain.name', 'pterodactyl_api_key');
 
 // Accessing information
-client.servers.fetch('evuk98yu').then(console.log);
+app.servers.fetch('evuk98yu').then(console.log);
 ```
 
 ### Using the client API
@@ -62,6 +63,9 @@ shard.on('statusUpdate', status => {
 // Connecting to the server
 shard.connect();
 ```
+
+## Migrations
+Checkout the new [migrations guide](./migrations/v2-0-1.md) to PteroJS v2!
 
 ## Contributing
 Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TODO.md) or [issues](https://github.com/PteroPackages/PteroJS/issues) section for contributing ideas. New ideas/features are also welcome.
