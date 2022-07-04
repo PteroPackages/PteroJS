@@ -1,7 +1,7 @@
 # Changelog
 Tracking changes for PteroJS and extensions from v2 onwards (using [SemVer 2](http://semver.org/)).
 
-## [2.0.2] - 06-2022
+## [2.0.2] - 07-2022
 Mainly bug fixes and minor additions to structures.
 
 ### Added
@@ -13,6 +13,9 @@ Mainly bug fixes and minor additions to structures.
 - `ClientServer#eggFeatures` optional property
 - `ClientServer#invocation` property
 - `ClientServer#transferring` boolean property
+- `UserBuilder` class
+- `ServerBuilder` class
+- `NodeBuilder` class
 
 ### Changed
 - all managers with caches now uses the `Dict#update()` method
@@ -21,6 +24,8 @@ Mainly bug fixes and minor additions to structures.
 ### Fixed
 - `Node#daemon` now shows the actual daemon data object
 - `caseConv` functions handling arrays incorrectly
+- Node creation method now uses the correct endpoint
+- `NodeCreationOptions` is now updated to use actual creation options in the API
 
 ## [2.0.0] - 26-05-2022
 A huge turning point for the PteroJS library, having a new TypeScript look, updated classes/methods, and proper documentation. Thanks to everyone that contributed! :D
