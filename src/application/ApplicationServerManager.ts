@@ -68,7 +68,7 @@ export class ApplicationServerManager extends BaseManager {
     get defaultFeatureLimits(): FeatureLimits {
         return {
             allocations: 1,
-            databases: 5,
+            databases: 1,
             backups: 1
         }
     }
