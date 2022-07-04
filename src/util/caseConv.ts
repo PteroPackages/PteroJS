@@ -26,6 +26,10 @@ function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
     if (typeof obj !== 'object') return obj;
     const parsed: Record<string, any> = {};
 
+    if (Array.isArray(obj)) {
+        return <any> obj.map(i => toCamelCase(i));
+    }
+
     for (let [k, v] of Object.entries(obj)) {
         if (options.ignore?.includes(k)) continue;
         if (options.map?.[k]) k = options.map[k];
@@ -65,6 +69,10 @@ function snakeCase(str: string): string {
 function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
     if (typeof obj !== 'object') return obj;
     const parsed: Record<string, any> = {};
+
+    if (Array.isArray(obj)) {
+        return <any> obj.map(i => toSnakeCase(i));
+    }
 
     for (let [k, v] of Object.entries(obj)) {
         if (options.ignore?.includes(k)) continue;
