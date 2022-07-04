@@ -46,6 +46,7 @@ export * from './structures/User';
 
 // Builders
 export { Builder } from './builders/base';
+export { NodeBuilder } from './builders/Node';
 export { ServerBuilder } from './builders/Server';
 export { UserBuilder } from './builders/User';
 
