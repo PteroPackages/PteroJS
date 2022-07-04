@@ -193,7 +193,7 @@ export class NodeManager extends BaseManager {
     async create(options: CreateNodeOptions): Promise<Node> {
         const payload = caseConv.toSnakeCase<object>(options);
         const data = await this.client.requests.post(
-            endpoints.users.main, payload
+            endpoints.nodes.main, payload
         );
         return this._patch(data);
     }

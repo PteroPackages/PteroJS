@@ -25,17 +25,27 @@ export interface ApplicationDatabase {
 /** Options for creating a node. */
 export interface CreateNodeOptions {
     name:                   string;
+    description:            string | undefined;
+    /** @deprecated Broken, use `locationId`. */
     location:               string;
+    locationId:             number;
+    public:                 boolean;
     fqdn:                   string;
     scheme:                 string;
+    behindProxy:            boolean;
     memory:                 number;
     memoryOverallocate?:    number;
     disk:                   number;
     diskOverallocate?:      number;
+    /** @deprecated Use `daemonPort` and `daemonListen` instead. */
     sftp:{
         port:               number;
         listener:           number;
     }
+    daemonBase:             string;
+    daemonSftp:             number;
+    daemonListen:           number;
+    maintenanceMode:        boolean;
     uploadSize?:            number;
 }
 
