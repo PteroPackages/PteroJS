@@ -1,3 +1,15 @@
+export interface Activity {
+    id:                     string;
+    batch:                  unknown;
+    event:                  string;
+    isApi:                  boolean;
+    ip:                     string | null;
+    description:            string | null;
+    properties:             Record<string, any>;
+    hasAdditionalMetadata:  boolean;
+    timestamp:              Date;
+}
+
 /** Represents a client API key. */
 export interface APIKey {
     identifier:     string;

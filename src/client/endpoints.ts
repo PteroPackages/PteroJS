@@ -7,7 +7,8 @@ export default {
         apikeys:{
             main: '/account/api-keys',
             get: (k: string) => `/account/api-keys/${k}`
-        }
+        },
+        activity: '/account/activity'
     },
     servers:{
         main: '',

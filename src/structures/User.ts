@@ -4,7 +4,7 @@ import type { PteroClient } from '../client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
 import { ValidationError } from './Errors';
-import { APIKey } from '../common/client';
+import { Activity, APIKey } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -342,5 +342,15 @@ export class Account extends BaseUser {
     async deleteKey(id: string): Promise<void> {
         await this.client.requests.delete(endpoints.account.apikeys.get(id));
         this.apikeys = this.apikeys.filter(k => k.identifier !== id);
+    }
+
+    async fetchActivities(): Promise<Activity[]> {
+        const data = await this.client.requests.get(endpoints.account.activity);
+        const act = data.data.map((o: any) => {
+            const a = caseConv.toCamelCase<Activity>(o.attributes);
+            a.timestamp = new Date(a.timestamp);
+            return a;
+        });
+        return act;
     }
 }
