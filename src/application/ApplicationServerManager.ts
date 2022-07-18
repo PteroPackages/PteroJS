@@ -284,8 +284,8 @@ export class ApplicationServerManager extends BaseManager {
             throw new ValidationError('Too few options to update the server.');
 
         const server = await this.fetch(id, { force: true });
-        options = Object.assign(server.limits, options);
-        options = Object.assign(server.featureLimits, options);
+        options.limits = Object.assign(server.limits, options.limits);
+        options.featureLimits = Object.assign(server.featureLimits, options.featureLimits);
         options.allocation ??= server.allocation;
 
         const data = await this.client.requests.patch(

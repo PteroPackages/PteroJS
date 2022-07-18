@@ -202,7 +202,9 @@ export enum ServerStatus {
     NONE = ''
 }
 
-export interface UpdateBuildOptions extends Partial<Limits & FeatureLimits> {
+export interface UpdateBuildOptions {
+    limits?:            Partial<Limits>;
+    featureLimits?:     Partial<FeatureLimits>;
     allocation?:        number;
     oomDisabled?:       boolean;
     addAllocations?:    number[];
