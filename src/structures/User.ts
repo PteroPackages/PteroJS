@@ -4,7 +4,7 @@ import type { PteroClient } from '../client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
 import { ValidationError } from './Errors';
-import { Activity, APIKey } from '../common/client';
+import { Activity, APIKey, SSHKey } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -344,6 +344,7 @@ export class Account extends BaseUser {
         this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 
+    /** @returns A list of activity logs on the account. */
     async fetchActivities(): Promise<Activity[]> {
         const data = await this.client.requests.get(endpoints.account.activity);
         const act = data.data.map((o: any) => {
@@ -352,5 +353,43 @@ export class Account extends BaseUser {
             return a;
         });
         return act;
+    }
+
+    /** @returns A list of SSH keys associated with the account. */
+    async fetchSSHKeys(): Promise<SSHKey[]> {
+        const data = await this.client.requests.get(endpoints.account.sshkeys.main);
+        const keys = data.data.map((o: any) => {
+            const k = caseConv.toCamelCase<SSHKey>(o.attributes);
+            k.createdAt = new Date(k.createdAt);
+            return k;
+        });
+        return keys;
+    }
+
+    /**
+     * Creates an SSH key associated with the account.
+     * @param name The name of the key.
+     * @param publicKey The public key to authorize.
+     * @returns The new SSH key.
+     */
+    async createSSHKey(name: string, publicKey: string): Promise<SSHKey> {
+        const data = await this.client.requests.post(
+            endpoints.account.sshkeys.main,
+            { name, public_key: publicKey }
+        );
+        const key = caseConv.toCamelCase<SSHKey>(data.attributes);
+        key.createdAt = new Date(key.createdAt);
+        return key;
+    }
+
+    /**
+     * Removes an SSH key from the account.
+     * @param fingerprint The fingerprint of the SSH key.
+     */
+    async removeSSHKey(fingerprint: string): Promise<void> {
+        await this.client.requests.post(
+            endpoints.account.sshkeys.remove,
+            { fingerprint }
+        );
     }
 }

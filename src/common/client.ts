@@ -174,6 +174,13 @@ export enum ShardStatus {
     CONNECTED
 }
 
+export interface SSHKey {
+    name:           string;
+    fingerprint:    string;
+    publicKey:      string;
+    createdAt:      Date;
+}
+
 export interface StartupData {
     variables:          EggVariable[];
     startupCommand:     string;
