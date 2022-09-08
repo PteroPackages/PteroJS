@@ -1,14 +1,10 @@
 import { Dict, PteroAPIError, PteroApp, User } from '../../src';
-import auth from '../auth.json';
+import auth from '../auth';
 
 const app = new PteroApp(auth.url, auth.key);
 let id: number;
 
 describe('Application: Users', () => {
-    // beforeEach(() => {
-    //     app = new PteroApp(auth.url, auth.key);
-    // });
-
     it('fetches all users', async () => {
         let users = await app.users.fetch();
 
