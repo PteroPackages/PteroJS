@@ -25,7 +25,7 @@ export class UserManager extends BaseManager {
     get FILTERS() {
         return Object.freeze([
             'email', 'uuid', 'uuidShort',
-            'username', 'image', 'external_id'
+            'name', 'image', 'external_id'
         ]);
     }
 
