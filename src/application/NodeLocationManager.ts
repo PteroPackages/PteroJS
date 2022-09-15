@@ -18,17 +18,25 @@ export class NodeLocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, NodeLocation>;
 
-    /** Allowed filter arguments for locations. */
+    /**
+     * Allowed filter arguments for locations:
+     * * short
+     * * long
+     */
     get FILTERS() {
         return Object.freeze(['short', 'long']);
     }
 
-    /** Allowed include arguments for locations. */
+    /**
+     * Allowed include arguments for locations:
+     * * nodes
+     * * servers
+     */
     get INCLUDES() {
         return Object.freeze(['nodes', 'servers']);
     }
 
-    /** Allowed sort arguments for locations. */
+    /** Allowed sort arguments for locations (none). */
     get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -37,6 +45,11 @@ export class NodeLocationManager extends BaseManager {
         this.cache = new Dict();
     }
 
+    /**
+     * Transforms the raw location object(s) into typed objects.
+     * @param data The resolvable location object(s).
+     * @returns The resolved location object(s).
+     */
     _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, NodeLocation>();
@@ -92,7 +105,33 @@ export class NodeLocationManager extends BaseManager {
      * @param [options] Additional fetch options.
      * @returns The fetched locations(s).
      */
+
+    /**
+     * Fetches a location from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
+     * @param id The ID of the location.
+     * @param [options] Additional fetch options.
+     * @returns The fetched location.
+     * @example
+     * ```
+     * app.locations.fetch(8).then(console.log).catch(console.error);
+     * ```
+     */
     async fetch(id: number, options?: Include<FetchOptions>): Promise<NodeLocation>;
+    /**
+     * Fetches a list of locations from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched locations.
+     * @example
+     * ```
+     * app.locations.fetch({ include:['nodes'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
     async fetch(options?: Include<FetchOptions>): Promise<Dict<number, NodeLocation>>;
     async fetch(
         op?: number | Include<FetchOptions>,
@@ -113,9 +152,9 @@ export class NodeLocationManager extends BaseManager {
     }
 
     /**
-     * Queries the Pterodactyl API for locations that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods
-     * for filtering and sorting.
+     * Queries the API for locations that match the specified query filters. This fetches from the
+     * API directly and does not check the cache. Use cache methods for filtering and sorting.
+     * 
      * Available query filters:
      * * short
      * * long
@@ -123,6 +162,12 @@ export class NodeLocationManager extends BaseManager {
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried locations.
+     * @example
+     * ```
+     * app.locations.query('us', { filter: 'long' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async query(
         entity: string,
@@ -149,6 +194,12 @@ export class NodeLocationManager extends BaseManager {
      * @param short The short name for the location (usually the country code).
      * @param long The long name for the location.
      * @returns The new location.
+     * @example
+     * ```
+     * app.locations.create('ca', 'canada')
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async create(short: string, long: string): Promise<NodeLocation> {
         const data = await this.client.requests.post(
@@ -162,6 +213,12 @@ export class NodeLocationManager extends BaseManager {
      * @param id The ID of the location.
      * @param options The updated short and/or long name of the location.
      * @returns The updated location.
+     * @example
+     * ```
+     * app.locations.update(10, { long: 'united kingdom' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async update(
         id: number,
@@ -181,6 +238,10 @@ export class NodeLocationManager extends BaseManager {
     /**
      * Deletes a location.
      * @param id The ID of the location.
+     * @example
+     * ```
+     * app.locations.delete(9).catch(console.error);
+     * ```
      */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.locations.get(id));
