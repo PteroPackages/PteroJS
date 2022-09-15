@@ -26,7 +26,15 @@ export class ApplicationServerManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
 
-    /** Allowed filter arguments for servers. */
+    /**
+     * Allowed filter arguments for servers:
+     * * name
+     * * uuid
+     * * uuidShort
+     * * identifier (alias for uuidShort)
+     * * externalId
+     * * image
+     */
     get FILTERS() {
         return Object.freeze([
             'name', 'uuid', 'uuidShort',
@@ -34,7 +42,20 @@ export class ApplicationServerManager extends BaseManager {
         ]);
     }
 
-    /** Allowed include arguments for servers. */
+    /**
+     * Allowed include arguments for servers:
+     * * allocations
+     * * user
+     * * subusers
+     * * nest
+     * * egg
+     * * variables
+     * * location
+     * * node
+     * * databases
+     * 
+     * Note: not all of these include options have been implemented yet.
+     */
     get INCLUDES() {
         return Object.freeze([
             'allocations', 'user', 'subusers',
@@ -43,7 +64,15 @@ export class ApplicationServerManager extends BaseManager {
         ]);
     }
 
-    /** Allowed sort arguments for servers. */
+    /**
+     * Allowed sort arguments for servers:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * 
+     * Negative arguments reverse the sorted results.
+     */
     get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
@@ -73,6 +102,11 @@ export class ApplicationServerManager extends BaseManager {
         }
     }
 
+    /**
+     * Transforms the raw server object(s) into class objects.
+     * @param data The resolvable server object(s).
+     * @returns The resolved server object(s).
+     */
     _patch(data: any): any {
         if (data.data) {
             const res = new Dict<number, ApplicationServer>();
@@ -123,16 +157,43 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     /**
-     * Fetches a server or a list of servers from the Pterodactyl API.
-     * @param [id] The ID or external ID of the server.
+     * Fetches a server from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
+     * @param id The ID of the server.
      * @param [options] Additional fetch options.
-     * @returns The fetched server(s).
+     * @returns The fetched server.
+     * @example
+     * ```
+     * app.servers.fetch(12).then(console.log).catch(console.error);
+     * ```
      */
     async fetch(id: number, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    /**
+     * Fetches a server from the API by its external ID. This will check the cache first unless the
+     * force option is specified.
+     *
+     * @param id The external ID of the server.
+     * @param [options] Additional fetch options.
+     * @returns The fetched server.
+     * @example
+     * ```
+     * app.servers.fetch('minecraft').then(console.log).catch(console.error);
+     * ```
+     */
     async fetch(id: string, options?: Include<FetchOptions>): Promise<ApplicationServer>;
-    async fetch(
-        options?: Include<FetchOptions>
-    ): Promise<Dict<number, ApplicationServer>>;
+    /**
+     * Fetches a list of servers from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched servers.
+     * @example
+     * ```
+     * app.servers.fetch({ page: 2 }).then(console.log).catch(console.error);
+     * ```
+     */
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ApplicationServer>>;
     async fetch(
         op?: number | string | Include<FetchOptions>,
         ops: Include<FetchOptions> = {}
@@ -173,8 +234,9 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Queries the Pterodactyl API for servers that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods
-     * for filtering and sorting.
+     * This fetches from the API directly and does not check the cache. Use cache methods for
+     * filtering and sorting.
+     * 
      * Available query filters:
      * * name
      * * uuid
@@ -192,6 +254,12 @@ export class ApplicationServerManager extends BaseManager {
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried servers.
+     * @example
+     * ```
+     * app.servers.query('ARK', { filter: 'name', sort: 'id' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async query(
         entity: string,
@@ -217,9 +285,31 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Creates a server with the specified options.
-     * @param options Create server options.
      * @see {@link CreateServerOptions}.
+     * @param options Create server options.
      * @returns The new server.
+     * @example
+     * ```
+     * app.servers.create({
+     *  name: 'ptero bot',
+     *  user: 5,
+     *  egg: 16,
+     *  dockerImage: 'ghcr.io/parkervcp/yolks:nodejs_17',
+     *  startup: 'if [ -f /home/container/package.json ];' +
+     *   'then /usr/local/bin/npm install; fi;' +
+     *   '/usr/local/bin/node /home/container/{{BOT_JS_FILE}}',
+     *  environment:{
+     *   USER_UPLOAD: false,
+     *   AUTO_UPDATE: false,
+     *   BOT_JS_FILE: 'index.js'
+     *  },
+     *  allocation:{
+     *   default: 24
+     *  }
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async create(options: CreateServerOptions): Promise<ApplicationServer> {
         options.limits = Object.assign(
@@ -244,10 +334,16 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Updates the details of a server.
+     * @see {@link UpdateDetailsOptions}.
      * @param id The ID of the server.
      * @param options Update details options.
-     * @see {@link UpdateDetailsOptions}.
      * @returns The updated server.
+     * @example
+     * ```
+     * app.servers.updateDetails(12, { externalId: 'mc01' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async updateDetails(
         id: number,
@@ -271,10 +367,21 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Updates the build configuration of a server.
+     * @see {@link UpdateBuildOptions}.
      * @param id The ID of the server.
      * @param options Update build options.
-     * @see {@link UpdateBuildOptions}.
      * @returns The updated server.
+     * @example
+     * ```
+     * app.servers.updateBuild(12, {
+     *  limits:{
+     *   memory: 2048
+     *  },
+     *  addAllocations:[32]
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async updateBuild(
         id: number,
@@ -297,10 +404,19 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Updates the startup configuration of a server.
+     * @see {@link UpdateStartupOptions}.
      * @param id The ID of the server.
      * @param options Update startup options.
-     * @see {@link UpdateStartupOptions}.
      * @returns The updated server.
+     * @example
+     * ```
+     * app.servers.updateStartup(12, {
+     *  image: 'ghcr.io/pterodactyl/yolks:java_17',
+     *  skipScripts: false
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async updateStartup(
         id: number,
@@ -329,39 +445,50 @@ export class ApplicationServerManager extends BaseManager {
     /**
      * Suspends a server.
      * @param id The ID of the server.
+     * @example
+     * ```
+     * app.servers.suspend(14).catch(console.error);
+     * ```
      */
-    async suspend(id: number): Promise<void> {
-        await this.client.requests.post(endpoints.servers.suspend(id));
+    suspend(id: number): Promise<void> {
+        return this.client.requests.post(endpoints.servers.suspend(id));
     }
 
     /**
      * Unsuspends a server.
      * @param id The ID of the server.
+     * @example
+     * ```
+     * app.servers.unsuspend(16).catch(console.error);
+     * ```
      */
-    async unsuspend(id: number): Promise<void> {
-        await this.client.requests.post(endpoints.servers.unsuspend(id));
+    unsuspend(id: number): Promise<void> {
+        return this.client.requests.post(endpoints.servers.unsuspend(id));
     }
 
     /**
      * Triggers the reinstall process of a server.
      * @param id The ID of the server.
+     * @example
+     * ```
+     * app.servers.reinstall(17).catch(console.error);
+     * ```
      */
-    async reinstall(id: number): Promise<void> {
-        await this.client.requests.post(endpoints.servers.reinstall(id));
+    reinstall(id: number): Promise<void> {
+        return this.client.requests.post(endpoints.servers.reinstall(id));
     }
 
     /**
      * Deletes a server.
      * @param id The ID of the server.
      * @param [force] Whether to force delete the server.
+     * @example
+     * ```
+     * app.servers.delete(21, true).catch(console.error);
+     * ```
      */
-    async delete(
-        id: number,
-        force: boolean = false
-    ): Promise<void> {
-        await this.client.requests.delete(
-            endpoints.servers.get(id) + (force ? '/force' : '')
-        );
+    async delete(id: number, force: boolean = false): Promise<void> {
+        await this.client.requests.delete(endpoints.servers.get(id) + (force ? '/force' : ''));
         this.cache.delete(id);
     }
 }
