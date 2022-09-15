@@ -12,15 +12,19 @@ export class NestManager extends BaseManager {
     public cache: Dict<number, Nest>;
     public eggs: NestEggsManager;
 
-    /** Allowed filter arguments for nests. */
+    /** Allowed filter arguments for nests (none). */
     get FILTERS() { return Object.freeze([]); }
 
-    /** Allowed include arguments for nests. */
+    /**
+     * Allowed include arguments for nests:
+     * * eggs
+     * * servers
+     */
     get INCLUDES() {
         return Object.freeze(['eggs', 'servers']);
     }
 
-    /** Allowed sort arguments for nests. */
+    /** Allowed sort arguments for nests (none). */
     get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -30,6 +34,11 @@ export class NestManager extends BaseManager {
         this.eggs = new NestEggsManager(client);
     }
 
+    /**
+     * Transforms the raw nest object(s) into typed objects.
+     * @param data The resolvable nest object(s).
+     * @returns The resolved nest object(s).
+     */
     _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, Nest>();
@@ -60,12 +69,27 @@ export class NestManager extends BaseManager {
     }
 
     /**
-     * Fetches a nest or a list of nests from the Pterodactyl API.
-     * @param [id] The ID of the nest.
+     * Fetches a nest from the API with the given options (default is undefined).
+     * @param id The ID of the nest.
      * @param [include] Optional include arguments.
-     * @returns The fetched nest(s).
+     * @returns The fetched nest.
+     * @example
+     * ```
+     * app.nests.fetch(1).then(console.log).catch(console.error);
+     * ```
      */
     async fetch(id: number, include?: string[]): Promise<Nest>;
+    /**
+     * Fetches a list of nests from the API with the given options (default is undefined).
+     * @param [include] Optional include arguments.
+     * @returns The fetched nest.
+     * @example
+     * ```
+     * app.nests.fetch()
+     *  .then(nests => nests.forEach(n => console.log(n)))
+     *  .catch(console.error);
+     * ```
+     */
     async fetch(include?: string[]): Promise<Dict<number, Nest>>;
     async fetch(op?: number | string[], include: string[] = []): Promise<any> {
         let path = endpoints.nests.main;
