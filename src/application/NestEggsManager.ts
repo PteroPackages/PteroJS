@@ -10,10 +10,17 @@ export class NestEggsManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Egg>;
 
-    /** Allowed filter arguments for eggs. */
+    /** Allowed filter arguments for eggs (none). */
     get FILTERS() { return Object.freeze([]); }
 
-    /** Allowed include arguments for eggs. */
+    /**
+     * Allowed include arguments for eggs:
+     * * nest
+     * * servers
+     * * config
+     * * script
+     * * variables
+     */
     get INCLUDES() {
         return Object.freeze([
             'nest', 'servers', 'config',
@@ -21,7 +28,7 @@ export class NestEggsManager extends BaseManager {
         ]);
     }
 
-    /** Allowed sort arguments for eggs. */
+    /** Allowed sort arguments for eggs (none). */
     get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -30,6 +37,11 @@ export class NestEggsManager extends BaseManager {
         this.cache = new Dict();
     }
 
+    /**
+     * Transforms the raw egg object(s) into typed objects.
+     * @param data The resolvable egg object(s).
+     * @returns The resolved egg object(s).
+     */
     _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, Egg>();
@@ -60,17 +72,34 @@ export class NestEggsManager extends BaseManager {
     }
 
     /**
-     * Fetches an egg or a list of eggs from the Pterodactyl API.
+     * Fetches an egg from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
      * @param nest The ID of the nest.
-     * @param [id] The ID of the egg.
+     * @param id The ID of the egg.
      * @param [options] Additional fetch options.
-     * @returns The fetched egg(s).
+     * @returns The fetched egg.
+     * @example
+     * ```
+     * app.nests.eggs.fetch(1, 16).then(console.log).catch(console.error);
+     * ```
      */
     async fetch(nest: number, id: number, options?: Include<FetchOptions>): Promise<Egg>;
-    async fetch(
-        nest: number,
-        options?: Include<FetchOptions>
-    ): Promise<Dict<number, Egg>>;
+    /**
+     * Fetches a list of eggs from the API by its ID. This will check the cache first unless the
+     * force option is specified.
+     *
+     * @param nest The ID of the nest.
+     * @param [options] Additional fetch options.
+     * @returns The fetched eggs.
+     * @example
+     * ```
+     * app.nests.eggs.fetch(1)
+     *  .then(eggs => eggs.forEach(e => console.log(e)))
+     *  .catch(console.error);
+     * ```
+     */
+    async fetch(nest: number, options?: Include<FetchOptions>): Promise<Dict<number, Egg>>;
     async fetch(
         nest: number,
         op1?: number | Include<FetchOptions>,
