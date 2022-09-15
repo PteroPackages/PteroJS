@@ -48,15 +48,20 @@ export class NodeAllocationManager extends BaseManager {
     }
 
     /**
-     * Fetches a list of allocations from the Pterodactyl API.
-     * @param node The ID of the node.
-     * @param options Additional fetch options.
+     * Fetches a list of allocations on a specific node from the API with the given options
+     * (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
      * @returns The fetched allocations.
+     * @example
+     * ```
+     * app.allocations.fetch(4, { page: 3 })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
-    async fetch(
-        node: number,
-        options: Include<FetchOptions> = {}
-    ): Promise<Dict<number, Allocation>> {
+    async fetch(node: number, options: Include<FetchOptions> = {}): Promise<Dict<number, Allocation>> {
         if (!options.force) {
             const a = this.cache.get(node);
             if (a) return Promise.resolve(a);
@@ -70,12 +75,30 @@ export class NodeAllocationManager extends BaseManager {
     }
 
     /**
+     * Fetches the available allocations on a node and returns a single one.
+     * @param node The ID of the node.
+     * @param single Whether to return a single allocation.
+     * @returns The available allocation(s).
+     * @example
+     * ```
+     * app.allocations.fetchAvailable(4, true)
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+    async fetchAvailable(node: number, single: true): Promise<Allocation | undefined>;
+    /**
      * Fetches the available allocations on a node.
      * @param node The ID of the node.
      * @param single Whether to return a single allocation.
      * @returns The available allocation(s).
+     * @example
+     * ```
+     * app.allocations.fetchAvailable(4, false)
+     *  .then(all => all.forEach(a => console.log(a)))
+     *  .catch(console.error);
+     * ```
      */
-    async fetchAvailable(node: number, single: true): Promise<Allocation | undefined>;
     async fetchAvailable(node: number, single: false): Promise<Dict<number, Allocation>>;
     async fetchAvailable(node: number, single: boolean): Promise<any> {
         const all = await this.fetch(node);
@@ -85,10 +108,17 @@ export class NodeAllocationManager extends BaseManager {
     }
 
     /**
-     * Creates a number of allocations based on the ports specified.
+     * Creates a number of allocations based on the ports specified. Note that the created
+     * allocations will not be returned due to the number that can be created in a single request,
+     * which can cause unwanted issues.
      * @param node The ID of the node.
      * @param ip The IP for the allocation.
      * @param ports A list of ports or port ranges for the allocation.
+     * @example
+     * ```
+     * app.allocations.create(4, '10.0.0.1', ['8000-9000'])
+     *  .catch(console.error);
+     * ```
      */
     async create(node: number, ip: string, ports: string[]): Promise<void> {
         if (!ports.every(p => typeof p === 'string')) throw new TypeError(
@@ -119,6 +149,10 @@ export class NodeAllocationManager extends BaseManager {
      * Deletes an allocation from a node.
      * @param node The ID of the node.
      * @param id The ID of the allocation.
+     * @example
+     * ```
+     * app.allocations.delete(4, 92).catch(console.error);
+     * ```
      */
     async delete(node: number, id: number): Promise<void> {
         await this.client.requests.delete(endpoints.nodes.allocations.get(node, id));
