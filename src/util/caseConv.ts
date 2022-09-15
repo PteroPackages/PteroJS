@@ -1,4 +1,4 @@
-interface ConvertOptions {
+export interface ConvertOptions {
     ignore?:    string[];
     map?:       Record<string, string>;
     cast?:      Record<string, any>;

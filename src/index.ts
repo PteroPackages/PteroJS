@@ -31,7 +31,7 @@ export * from './common/app';
 export * from './common/client';
 
 // HTTP
-export { RequestManager } from './http/RequestManager';
+export * from './http/RequestManager';
 
 // Structures
 export { ApplicationServer } from './structures/ApplicationServer';
@@ -51,6 +51,6 @@ export { ServerBuilder } from './builders/Server';
 export { UserBuilder } from './builders/User';
 
 // Utilities
-export { default as caseConv } from './util/caseConv';
+export { default as caseConv, ConvertOptions } from './util/caseConv';
 export { default as configLoader } from './util/config';
 export * from './util/query';
