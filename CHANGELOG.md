@@ -16,6 +16,10 @@ Mainly bug fixes and minor additions to structures.
 - `UserBuilder` class
 - `ServerBuilder` class
 - `NodeBuilder` class
+- Activity logs support (`Account#fetchActivities()`)
+- SSH keys support (`Account#fetchSSHKeys()`, `Account#createSSHKey()`, `Account#removeSSHKey()`)
+- Jest testing instead of custom testing
+- Additional documentation and examples for application API
 
 ### Changed
 - all managers with caches now uses the `Dict#update()` method
@@ -26,6 +30,11 @@ Mainly bug fixes and minor additions to structures.
 - `caseConv` functions handling arrays incorrectly
 - Node creation method now uses the correct endpoint
 - `NodeCreationOptions` is now updated to use actual creation options in the API
+- `ApplicationServerManager#updateBuild()` applies missing limits and feature limits
+- `UserManager#query()` now uses the correct endpoint (previously servers)
+- Export missing type/interface members for documentation
+- `UserUpdateOptions#externalId` now accepts `null` to remove the external ID
+- `UserManager#update()` now checks if `externalId` is set before defaulting
 
 ## [2.0.0] - 26-05-2022
 A huge turning point for the PteroJS library, having a new TypeScript look, updated classes/methods, and proper documentation. Thanks to everyone that contributed! :D
