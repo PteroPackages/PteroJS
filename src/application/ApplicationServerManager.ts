@@ -233,9 +233,8 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     /**
-     * Queries the Pterodactyl API for servers that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods for
-     * filtering and sorting.
+     * Queries the API for servers that match the specified query filters. This fetches from the
+     * API directly and does not check the cache. Use cache methods for filtering and sorting.
      * 
      * Available query filters:
      * * name

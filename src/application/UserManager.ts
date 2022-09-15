@@ -6,7 +6,6 @@ import { User } from '../structures/User';
 import { UpdateUserOptions } from '../common/app';
 import { ValidationError } from '../structures/Errors';
 import {
-    External,
     FetchOptions,
     Filter,
     FilterArray,
@@ -21,18 +20,27 @@ export class UserManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, User>;
 
-    /** Allowed filter arguments for users. */
+    /**
+     * Allowed filter arguments for users:
+     * * email
+     * * uuid
+     * * username
+     * * externalId
+     */
     get FILTERS() {
-        return Object.freeze([
-            'email', 'uuid', 'uuidShort',
-            'name', 'image', 'external_id'
-        ]);
+        return Object.freeze(['email', 'uuid', 'username', 'external_id']);
     }
 
-    /** Allowed include arguments for users. */
+    /** Allowed include arguments for users (none). */
     get INCLUDES() { return Object.freeze([]); }
 
-    /** Allowed sort arguments for users. */
+    /**
+     * Allowed sort arguments for users:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     */
     get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
@@ -43,6 +51,11 @@ export class UserManager extends BaseManager {
         this.cache = new Dict();
     }
 
+    /**
+     * Transforms the raw user object(s) into class objects.
+     * @param data The resolvable user object(s).
+     * @returns The resolved user object(s).
+     */
     _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, User>();
@@ -89,13 +102,42 @@ export class UserManager extends BaseManager {
     }
 
     /**
-     * Fetches a user or a list of users from the Pterodactyl API.
-     * @param [id] The ID of the user.
+     * Fetches a user from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
+     * @param id The ID of the user.
      * @param [options] Additional fetch options.
-     * @returns The fetched user(s).
+     * @returns The fetched user.
+     * @example
+     * ```
+     * app.users.fetch(5).then(console.log).catch(console.error);
+     * ```
      */
     async fetch(id: number, options?: Include<FetchOptions>): Promise<User>;
+    /**
+     * Fetches a user from the API by its external ID. This will check the cache first unless the
+     * force option is specified.
+     *
+     * @param id The external ID of the user.
+     * @param [options] Additional fetch options.
+     * @returns The fetched user.
+     * @example
+     * ```
+     * app.users.fetch('admin').then(console.log).catch(console.error);
+     * ```
+     */
     async fetch(id: string, options?: Include<FetchOptions>): Promise<User>;
+    /**
+     * Fetches a list of users from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched users.
+     * @example
+     * ```
+     * app.users.fetch({ perPage: 20 }).then(console.log).catch(console.error);
+     * ```
+     */
     async fetch(options?: Include<FetchOptions>): Promise<Dict<number, User>>;
     async fetch(
         op?: number | string | Include<FetchOptions>,
@@ -141,16 +183,13 @@ export class UserManager extends BaseManager {
     }
 
     /**
-     * Queries the Pterodactyl API for users that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods
-     * for filtering and sorting.
+     * Queries the API for users that match the specified query filters. This fetches from the
+     * API directly and does not check the cache. Use cache methods for filtering and sorting.
+     * 
      * Available query filters:
      * * email
      * * uuid
-     * * uuidShort
-     * * identifier (alias for uuidShort)
      * * username
-     * * image
      * * externalId
      * 
      * Available sort options:
@@ -162,6 +201,12 @@ export class UserManager extends BaseManager {
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried users.
+     * @example
+     * ```
+     * app.users.query('d5f506c9', { filter: 'uuid' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async query(
         entity: string,
@@ -170,7 +215,6 @@ export class UserManager extends BaseManager {
         if (!options.sort && !options.filter) throw new ValidationError(
             'Sort or filter is required.'
         );
-        if (options.filter === 'identifier') options.filter = 'uuidShort';
         if (options.filter === 'externalId') options.filter = 'external_id';
 
         const payload: FilterArray<Sort<{}>> = {};
@@ -178,7 +222,7 @@ export class UserManager extends BaseManager {
         if (options.sort) payload.sort = options.sort;
 
         const data = await this.client.requests.get(
-            endpoints.servers.main,
+            endpoints.users.main,
             payload as FilterArray<Sort<FetchOptions>>,
             null, this
         );
@@ -187,9 +231,21 @@ export class UserManager extends BaseManager {
 
     /**
      * Creates a user account.
-     * @param options Create user options.
      * @see {@link CreateUserOptions}.
+     * @param options Create user options.
      * @returns The new user.
+     * @example
+     * ```
+     * app.users.create({
+     *  email: 'user@example.com',
+     *  username: 'example-user',
+     *  firstname: 'example',
+     *  lastname: 'user',
+     *  externalId: 'example1'
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async create(options: CreateUserOptions): Promise<User> {
         const payload = caseConv.toSnakeCase<object>(
@@ -211,10 +267,16 @@ export class UserManager extends BaseManager {
 
     /**
      * Updates the user account with the specified options.
+     * @see {@link UpdateUserOptions}.
      * @param id The ID of the user.
      * @param options Update user options.
-     * @see {@link UpdateUserOptions}.
      * @returns The updated user.
+     * @example
+     * ```
+     * app.users.update(7, { externalId: 'admin2', isAdmin: true })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async update(id: number, options: Partial<UpdateUserOptions>): Promise<User> {
         if (!Object.keys(options).length)
@@ -247,6 +309,10 @@ export class UserManager extends BaseManager {
     /**
      * Deletes a user account.
      * @param id The ID of the user.
+     * @example
+     * ```
+     * app.users.delete(8).catch(console.error);
+     * ```
      */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.users.get(id));
