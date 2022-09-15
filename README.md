@@ -21,11 +21,12 @@ import pterojs from 'https://cdn.skypack.dev/@devnote-dev/pterojs';
 Please join the [support server](https://discord.com/invite/dwcfTjgn7S) if you experience any issues with installing the package.
 
 ## Compatibility
-Pterodactyl API | Wings API | Support
-----------------|-----------|--------
-`<=0.7` | `<=1.5` | ❌
-`1.6.5 >= 1.8.0` | `^1.6` | ✅
-`1.8.1` || ❌
+PteroJS | Panel | Wings
+--------|-------|------
+❌ | `<= 0.7` | `<= 1.5`
+`1.3.0` | `1.6.5 >= 1.7.0` | `~1.6.0`
+`1.4.2` | `1.7.0 >= 1.8.1` | `~1.6.0`
+`2.0.1` | `^1.9.0` | `^1.7.0`
 
 ## Setting Up
 PteroJS uses separate classes for the client and application sides of the Pterodactyl API.
