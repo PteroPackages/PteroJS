@@ -43,7 +43,7 @@ describe('Application: Users', () => {
         expect(app.users.fetch(0)).rejects.toThrowError(PteroAPIError);
         expect(app.users.fetch(id)).resolves.toBeInstanceOf(User);
         expect(app.users.fetch('jester')).resolves.toBeInstanceOf(User);
-        expect(app.users.query('jest', { filter: 'name' })).resolves.toBeInstanceOf(Dict);
+        expect(app.users.query('jest', { filter: 'username' })).resolves.toBeInstanceOf(Dict);
 
         let user = await app.users.fetch(id);
 
@@ -58,21 +58,19 @@ describe('Application: Users', () => {
         // expect(user.servers!.size).toEqual(0);
     });
 
-    // TODO: currently broken
-    //
-    // it('updates a user', async () => {
-    //     let user = await app.users.fetch('jester');
+    it('updates a user', async () => {
+        let user = await app.users.fetch('jester');
 
-    //     expect(app.users.update(user.id, {
-    //         // externalId: null,
-    //         isAdmin: true
-    //     })).resolves.toBeInstanceOf(User);
+        expect(app.users.update(user.id, {
+            externalId: null,
+            isAdmin: true
+        })).resolves.toBeInstanceOf(User);
 
-    //     user = await app.users.fetch(id, { force: true });
+        user = await app.users.fetch(id, { force: true });
 
-    //     // expect(user.externalId).toBeUndefined();
-    //     expect(user.isAdmin).toBe(true);
-    // });
+        expect(user.externalId).toBeUndefined();
+        expect(user.isAdmin).toBe(true);
+    });
 
     it('deletes a user', () => {
         expect(app.users.delete(id)).resolves.toBeUndefined();

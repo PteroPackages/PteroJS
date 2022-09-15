@@ -226,4 +226,6 @@ export interface UpdateStartupOptions {
     skipScripts?:   boolean;
 }
 
-export interface UpdateUserOptions extends CreateUserOptions {}
+export interface UpdateUserOptions extends Omit<CreateUserOptions, 'externalId'> {
+    externalId?: string | null;
+}

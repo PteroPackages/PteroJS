@@ -288,6 +288,7 @@ export class UserManager extends BaseManager {
         options.lastname ||= user.lastname;
         options.email ||= user.email;
         options.isAdmin ??= user.isAdmin;
+        if (!('externalId' in options)) options.externalId = user.externalId;
 
         const payload = caseConv.toSnakeCase<object>(
             options,
