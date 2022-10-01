@@ -96,6 +96,12 @@ export class Shard extends EventEmitter {
      * Sends a websocket event to the server (with optional payload args).
      * @param event The event to send to the server.
      * @param args Additional arguements to pass with to the event.
+     * @example
+     * ```
+     * const shard = client.addSocketServer('411d2eb9');
+     * shard.on('authSuccess', () => shard.send('send logs'));
+     * shard.connect();
+     * ```
      */
     send(event: string, args: string[] = []): void {
         if (!this.socket) throw new Error('Socket for this shard is unavailable.');
@@ -108,11 +114,73 @@ export class Shard extends EventEmitter {
      * @param event The event to send.
      * @param [args] The arguments to send with the event.
      * @returns The event's response, if any.
+     * @example
+     * ```
+     * const shard = client.addSocketServer('411d2eb9');
+     * shard.on('authSuccess', () => {
+     *  shard.request('sendCommand', '/say hello world').then(console.log)
+     * );
+     * shard.connect();
+     * ```
      */
     async request(event: string, args?: string): Promise<any>;
+    /**
+     * Sends an event to the server and waits for a response.
+     * @param event The event to send.
+     * @param command The command to send.
+     * @returns The event's response, if any.
+     * @example
+     * ```
+     * const shard = client.addSocketServer('411d2eb9');
+     * shard.on('authSuccess', () => {
+     *  shard.request('sendCommand', '/say hello world').then(console.log)
+     * );
+     * shard.connect();
+     * ```
+     */
     async request(event: 'sendCommand', command: string): Promise<void>;
+    /**
+     * Sends an event to the server and waits for a response.
+     * @param event The event to send.
+     * @returns The event's response, if any.
+     * @example
+     * ```
+     * const shard = client.addSocketServer('411d2eb9');
+     * shard.on('authSuccess', () => {
+     *  shard.request('sendLogs').then(console.log)
+     * );
+     * shard.connect();
+     * ```
+     */
     async request(event: 'sendLogs'): Promise<void>;
+    /**
+     * Sends an event to the server and waits for a response.
+     * @param event The event to send.
+     * @returns The event's response, if any.
+     * @example
+     * ```
+     * const shard = client.addSocketServer('411d2eb9');
+     * shard.on('authSuccess', () => {
+     *  shard.request('sendStats').then(console.log)
+     * );
+     * shard.connect();
+     * ```
+     */
     async request(event: 'sendStats'): Promise<void>;
+    /**
+     * Sends an event to the server and waits for a response.
+     * @param event The event to send.
+     * @param state The power state to send.
+     * @returns The event's response, if any.
+     * @example
+     * ```
+     * const shard = client.addSocketServer('411d2eb9');
+     * shard.on('authSuccess', () => {
+     *  shard.request('setState', 'restart').then(console.log)
+     * );
+     * shard.connect();
+     * ```
+     */
     async request(event: 'setState', state: string): Promise<void>;
     async request(event: string, args: string = ''): Promise<any> {
         switch (event) {

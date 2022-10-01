@@ -50,6 +50,11 @@ export class WebSocketManager {
      * @param event The event to broadcast.
      * @param args Arguments to send with the event.
      * @returns A list of the returned values, if any.
+     * @example
+     * ```
+     * const values = await client.ws.broadcast('sendStats');
+     * console.log(values.map(s => s.resources.uptime));
+     * ```
      */
     async broadcast<T>(event: string, args?: string): Promise<T[]> {
         const res = [] as T[];
