@@ -49,13 +49,6 @@ describe('Application: Users', () => {
 
         expect(user).toBeInstanceOf(User);
         expect(user.servers).toBeUndefined();
-
-        // TODO: not implemented in library yet
-        // user = await app.users.fetch(id, { force: true, include: ['servers'] });
-
-        // expect(user).toBeInstanceOf(User);
-        // expect(user.servers).toBeInstanceOf(Dict);
-        // expect(user.servers!.size).toEqual(0);
     });
 
     it('updates a user', async () => {
