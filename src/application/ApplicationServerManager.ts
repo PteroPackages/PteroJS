@@ -132,11 +132,11 @@ export class ApplicationServerManager extends BaseManager {
      * @param obj The object to resolve from.
      * @returns The resolved server or undefined if not found.
      */
-    resolve(obj: Resolvable<ApplicationServer>): ApplicationServer | undefined {
+    resolve(obj: Resolvable<ApplicationServer>): ApplicationServer | Dict<number, ApplicationServer> | undefined {
         if (obj instanceof ApplicationServer) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
-        if (obj.relationships?.servers) return this._patch(obj) as ApplicationServer;
+        if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
         return undefined;
     }
 

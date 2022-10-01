@@ -31,8 +31,11 @@ export class UserManager extends BaseManager {
         return Object.freeze(['email', 'uuid', 'username', 'external_id']);
     }
 
-    /** Allowed include arguments for users (none). */
-    get INCLUDES() { return Object.freeze([]); }
+    /**
+     * Allowed include arguments for users:
+     * * servers
+     */
+    get INCLUDES() { return Object.freeze(['servers']); }
 
     /**
      * Allowed sort arguments for users:

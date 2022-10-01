@@ -73,6 +73,8 @@ export class User extends BaseUser {
     public readonly createdAt: Date;
     public readonly createdTimestamp: number;
 
+    public client: PteroApp;
+
     /** The external ID of the user (if set). */
     public externalId: string | null;
 
@@ -94,7 +96,12 @@ export class User extends BaseUser {
 
         this.createdAt = new Date(data.created_at);
         this.createdTimestamp = this.createdAt.getTime();
-        this.servers = undefined; // Not implemented yet
+
+        if ('relationships' in data) {
+            this.servers = 'servers' in data.relationships
+                ? this.client.servers.resolve(data) as Dict<number, ApplicationServer>
+                : undefined;
+        }
     }
 
     _patch(data: any): void {
