@@ -11,8 +11,8 @@ import loader from '../util/config';
 
 /**
  * The base class for the Pterodactyl application API.
- * This operates using a Pterodactyl application API key which can be found
- * at <your.domain.name/admin/api>.
+ * This operates using a Pterodactyl API key which can be found at <your.domain.name/admin/api>
+ * or <your.domain.name/account/api> if you are using a client API key.
  * 
  * **Warning:** Keep your API key private at all times. Exposing this can lead
  * to your servers, nodes, configurations and more being corrupted and/or deleted.
