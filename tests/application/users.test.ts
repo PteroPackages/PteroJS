@@ -2,7 +2,7 @@ import { Dict, PteroAPIError, PteroApp, User } from '../../src';
 import auth from '../auth';
 
 const app = new PteroApp(auth.url, auth.key);
-let id: number;
+var id: number;
 
 describe('Application: Users', () => {
     it('fetches all users', async () => {
