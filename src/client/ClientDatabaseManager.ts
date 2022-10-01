@@ -11,15 +11,18 @@ export class ClientDatabaseManager extends BaseManager {
     public cache: Dict<number, ClientDatabase>;
     public serverId: string;
 
-    /** Allowed filter arguments for databases. */
+    /** Allowed filter arguments for databases (none). */
     get FILTERS() { return Object.freeze([]); }
 
-    /** Allowed include arguments for databases. */
+    /**
+     * Allowed include arguments for databases:
+     * * password
+     */
     get INCLUDES() {
         return Object.freeze(['password']);
     }
 
-    /** Allowed sort arguments for databases. */
+    /** Allowed sort arguments for databases (none). */
     get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroClient, serverId: string) {
@@ -29,6 +32,11 @@ export class ClientDatabaseManager extends BaseManager {
         this.serverId = serverId;
     }
 
+    /**
+     * Transforms the raw database object(s) into typed objects.
+     * @param data The resolvable database object(s).
+     * @returns The resolved database object(s).
+     */
     _patch(data: any): any {
         if (data.data) {
             const res = new Dict<number, ClientDatabase>();
@@ -46,9 +54,17 @@ export class ClientDatabaseManager extends BaseManager {
     }
 
     /**
-     * Fetches a list of databases from the Pterodactyl API.
+     * Fetches a list of databases from the API with the given options (default is undefined).
+     * 
      * @param [options] Additional fetch options.
      * @returns The fetched databases.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.databases.fetch({ page: 2 })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async fetch(
         options: Include<FetchOptions> = {}
@@ -78,6 +94,13 @@ export class ClientDatabaseManager extends BaseManager {
      * Rotates the password of a specified database.
      * @param id The ID of the database.
      * @returns The updated database.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.databases.rotate(1)
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async rotate(id: number): Promise<ClientDatabase> {
         const data = await this.client.requests.post(
@@ -89,6 +112,11 @@ export class ClientDatabaseManager extends BaseManager {
     /**
      * Deletes a database from the server.
      * @param id The ID of the database.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.databases.delete(2).catch(console.error);
+     * ```
      */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(

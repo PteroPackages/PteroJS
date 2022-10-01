@@ -231,17 +231,16 @@ export class ClientServerManager extends BaseManager {
      * Updates a specified environment variable on a server. The key must be
      * the environment variable name in capital letters, not the normal
      * variable name.
+     * @param id The identifier of the server.
+     * @param key The environment variable key.
+     * @param value The value of the environment variable.
+     * @returns The updated egg variable.
      * @example
      * ```
      * await client.servers
      *     .setVariable('b8f32a45', 'SERVER_JARFILE', 'latest.jar')
      *     .then(console.log);
      * ```
-     * 
-     * @param id The identifier of the server.
-     * @param key The environment variable key.
-     * @param value The value of the environment variable.
-     * @returns The updated egg variable.
      */
     async setVariable(
         id: string,

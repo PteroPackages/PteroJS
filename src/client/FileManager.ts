@@ -17,6 +17,11 @@ export class FileManager {
         this.serverId = serverId;
     }
 
+    /**
+     * Transforms the raw file object(s) into typed objects.
+     * @param data The resolvable file object(s).
+     * @returns The resolved file object(s).
+     */
     _patch(dir: string, data: any): Dict<string, File> {
         const res = new Dict<string, File>();
         for (let o of data.data) {
@@ -46,6 +51,11 @@ export class FileManager {
      * Fetches the files/directories in a specified direcory (defaults to root).
      * @param [dir] The directory to fetch from.
      * @returns The fetched files.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.fetch().then(console.log).catch(console.error);
+     * ```
      */
     async fetch(dir: string = '/'): Promise<Dict<string, File>> {
         const data = await this.client.requests.get(
@@ -60,6 +70,13 @@ export class FileManager {
      * string by default, regardless of file type.
      * @param path The file path.
      * @returns The file contents.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.getContents('./install.log')
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async getContents(path: string): Promise<string> {
         const data = await this.client.requests.get(
@@ -72,6 +89,13 @@ export class FileManager {
      * Fetches the download URL for a specified file.
      * @param path The file path.
      * @returns The download URL.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.getDownloadURL('./config.yml')
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async getDownloadURL(path: string): Promise<string> {
         const data = await this.client.requests.get(
@@ -84,6 +108,12 @@ export class FileManager {
      * Fetches and saves a file to a specified path on the system.
      * @param path The file path.
      * @param dest The file path to save the file to.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.download('./config.yml', '/mc/config.yml')
+     *  .catch(console.error);
+     * ```
      */
     async download(path: string, dest: string): Promise<void> {
         if (existsSync(dest)) throw new ValidationError(
@@ -99,6 +129,13 @@ export class FileManager {
      * Fetches the upload URL for a specified directory (defaults to root).
      * @param [dir] The directory the files should be uploaded to.
      * @returns The upload URL.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.getUploadURL('./plugins')
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async getUploadURL(dir: string = '/'): Promise<string> {
         const data = await this.client.requests.get(
@@ -120,6 +157,15 @@ export class FileManager {
      * Writes the content to a specified file.
      * @param path The file path.
      * @param content The content to write.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.write(
+     *  './config.yml',
+     *  'listeners:\n- host: 0.0.0.0:6203\n query_port: 6203'
+     * )
+     *  .catch(console.error);
+     * ```
      */
     async write(path: string, content: any): Promise<void> {
         await this.client.requests.post(
@@ -132,6 +178,11 @@ export class FileManager {
      * Creates a folder in a specified root folder.
      * @param path The root path to create the directory in.
      * @param name The name of the directory.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.createFolder('./', 'ext').catch(console.error);
+     * ```
      */
     async createFolder(path: string, name: string): Promise<void> {
         await this.client.requests.post(
@@ -144,6 +195,18 @@ export class FileManager {
      * Renames one or more files in a specified directory.
      * @param path The root path of the files.
      * @param files The file rename descriptors.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.rename(
+     *  './',
+     *  [
+     *   { from: 'install.log', to: 'old-install.log' },
+     *   { from: '_config.yml', to: 'new-config.yml' }
+     *  ]
+     * )
+     *  .catch(console.error);
+     * ```
      */
     async rename(path: string, files:{ from: string; to: string }[]): Promise<void> {
         await this.client.requests.put(
@@ -156,6 +219,15 @@ export class FileManager {
      * Changes the permissions on one or more files in a specified directory.
      * @param dir The root path of the files.
      * @param files The file mode descriptors.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.chmod(
+     *  './',
+     *  [{ file: 'server.jar', mode: 0o755 }]
+     * )
+     *  .catch(console.error);
+     * ```
      */
     async chmod(dir: string, files: FileChmodData[]): Promise<void> {
         files = files.map(f => {
@@ -172,6 +244,11 @@ export class FileManager {
     /**
      * Copies the specified file in its directory.
      * @param path The path of the file to copy.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.copy('server.properties').catch(console.error);
+     * ```
      */
     async copy(path: string): Promise<void> {
         await this.client.requests.post(
@@ -185,6 +262,16 @@ export class FileManager {
      * @param dir The root directory of the files.
      * @param files The files to be compressed.
      * @returns The compressed files.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.compress(
+     *  './'
+     *  ['server.properties', 'server.jar', 'config.yml']
+     * )
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async compress(dir: string, files: string[]): Promise<Dict<string, File>> {
         files = files.map(f => f.startsWith('.') ? f.slice(1) : f);
@@ -199,6 +286,12 @@ export class FileManager {
      * Decompresses the specified file in its directory.
      * @param dir The root directory of the file.
      * @param file The file to decompress.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.decompress('./ext', 'archive-2022-08-25T034234Z.tar.gz')
+     *  .catch(console.error);
+     * ```
      */
     async decompress(dir: string, file: string): Promise<void> {
         await this.client.requests.post(
@@ -211,6 +304,12 @@ export class FileManager {
      * Deletes one or more files in the specified directory.
      * @param dir The root directory of the files.
      * @param files The files to delete.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('aea005b6');
+     * await server.files.delete('./', ['old-install.log'])
+     *  .catch(console.error);
+     * ```
      */
     async delete(dir: string, files: string[]): Promise<void> {
         files = files.map(f => f.startsWith('.') ? f.slice(1) : f);

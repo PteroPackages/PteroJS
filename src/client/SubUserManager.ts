@@ -13,6 +13,11 @@ export class SubUserManager {
         this.cache = new Dict();
     }
 
+    /**
+     * Transforms the raw subuser object(s) into class objects.
+     * @param data The resolvable subuser object(s).
+     * @returns The resolved subuser object(s).
+     */
     _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<string, SubUser>();
@@ -43,9 +48,7 @@ export class SubUserManager {
         // needed for typing resolution
         if (typeof obj === 'number') return undefined;
         if (typeof obj === 'string') return this.cache.get(obj);
-        if (obj.relationships?.users)
-            return this._patch(obj.relationships.users);
-
+        if (obj.relationships?.users) return this._patch(obj.relationships.users);
         return undefined;
     }
 
@@ -58,12 +61,34 @@ export class SubUserManager {
     }
 
     /**
-     * Fetches a subuser or a list of subusers from the server.
-     * @param [id] The ID of the subuser.
+     * Fetches a subuser from the API by its UUID. This will check the cache first unless the
+     * force option is specified.
+     * 
+     * @param uuid The UUID of the subuser.
      * @param [options] Additional fetch options.
-     * @returns The fetched subuser(s).
+     * @returns The fetched subuser.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.users.fetch('36de5ed4-8c37-4bde-a1da-4203115a3e9d')
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
-    async fetch(id: string, options?: FetchOptions): Promise<SubUser>;
+    async fetch(uuid: string, options?: FetchOptions): Promise<SubUser>;
+    /**
+     * Fetches a list of subusers from the API with the given options (default is undefined).
+     * 
+     * @param [options] Additional fetch options.
+     * @returns The fetched subusers.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.users.fetch({ perPage: 10 })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
     async fetch(options?: FetchOptions): Promise<Dict<number, SubUser>>;
     async fetch(op?: string | FetchOptions, ops: FetchOptions = {}): Promise<any> {
         let path = endpoints.servers.users.main(this.serverId);
@@ -85,10 +110,18 @@ export class SubUserManager {
      * @param email The email of the account to add.
      * @param permissions Permissions for the account.
      * @returns The new subuser.
+     * @example
+     * ```
+     * const perms = new Permissions(...Permissions.CONTROL, ...Permissions.FILES);
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.users.add('user@example.com', perms.value)
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async add(
         email: string,
-        permissions: string[]
+        permissions: string[] // TODO: change to permissions
     ): Promise<SubUser> {
         const perms = Permissions.resolve(...permissions);
         if (!perms.length) throw new ValidationError(
@@ -107,6 +140,17 @@ export class SubUserManager {
      * @param id The UUID of the subuser.
      * @param permissions The permissions to set.
      * @returns The updated subuser account.
+     * @example
+     * ```
+     * const perms = new Permissions(...Permissions.FILES, ...Permissions.BACKUPS);
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.users.setPermissions(
+     *  '36de5ed4-8c37-4bde-a1da-4203115a3e9d',
+     *  perms.value
+     * )
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async setPermissions(
         id: string,
@@ -127,6 +171,12 @@ export class SubUserManager {
     /**
      * Removes a subuser's access to the server.
      * @param id The UUID of the subuser.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.users.remove('9d7b1d20-6e34-4a3a-abcd-c26ae79dc2bd')
+     *  .catch(console.error);
+     * ```
      */
     async remove(id: string): Promise<void> {
         await this.client.requests.delete(
