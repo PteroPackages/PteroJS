@@ -17,6 +17,7 @@ export interface APIKey {
     allowedIps:     string[];
     createdAt:      Date;
     lastUsedAt:     Date | undefined;
+    token?:         string;
 }
 
 /** Represents a server backup object. */

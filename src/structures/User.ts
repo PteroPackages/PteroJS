@@ -73,8 +73,6 @@ export class User extends BaseUser {
     public readonly createdAt: Date;
     public readonly createdTimestamp: number;
 
-    public client: PteroApp;
-
     /** The external ID of the user (if set). */
     public externalId: string | null;
 
@@ -91,7 +89,7 @@ export class User extends BaseUser {
     public updatedAt: Date | undefined;
     public updatedTimestamp: number | undefined;
 
-    constructor(client: PteroApp, data: any) {
+    constructor(public client: PteroApp, data: any) {
         super(client, data);
 
         this.createdAt = new Date(data.created_at);
@@ -337,6 +335,7 @@ export class Account extends BaseUser {
         const key = caseConv.toCamelCase<APIKey>(data.attributes);
         key.createdAt = new Date(key.createdAt);
         key.lastUsedAt &&= new Date(key.lastUsedAt);
+        key.token = data.meta.secret_token;
 
         this.apikeys.push(key);
         return key;
