@@ -10,6 +10,7 @@ import {
     Filter,
     FilterArray,
     Include,
+    PaginationMeta,
     Resolvable,
     Sort
 } from '../common';
@@ -19,6 +20,7 @@ import endpoints from './endpoints';
 export class UserManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, User>;
+    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for users:
@@ -52,6 +54,13 @@ export class UserManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
     /**
@@ -60,6 +69,11 @@ export class UserManager extends BaseManager {
      * @returns The resolved user object(s).
      */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data?.data) {
             const res = new Dict<number, User>();
             for (const o of data.data) {

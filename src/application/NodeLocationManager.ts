@@ -8,8 +8,9 @@ import {
     FilterArray,
     Include,
     NodeLocation,
-    Sort,
-    Resolvable
+    PaginationMeta,
+    Resolvable,
+    Sort
 } from '../common';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -17,6 +18,7 @@ import endpoints from './endpoints';
 export class NodeLocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, NodeLocation>;
+    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for locations:
@@ -43,6 +45,13 @@ export class NodeLocationManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
     /**
@@ -51,6 +60,11 @@ export class NodeLocationManager extends BaseManager {
      * @returns The resolved location object(s).
      */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data?.data) {
             const res = new Dict<number, NodeLocation>();
             for (let o of data.data) {

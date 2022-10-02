@@ -2,7 +2,7 @@ import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { ApplicationDatabase } from '../common/app';
-import { FetchOptions, Include, Resolvable } from '../common';
+import { FetchOptions, Include } from '../common';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 import { ValidationError } from '../structures/Errors';

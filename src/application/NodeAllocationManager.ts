@@ -1,7 +1,7 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { FetchOptions, Include } from '../common';
+import { FetchOptions, Include, PaginationMeta } from '../common';
 import { Allocation } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -9,6 +9,7 @@ import endpoints from './endpoints';
 export class NodeAllocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Dict<number, Allocation>>;
+    public meta: PaginationMeta;
 
     /** Allowed filter arguments for allocations. */
     get FILTERS() { return Object.freeze([]); }
@@ -25,9 +26,21 @@ export class NodeAllocationManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
     _patch(node: number, data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         const res = new Dict<number, Allocation>();
         for (let o of data.data) {
             const a = caseConv.toCamelCase<Allocation>(o.attributes);

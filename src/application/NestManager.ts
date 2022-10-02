@@ -1,7 +1,7 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { FetchOptions, Include } from '../common';
+import { FetchOptions, Include, PaginationMeta } from '../common';
 import { Nest } from '../common/app';
 import { NestEggsManager } from './NestEggsManager';
 import caseConv from '../util/caseConv';
@@ -10,6 +10,7 @@ import endpoints from './endpoints';
 export class NestManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Nest>;
+    public meta: PaginationMeta;
     public eggs: NestEggsManager;
 
     /** Allowed filter arguments for nests (none). */
@@ -32,6 +33,13 @@ export class NestManager extends BaseManager {
         this.client = client;
         this.cache = new Dict();
         this.eggs = new NestEggsManager(client);
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
     /**
@@ -40,6 +48,11 @@ export class NestManager extends BaseManager {
      * @returns The resolved nest object(s).
      */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data?.data) {
             const res = new Dict<number, Nest>();
             for (let o of data.data) {
