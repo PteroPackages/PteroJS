@@ -9,3 +9,5 @@ package-lock.json
 # Test files/directories
 /test
 /src/remote
+*.cmd
+*.sh
