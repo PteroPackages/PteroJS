@@ -51,6 +51,7 @@ export { ServerBuilder } from './builders/Server';
 export { UserBuilder } from './builders/User';
 
 // Utilities
+export { default as escape } from './util/escape';
 export { default as caseConv, ConvertOptions } from './util/caseConv';
 export { default as configLoader } from './util/config';
 export * from './util/query';
