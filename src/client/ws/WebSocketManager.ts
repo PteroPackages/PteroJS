@@ -5,11 +5,13 @@ export class WebSocketManager {
     public client: PteroClient;
     public shards: Map<string, Shard>;
     public active: boolean;
+    public useOrigin: boolean;
 
     constructor(client: PteroClient) {
         this.client = client;
         this.shards = new Map();
         this.active = false;
+        this.useOrigin = false;
     }
 
     /**
@@ -19,7 +21,7 @@ export class WebSocketManager {
      */
     createShard(id: string): Shard {
         if (this.shards.has(id)) return this.shards.get(id)!;
-        const shard = new Shard(this.client, id);
+        const shard = new Shard(this.client, id, this.useOrigin);
         this.shards.set(id, shard);
         this.active = true;
         return shard;

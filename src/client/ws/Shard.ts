@@ -1,6 +1,6 @@
+import type { PteroClient } from '..';
 import { EventEmitter } from 'events';
 import { WebSocket } from 'ws';
-import type { PteroClient } from '..';
 import { WebSocketError } from '../../structures/Errors';
 import {
     ShardStatus,
@@ -14,16 +14,18 @@ import handle from './packetHandler';
 export class Shard extends EventEmitter {
     public client: PteroClient;
     public id: string;
+    public origin: boolean;
     private socket: WebSocket | null;
     private status: ShardStatus;
     public readyAt: number;
     public ping: number;
     public lastPing: number;
 
-    constructor(client: PteroClient, id: string) {
+    constructor(client: PteroClient, id: string, origin: boolean) {
         super();
         this.client = client;
         this.id = id;
+        this.origin = origin;
         this.socket = null;
         this.status = ShardStatus.CLOSED;
         this.readyAt = 0;
@@ -74,7 +76,8 @@ export class Shard extends EventEmitter {
         const auth = await this.client.requests.get(
             endpoints.servers.ws(this.id)
         ) as WebSocketAuth;
-        this.socket = new WebSocket(auth.data.socket);
+        const origin = this.origin ? { origin: this.client.domain } : undefined;
+        this.socket = new WebSocket(auth.data.socket, origin);
 
         this.socket.on('open', () => this.onOpen(auth.data.token));
         this.socket.on('message', m => this.onMessage(m.toString()));
