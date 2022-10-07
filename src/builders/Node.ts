@@ -23,8 +23,18 @@ export class NodeBuilder extends Builder {
     constructor() {
         super();
 
-        this.memoryOverallocate = 0;
-        this.diskOverallocate = 0;
+        this.name = '';
+        this.description = undefined;
+        this.locationId = 0;
+        this.public = false;
+        this.fqdn = '';
+        this.scheme = '';
+        this.behindProxy = false;
+        this.memory = 0;
+        this.memoryOverallocate = -1;
+        this.disk = 0;
+        this.diskOverallocate = -1;
+        this.daemonBase = '/var/lib/pterodactyl/volumes';
         this.daemonSftp = 2022;
         this.daemonListen = 8080;
         this.maintenanceMode = false;
@@ -36,8 +46,18 @@ export class NodeBuilder extends Builder {
         return this;
     }
 
+    setDescription(description: string): this {
+        this.description = description;
+        return this;
+    }
+
     setLocationId(id: number): this {
         this.locationId = id;
+        return this;
+    }
+
+    setPublic(value: boolean): this {
+        this.public = value;
         return this;
     }
 
@@ -48,6 +68,11 @@ export class NodeBuilder extends Builder {
 
     setScheme(scheme: string): this {
         this.scheme = scheme;
+        return this;
+    }
+
+    setBehindProxy(value: boolean): this {
+        this.behindProxy = value;
         return this;
     }
 
@@ -94,8 +119,12 @@ export class NodeBuilder extends Builder {
         if (!this.fqdn) throw new ValidationError('An FQDN is required');
         if (!this.scheme) throw new ValidationError('A HTTP scheme is required');
         if (!this.memory) throw new ValidationError('A total memory limit is required');
+        if (this.memory < 1) throw new ValidationError('Memory cannot be less than 1');
+        if (this.memoryOverallocate < -1) throw new ValidationError('Overallocated memory cannot be less than -1');
         if (!this.disk) throw new ValidationError('A total disk limit is required');
-        if (this.uploadSize < 1 || this.uploadSize > 2024) throw new ValidationError(
+        if (this.disk < 1) throw new ValidationError('Disk cannot be less than 1');
+        if (this.diskOverallocate < -1) throw new ValidationError('Overallocated disk cannot be less than -1');
+        if (this.uploadSize < 1 || this.uploadSize > 1024) throw new ValidationError(
             'The upload size must be between 1 and 1024'
         );
 
