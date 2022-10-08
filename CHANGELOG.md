@@ -1,8 +1,8 @@
 # Changelog
 Tracking changes for PteroJS and extensions from v2 onwards (using [SemVer 2](http://semver.org/)).
 
-## [2.0.2] - 07-2022
-Mainly bug fixes and minor additions to structures.
+## [2.1.0] - 08-10-2022
+A lot of bug fixes and some new useful QOL features for the library and developers.
 
 ### Added
 - `Dict#update()` updates the dict instance in place with another dict
@@ -20,10 +20,16 @@ Mainly bug fixes and minor additions to structures.
 - SSH keys support (`Account#fetchSSHKeys()`, `Account#createSSHKey()`, `Account#removeSSHKey()`)
 - Jest testing instead of custom testing
 - Additional documentation and examples for application API
+- Support including servers for `UserManager`
+- Documentation with examples for the application and client API
+- Include `token` field from metadata when creating API keys
+- Cache metadata from all `fetch()` methods in the application API
+- Support `origin` header for websocket connections
 
 ### Changed
 - all managers with caches now uses the `Dict#update()` method
 - `ClientServer#state` -> `ClientServer#status` matches API data
+- Overloaded `PteroClient#addSocketServer()` to not return an array if only one ID is present
 
 ### Fixed
 - `Node#daemon` now shows the actual daemon data object
