@@ -1,7 +1,7 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { FetchOptions, Include } from '../common';
+import { FetchOptions, Include, PaginationMeta } from '../common';
 import { Nest } from '../common/app';
 import { NestEggsManager } from './NestEggsManager';
 import caseConv from '../util/caseConv';
@@ -10,17 +10,22 @@ import endpoints from './endpoints';
 export class NestManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Nest>;
+    public meta: PaginationMeta;
     public eggs: NestEggsManager;
 
-    /** Allowed filter arguments for nests. */
+    /** Allowed filter arguments for nests (none). */
     get FILTERS() { return Object.freeze([]); }
 
-    /** Allowed include arguments for nests. */
+    /**
+     * Allowed include arguments for nests:
+     * * eggs
+     * * servers
+     */
     get INCLUDES() {
         return Object.freeze(['eggs', 'servers']);
     }
 
-    /** Allowed sort arguments for nests. */
+    /** Allowed sort arguments for nests (none). */
     get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -28,9 +33,26 @@ export class NestManager extends BaseManager {
         this.client = client;
         this.cache = new Dict();
         this.eggs = new NestEggsManager(client);
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
+    /**
+     * Transforms the raw nest object(s) into typed objects.
+     * @param data The resolvable nest object(s).
+     * @returns The resolved nest object(s).
+     */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data?.data) {
             const res = new Dict<number, Nest>();
             for (let o of data.data) {
@@ -40,7 +62,7 @@ export class NestManager extends BaseManager {
                 res.set(n.id, n);
             }
 
-            if (this.client.options.nests.cache) this.cache = this.cache.join(res);
+            if (this.client.options.nests.cache) this.cache.update(res);
             return res;
         }
 
@@ -60,17 +82,38 @@ export class NestManager extends BaseManager {
     }
 
     /**
-     * Fetches a nest or a list of nests from the Pterodactyl API.
-     * @param [id] The ID of the nest.
+     * Fetches a nest from the API with the given options (default is undefined).
+     * @param id The ID of the nest.
      * @param [include] Optional include arguments.
-     * @returns The fetched nest(s).
+     * @returns The fetched nest.
+     * @example
+     * ```
+     * app.nests.fetch(1).then(console.log).catch(console.error);
+     * ```
      */
-    async fetch<T extends number | undefined>(
-        id?: T,
-        include: string[] = []
-    ): Promise<T extends undefined ? Dict<number, Nest> : Nest> {
+    async fetch(id: number, include?: string[]): Promise<Nest>;
+    /**
+     * Fetches a list of nests from the API with the given options (default is undefined).
+     * @param [include] Optional include arguments.
+     * @returns The fetched nest.
+     * @example
+     * ```
+     * app.nests.fetch()
+     *  .then(nests => nests.forEach(n => console.log(n)))
+     *  .catch(console.error);
+     * ```
+     */
+    async fetch(include?: string[]): Promise<Dict<number, Nest>>;
+    async fetch(op?: number | string[], include: string[] = []): Promise<any> {
+        let path = endpoints.nests.main;
+        if (typeof op === 'number') {
+            path = endpoints.nests.get(op);
+        } else {
+            include.push(...op || []);
+        }
+
         const data = await this.client.requests.get(
-            id ? endpoints.nests.get(id) : endpoints.nests.main,
+            path,
             { include } as Include<FetchOptions>,
             null, this
         );

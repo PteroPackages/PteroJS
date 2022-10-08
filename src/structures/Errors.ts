@@ -20,7 +20,7 @@ export class PteroAPIError extends Error {
 
         super('\n'+ fmt);
         this.codes = data.errors.map(e => e.code);
-        this.meta = data.errors.map(e => e.meta);
+        this.meta = data.errors.map(e => e.meta).filter(Boolean);
     }
 }
 

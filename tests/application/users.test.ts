@@ -1,23 +1,71 @@
-import * as assert from 'assert';
-import type { PteroApp } from '../../src';
+import { Dict, PteroAPIError, PteroApp, User } from '../../src';
+import auth from '../auth';
 
-export async function test(ctrl: PteroApp) {
-    assert.doesNotThrow(async () => await ctrl.users.fetch());
+const app = new PteroApp(auth.url, auth.key);
+var id: number;
 
-    assert.doesNotThrow(async () => await ctrl.users.create({
-        firstname: 'test',
-        lastname: 'user',
-        username: 'test_user',
-        email: 'test_user@example.com'
-    }));
+describe('Application: Users', () => {
+    it('fetches all users', async () => {
+        let users = await app.users.fetch();
 
-    const results = await ctrl.users.query('test_user', { filter: 'username' });
-    assert.ok(results.size, 'failed to fetch user account from the panel');
-    let user = results.find(u => u.username === 'test_user');
-    assert.ok(user, 'failed to get user account from results');
+        expect(users).toBeInstanceOf(Dict);
+        expect(users.size).toBeGreaterThan(0);
+        for (let [, u] of users) expect(u).toBeInstanceOf(User);
 
-    user = await ctrl.users.update(user.id, { username: 'user_test' });
-    assert.strictEqual(user.username, 'user_test', 'failed to update user account');
+        users = await app.users.fetch({ perPage: 3 });
+        expect(users.size).toEqual(3);
+    });
 
-    assert.doesNotThrow(async () => await ctrl.users.delete(user!.id));
-}
+    it('creates a user', async () => {
+        // @ts-expect-error
+        expect(app.users.create({})).rejects.toThrowError(PteroAPIError);
+
+        const user = await app.users.create({
+            username: 'jester',
+            email: 'jest@example.com',
+            firstname: 'jest',
+            lastname: 'jest',
+            externalId: 'jester'
+        });
+
+        expect(user).toBeInstanceOf(User);
+        expect(user.username).toEqual('jester');
+        expect(user.email).toEqual('jest@example.com');
+        expect(user.firstname).toEqual('jest');
+        expect(user.lastname).toEqual('jest');
+        expect(user.externalId).toEqual('jester');
+        expect(user.isAdmin).toBe(false);
+
+        id = user.id;
+    });
+
+    it('fetches a user', async () => {
+        expect(app.users.fetch(0)).rejects.toThrowError(PteroAPIError);
+        expect(app.users.fetch(id)).resolves.toBeInstanceOf(User);
+        expect(app.users.fetch('jester')).resolves.toBeInstanceOf(User);
+        expect(app.users.query('jest', { filter: 'username' })).resolves.toBeInstanceOf(Dict);
+
+        let user = await app.users.fetch(id);
+
+        expect(user).toBeInstanceOf(User);
+        expect(user.servers).toBeUndefined();
+    });
+
+    it('updates a user', async () => {
+        let user = await app.users.fetch('jester');
+
+        expect(app.users.update(user.id, {
+            externalId: null,
+            isAdmin: true
+        })).resolves.toBeInstanceOf(User);
+
+        user = await app.users.fetch(id, { force: true });
+
+        expect(user.externalId).toBeUndefined();
+        expect(user.isAdmin).toBe(true);
+    });
+
+    it('deletes a user', () => {
+        expect(app.users.delete(id)).resolves.toBeUndefined();
+    });
+});

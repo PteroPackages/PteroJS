@@ -15,6 +15,11 @@ export class NetworkManager {
         this.serverId = serverId;
     }
 
+    /**
+     * Transforms the raw allocation object(s) into typed objects.
+     * @param data The resolvable allocation object(s).
+     * @returns The resolved allocation object(s).
+     */
     _patch(data: any): any {
         if (data.data) {
             const res = new Dict<number, NetworkAllocation>();
@@ -23,7 +28,7 @@ export class NetworkManager {
                 a.notes ||= null;
                 res.set(a.id, a);
             }
-            this.cache = this.cache.join(res);
+            this.cache.update(res);
             return res;
         }
 
@@ -36,6 +41,13 @@ export class NetworkManager {
     /**
      * Fetches the network allocations on the server.
      * @returns The fetched network allocations.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.network.fetch()
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async fetch(): Promise<Dict<number, NetworkAllocation>> {
         const data = await this.client.requests.get(
@@ -49,6 +61,13 @@ export class NetworkManager {
      * @param id The ID of the network allocation.
      * @param notes The notes to set.
      * @returns The updated network allocation.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.network.setNote(14, 'bungee')
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async setNote(id: number, notes: string): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
@@ -62,6 +81,13 @@ export class NetworkManager {
      * Sets the primary allocation of the server.
      * @param id The ID of the network allocation.
      * @returns The updated network allocation.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.network.setPrimary(14)
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async setPrimary(id: number): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
@@ -73,6 +99,11 @@ export class NetworkManager {
     /**
      * Unassigns the specified network allocation form the server.
      * @param id The ID of the network allocation.
+     * @example
+     * ```
+     * const server = await client.servers.fetch('1c639a86');
+     * await server.network.unassign(12).catch(console.error);
+     * ```
      */
     async unassign(id: number): Promise<void> {
         await this.client.requests.delete(

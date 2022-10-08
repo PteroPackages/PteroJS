@@ -10,7 +10,7 @@ import { FetchOptions, RequestEvents } from '../common';
 import { buildQuery } from '../util/query';
 import { version } from '../../package.json';
 
-type Method =
+export type Method =
     | 'GET'
     | 'POST'
     | 'PATCH'

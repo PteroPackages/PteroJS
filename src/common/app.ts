@@ -10,35 +10,60 @@ export interface Allocation {
     assigned:   boolean;
 }
 
+export interface ApplicationDatabase {
+    id:             number;
+    serverId:       number;
+    hostId:         number;
+    database:       unknown;
+    username:       string;
+    remote:         string;
+    maxConnections: number;
+    createdAt:      Date;
+    updatedAt:      Date | undefined;
+}
+
 /** Options for creating a node. */
 export interface CreateNodeOptions {
     name:                   string;
+    description:            string | undefined;
+    /** @deprecated Broken, use `locationId`. */
     location:               string;
+    locationId:             number;
+    public:                 boolean;
     fqdn:                   string;
     scheme:                 string;
+    behindProxy:            boolean;
     memory:                 number;
     memoryOverallocate?:    number;
     disk:                   number;
     diskOverallocate?:      number;
+    /** @deprecated Use `daemonPort` and `daemonListen` instead. */
     sftp:{
         port:               number;
         listener:           number;
-    };
+    }
+    daemonBase:             string;
+    daemonSftp:             number;
+    daemonListen:           number;
+    maintenanceMode:        boolean;
     uploadSize?:            number;
 }
 
 /** Options for creating a user account. */
 export interface CreateUserOptions {
-    email:      string;
-    username:   string;
-    firstname:  string;
-    lastname:   string;
-    password?:  string;
-    isAdmin?:   boolean;
+    externalId?:    string;
+    email:          string;
+    username:       string;
+    firstname:      string;
+    lastname:       string;
+    password?:      string;
+    isAdmin?:       boolean;
 }
 
 /** Options for creating a server. */
 export interface CreateServerOptions {
+    /** The external identifier of the server. */
+    externalId?:        string;
     /** The name of the server. */
     name:               string;
     /**
@@ -111,7 +136,7 @@ export interface Egg {
         logs:           string[];
         fileDenylist:   string[];
         extends:        string | null;
-    };
+    }
     startup:            string;
     script:{
         privileged:     boolean;
@@ -148,15 +173,15 @@ export interface NodeConfiguration {
             enabled:    boolean;
             cert:       string;
             key:        string;
-        };
+        }
         uploadLimit:    number;
     };
     system:{
         data:           string;
         sftp:{
             bindPort:   number;
-        };
-    };
+        }
+    }
     allowedMounts:      string[];
     remote:             string;
 }
@@ -168,7 +193,18 @@ export interface NodeDeploymentOptions {
     locationIds?:   number[];
 }
 
-export interface UpdateBuildOptions extends Partial<Limits & FeatureLimits> {
+/** Represents a server status. If the server has no status, `NONE` is used. */
+export enum ServerStatus {
+    INSTALLING = 'installing',
+    INSTALL_FAILED = 'install_failed',
+    SUSPENDED = 'suspended',
+    RESTORING = 'restoring_backup',
+    NONE = ''
+}
+
+export interface UpdateBuildOptions {
+    limits?:            Partial<Limits>;
+    featureLimits?:     Partial<FeatureLimits>;
     allocation?:        number;
     oomDisabled?:       boolean;
     addAllocations?:    number[];
@@ -184,12 +220,12 @@ export interface UpdateDetailsOptions {
 
 export interface UpdateStartupOptions {
     startup?:       string;
-    environment?:   Record<string, string>;
+    environment?:   Record<string, string | number | boolean>;
     egg?:           number;
     image?:         string;
     skipScripts?:   boolean;
 }
 
-export interface UpdateUserOptions extends CreateUserOptions {
-    password: string;
+export interface UpdateUserOptions extends Omit<CreateUserOptions, 'externalId'> {
+    externalId?: string | null;
 }

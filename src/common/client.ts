@@ -1,3 +1,15 @@
+export interface Activity {
+    id:                     string;
+    batch:                  unknown;
+    event:                  string;
+    isApi:                  boolean;
+    ip:                     string | null;
+    description:            string | null;
+    properties:             Record<string, any>;
+    hasAdditionalMetadata:  boolean;
+    timestamp:              Date;
+}
+
 /** Represents a client API key. */
 export interface APIKey {
     identifier:     string;
@@ -5,6 +17,7 @@ export interface APIKey {
     allowedIps:     string[];
     createdAt:      Date;
     lastUsedAt:     Date | undefined;
+    token?:         string;
 }
 
 /** Represents a server backup object. */
@@ -50,14 +63,14 @@ export interface CreateBackupOptions {
 
 /** Options for creating a server schedule. */
 export interface CreateScheduleOptions {
-    name:           string;
-    active:         boolean;
-    dayOfWeek?:     string;
-    dayOfMonth?:    string;
-    month:          string;
-    hour:           string;
-    minute:         string;
-    onlyWhenOnline: boolean;
+    name:               string;
+    active:             boolean;
+    dayOfWeek?:         string;
+    dayOfMonth?:        string;
+    month:              string;
+    hour:               string;
+    minute:             string;
+    onlyWhenOnline?:    boolean;
 }
 
 /** Represents a schedule cronjob object. */
@@ -70,7 +83,7 @@ export interface Cron {
 }
 
 /** Represents a server database object. */
-export interface Database {
+export interface ClientDatabase {
     id:                 number;
     name:               string;
     username:           string;
@@ -160,6 +173,13 @@ export enum ShardStatus {
     CLOSED,
     CONNECTING,
     CONNECTED
+}
+
+export interface SSHKey {
+    name:           string;
+    fingerprint:    string;
+    publicKey:      string;
+    createdAt:      Date;
 }
 
 export interface StartupData {

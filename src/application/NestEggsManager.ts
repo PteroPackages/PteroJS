@@ -10,10 +10,17 @@ export class NestEggsManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Egg>;
 
-    /** Allowed filter arguments for eggs. */
+    /** Allowed filter arguments for eggs (none). */
     get FILTERS() { return Object.freeze([]); }
 
-    /** Allowed include arguments for eggs. */
+    /**
+     * Allowed include arguments for eggs:
+     * * nest
+     * * servers
+     * * config
+     * * script
+     * * variables
+     */
     get INCLUDES() {
         return Object.freeze([
             'nest', 'servers', 'config',
@@ -21,7 +28,7 @@ export class NestEggsManager extends BaseManager {
         ]);
     }
 
-    /** Allowed sort arguments for eggs. */
+    /** Allowed sort arguments for eggs (none). */
     get SORTS() { return Object.freeze([]); }
 
     constructor(client: PteroApp) {
@@ -30,6 +37,11 @@ export class NestEggsManager extends BaseManager {
         this.cache = new Dict();
     }
 
+    /**
+     * Transforms the raw egg object(s) into typed objects.
+     * @param data The resolvable egg object(s).
+     * @returns The resolved egg object(s).
+     */
     _patch(data: any): any {
         if (data?.data) {
             const res = new Dict<number, Egg>();
@@ -40,7 +52,7 @@ export class NestEggsManager extends BaseManager {
                 res.set(e.id, e);
             }
 
-            this.cache = this.cache.join(res);
+            this.cache.update(res);
             return res;
         }
 
@@ -60,26 +72,51 @@ export class NestEggsManager extends BaseManager {
     }
 
     /**
-     * Fetches an egg or a list of eggs from the Pterodactyl API.
+     * Fetches an egg from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
      * @param nest The ID of the nest.
-     * @param [id] The ID of the egg.
+     * @param id The ID of the egg.
      * @param [options] Additional fetch options.
-     * @returns The fetched egg(s).
+     * @returns The fetched egg.
+     * @example
+     * ```
+     * app.nests.eggs.fetch(1, 16).then(console.log).catch(console.error);
+     * ```
      */
-    async fetch<T extends number | undefined>(
+    async fetch(nest: number, id: number, options?: Include<FetchOptions>): Promise<Egg>;
+    /**
+     * Fetches a list of eggs from the API by its ID. This will check the cache first unless the
+     * force option is specified.
+     *
+     * @param nest The ID of the nest.
+     * @param [options] Additional fetch options.
+     * @returns The fetched eggs.
+     * @example
+     * ```
+     * app.nests.eggs.fetch(1)
+     *  .then(eggs => eggs.forEach(e => console.log(e)))
+     *  .catch(console.error);
+     * ```
+     */
+    async fetch(nest: number, options?: Include<FetchOptions>): Promise<Dict<number, Egg>>;
+    async fetch(
         nest: number,
-        id?: T,
-        options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? Dict<number, Egg> : Egg> {
-        if (id && !options.force) {
-            const e = this.cache.get(id);
-            if (e) return Promise.resolve<any>(e);
+        op1?: number | Include<FetchOptions>,
+        op2: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path = endpoints.nests.eggs.main(nest);
+
+        if (typeof op1 === 'number') {
+            if (!op2.force && this.cache.has(op1))
+                return this.cache.get(op1);
+
+            path = endpoints.nests.eggs.get(nest, op1);
+        } else {
+            if (op1) op2 = op1;
         }
 
-        const data = await this.client.requests.get(
-            id ? endpoints.nests.eggs.get(nest, id) : endpoints.nests.eggs.main(nest),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, op2, null, this);
         return this._patch(data);
     }
 }

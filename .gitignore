@@ -4,8 +4,10 @@
 
 # General files
 package-lock.json
-auth.json
+/tests/auth.ts
 
 # Test files/directories
 /test
 /src/remote
+*.cmd
+*.sh

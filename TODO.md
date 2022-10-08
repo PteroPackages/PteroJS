@@ -43,7 +43,7 @@ Want to contribute? Familiar with JS? You're already halfway there. Below are th
 - [X] Remove deprecated `Presets` util
 - [X] Rewrite in TypeScript
 - [X] Switch `node-fetch` to a different library
-- [ ] Implement builder classes
+- [X] Implement builder classes
 - [ ] Remove deprecated `UserManager#fetchExternal`
 
 ## Feature Plans

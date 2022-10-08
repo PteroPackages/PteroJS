@@ -10,10 +10,33 @@ import { ValidationError } from '../structures/Errors';
 import endpoints from './endpoints';
 import loader from '../util/config';
 
+/**
+ * The base class for the Pterodactyl client API.
+ * This operates using a Pterodactyl client API key which can be found
+ * at <your.domain.name/account/api>.
+ * 
+ * **Warning:** Keep your API key private at all times. Exposing this can lead
+ * to your accond and servers being corrupted, exposed and/or deleted.
+ */
 export class PteroClient {
+    /**
+     * The domain for your Pterodactyl panel. This should be the main URL only
+     * (not "/api"). Any additional paths will count as the API path.
+     */
     public domain: string;
+
+    /**
+     * The API key for your Pterodactyl account. This should be kept private at
+     * all times.
+     */
     public auth: string;
+
     public options: Record<string, OptionSpec>;
+
+    /**
+     * The account class for controlling your panel account, including the email,
+     * password, API keys and SSH keys.
+     */
     public account: Account;
 
     public schedules: ScheduleManager;
@@ -28,10 +51,11 @@ export class PteroClient {
     ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new ValidationError(
-                "Domain URL must start with 'http://' or 'https://' and "+
+                "Domain URL must start with 'http://' or 'https://' and " +
                 'must be bound to a port if using localhost.'
             );
 
+        if (domain.endsWith("/")) domain = domain.slice(0, -1);
         this.domain = domain;
         this.auth = auth;
         this.options = loader.clientConfig({ client: options });
@@ -48,6 +72,7 @@ export class PteroClient {
     }
 
     /**
+     * Fetches the raw permissions from the API.
      * @see {@link PermissionDescriptor}.
      * @returns The raw permission descriptors.
      */
@@ -64,12 +89,20 @@ export class PteroClient {
     }
 
     /**
-     * Adds one or more servers to be connected to websockets.
-     * @param ids The server identifiers to add.
-     * @returns The websocket shards.
+     * Creates a websocket shard for a specified server.
+     * @param id The identifier of the server.
+     * @returns The server websocket shard.
      */
-    addSocketServer(...ids: string[]): Shard[] {
-        return ids.map(i => this.ws.createShard(i));
+    addSocketServer(id: string): Shard;
+    /**
+     * Creates websocket shards for the specified servers.
+     * @param ids The identifiers of the servers.
+     * @returns An array of the server websocket shards.
+     */
+    addSocketServer(...ids: string[]): Shard[];
+    addSocketServer(...args: any[]): any {
+        if (args.length === 1) return this.ws.createShard(args[0]);
+        return args.map(i => this.ws.createShard(i));
     }
 
     /**

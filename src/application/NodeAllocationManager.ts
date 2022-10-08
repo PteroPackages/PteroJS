@@ -1,7 +1,7 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { FetchOptions, Include } from '../common';
+import { FetchOptions, Include, PaginationMeta } from '../common';
 import { Allocation } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -9,6 +9,7 @@ import endpoints from './endpoints';
 export class NodeAllocationManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Dict<number, Allocation>>;
+    public meta: PaginationMeta;
 
     /** Allowed filter arguments for allocations. */
     get FILTERS() { return Object.freeze([]); }
@@ -25,9 +26,21 @@ export class NodeAllocationManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
     _patch(node: number, data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         const res = new Dict<number, Allocation>();
         for (let o of data.data) {
             const a = caseConv.toCamelCase<Allocation>(o.attributes);
@@ -48,15 +61,20 @@ export class NodeAllocationManager extends BaseManager {
     }
 
     /**
-     * Fetches a list of allocations from the Pterodactyl API.
-     * @param node The ID of the node.
-     * @param options Additional fetch options.
+     * Fetches a list of allocations on a specific node from the API with the given options
+     * (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
      * @returns The fetched allocations.
+     * @example
+     * ```
+     * app.allocations.fetch(4, { page: 3 })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
-    async fetch(
-        node: number,
-        options: Include<FetchOptions>
-    ): Promise<Dict<number, Allocation>> {
+    async fetch(node: number, options: Include<FetchOptions> = {}): Promise<Dict<number, Allocation>> {
         if (!options.force) {
             const a = this.cache.get(node);
             if (a) return Promise.resolve(a);
@@ -70,26 +88,50 @@ export class NodeAllocationManager extends BaseManager {
     }
 
     /**
+     * Fetches the available allocations on a node and returns a single one.
+     * @param node The ID of the node.
+     * @param single Whether to return a single allocation.
+     * @returns The available allocation(s).
+     * @example
+     * ```
+     * app.allocations.fetchAvailable(4, true)
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+    async fetchAvailable(node: number, single: true): Promise<Allocation | undefined>;
+    /**
      * Fetches the available allocations on a node.
      * @param node The ID of the node.
      * @param single Whether to return a single allocation.
      * @returns The available allocation(s).
+     * @example
+     * ```
+     * app.allocations.fetchAvailable(4, false)
+     *  .then(all => all.forEach(a => console.log(a)))
+     *  .catch(console.error);
+     * ```
      */
-    async fetchAvailable<T extends true | false>(
-        node: number,
-        single: T
-    ): Promise<T extends true ? Allocation | undefined : Dict<number, Allocation>> {
-        const allocs = await this.fetch(node, { include:['server'] });
+    async fetchAvailable(node: number, single: false): Promise<Dict<number, Allocation>>;
+    async fetchAvailable(node: number, single: boolean): Promise<any> {
+        const all = await this.fetch(node);
         return single
-            ? allocs.filter(a => !a.assigned).first()
-            : allocs.filter(a => !a.assigned) as any;
+            ? all.filter(a => !a.assigned).first()
+            : all.filter(a => !a.assigned);
     }
 
     /**
-     * Creates a number of allocations based on the ports specified.
+     * Creates a number of allocations based on the ports specified. Note that the created
+     * allocations will not be returned due to the number that can be created in a single request,
+     * which can cause unwanted issues.
      * @param node The ID of the node.
      * @param ip The IP for the allocation.
      * @param ports A list of ports or port ranges for the allocation.
+     * @example
+     * ```
+     * app.allocations.create(4, '10.0.0.1', ['8000-9000'])
+     *  .catch(console.error);
+     * ```
      */
     async create(node: number, ip: string, ports: string[]): Promise<void> {
         if (!ports.every(p => typeof p === 'string')) throw new TypeError(
@@ -120,6 +162,10 @@ export class NodeAllocationManager extends BaseManager {
      * Deletes an allocation from a node.
      * @param node The ID of the node.
      * @param id The ID of the allocation.
+     * @example
+     * ```
+     * app.allocations.delete(4, 92).catch(console.error);
+     * ```
      */
     async delete(node: number, id: number): Promise<void> {
         await this.client.requests.delete(endpoints.nodes.allocations.get(node, id));

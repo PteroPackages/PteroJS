@@ -6,11 +6,11 @@ import { User } from '../structures/User';
 import { UpdateUserOptions } from '../common/app';
 import { ValidationError } from '../structures/Errors';
 import {
-    External,
     FetchOptions,
     Filter,
     FilterArray,
     Include,
+    PaginationMeta,
     Resolvable,
     Sort
 } from '../common';
@@ -20,19 +20,32 @@ import endpoints from './endpoints';
 export class UserManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, User>;
+    public meta: PaginationMeta;
 
-    /** Allowed filter arguments for users. */
+    /**
+     * Allowed filter arguments for users:
+     * * email
+     * * uuid
+     * * username
+     * * externalId
+     */
     get FILTERS() {
-        return Object.freeze([
-            'email', 'uuid', 'uuidShort',
-            'username', 'image', 'external_id'
-        ]);
+        return Object.freeze(['email', 'uuid', 'username', 'external_id']);
     }
 
-    /** Allowed include arguments for users. */
-    get INCLUDES() { return Object.freeze([]); }
+    /**
+     * Allowed include arguments for users:
+     * * servers
+     */
+    get INCLUDES() { return Object.freeze(['servers']); }
 
-    /** Allowed sort arguments for users. */
+    /**
+     * Allowed sort arguments for users:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     */
     get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
@@ -41,9 +54,26 @@ export class UserManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
+    /**
+     * Transforms the raw user object(s) into class objects.
+     * @param data The resolvable user object(s).
+     * @returns The resolved user object(s).
+     */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data?.data) {
             const res = new Dict<number, User>();
             for (const o of data.data) {
@@ -89,55 +119,94 @@ export class UserManager extends BaseManager {
     }
 
     /**
-     * Fetches a user or a list of users from the Pterodactyl API.
-     * @param [id] The ID of the user.
+     * Fetches a user from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
+     * @param id The ID of the user.
      * @param [options] Additional fetch options.
-     * @returns The fetched user(s).
+     * @returns The fetched user.
+     * @example
+     * ```
+     * app.users.fetch(5).then(console.log).catch(console.error);
+     * ```
      */
-    async fetch<T extends number | string | undefined>(
-        id?: T,
-        options: External<Include<FetchOptions>> = {}
-    ): Promise<T extends undefined ? Dict<number, User> : User> {
-        if (!options.force) {
-            if (typeof id === 'number') {
-                const u = this.cache.get(id);
-                if (u) return Promise.resolve<any>(u);
-            } else {
-                const u = this.cache.find(u => u.externalId === id);
-                if (u) return Promise.resolve<any>(u);
+    async fetch(id: number, options?: Include<FetchOptions>): Promise<User>;
+    /**
+     * Fetches a user from the API by its external ID. This will check the cache first unless the
+     * force option is specified.
+     *
+     * @param id The external ID of the user.
+     * @param [options] Additional fetch options.
+     * @returns The fetched user.
+     * @example
+     * ```
+     * app.users.fetch('admin').then(console.log).catch(console.error);
+     * ```
+     */
+    async fetch(id: string, options?: Include<FetchOptions>): Promise<User>;
+    /**
+     * Fetches a list of users from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched users.
+     * @example
+     * ```
+     * app.users.fetch({ perPage: 20 }).then(console.log).catch(console.error);
+     * ```
+     */
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, User>>;
+    async fetch(
+        op?: number | string | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path: string;
+        switch (typeof op) {
+            case 'number':{
+                if (!ops.force && this.cache.has(op))
+                    return this.cache.get(op);
+
+                path = endpoints.users.get(op);
+                break;
             }
+            case 'string':{
+                if (!ops.force) {
+                    const u = this.cache.find(u => u.externalId === op);
+                    if (u) return u;
+                }
+
+                path = endpoints.users.ext(op);
+                break;
+            }
+            case 'undefined':
+            case 'object':{
+                path = endpoints.users.main;
+                if (op) ops = op;
+                break;
+            }
+            default:
+                throw new ValidationError(
+                    `expected user id, external id or fetch options; got ${typeof op}`
+                );
         }
 
-        if (typeof id === 'string' && !options.external)
-            throw new ValidationError(
-                "The 'external' option must be set to fetch externally"
-            );
-
-        const data = await this.client.requests.get(
-            options.external && id
-                ? endpoints.users.ext(id as string)
-                : (id ? endpoints.users.get(id as number) : endpoints.users.main),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 
-    /** @deprecated Use {@link UserManager.fetch} with `options.external`. */
+    /** @deprecated Use {@link UserManager.fetch}. */
     async fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
-        return this.fetch(id, { ...options, external: true });
+        return this.fetch(id, options);
     }
 
     /**
-     * Queries the Pterodactyl API for users that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods
-     * for filtering and sorting.
+     * Queries the API for users that match the specified query filters. This fetches from the
+     * API directly and does not check the cache. Use cache methods for filtering and sorting.
+     * 
      * Available query filters:
      * * email
      * * uuid
-     * * uuidShort
-     * * identifier (alias for uuidShort)
      * * username
-     * * image
      * * externalId
      * 
      * Available sort options:
@@ -149,6 +218,12 @@ export class UserManager extends BaseManager {
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried users.
+     * @example
+     * ```
+     * app.users.query('d5f506c9', { filter: 'uuid' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async query(
         entity: string,
@@ -157,7 +232,6 @@ export class UserManager extends BaseManager {
         if (!options.sort && !options.filter) throw new ValidationError(
             'Sort or filter is required.'
         );
-        if (options.filter === 'identifier') options.filter = 'uuidShort';
         if (options.filter === 'externalId') options.filter = 'external_id';
 
         const payload: FilterArray<Sort<{}>> = {};
@@ -165,7 +239,7 @@ export class UserManager extends BaseManager {
         if (options.sort) payload.sort = options.sort;
 
         const data = await this.client.requests.get(
-            endpoints.servers.main,
+            endpoints.users.main,
             payload as FilterArray<Sort<FetchOptions>>,
             null, this
         );
@@ -174,9 +248,21 @@ export class UserManager extends BaseManager {
 
     /**
      * Creates a user account.
-     * @param options Create user options.
      * @see {@link CreateUserOptions}.
+     * @param options Create user options.
      * @returns The new user.
+     * @example
+     * ```
+     * app.users.create({
+     *  email: 'user@example.com',
+     *  username: 'example-user',
+     *  firstname: 'example',
+     *  lastname: 'user',
+     *  externalId: 'example1'
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async create(options: CreateUserOptions): Promise<User> {
         const payload = caseConv.toSnakeCase<object>(
@@ -198,10 +284,16 @@ export class UserManager extends BaseManager {
 
     /**
      * Updates the user account with the specified options.
+     * @see {@link UpdateUserOptions}.
      * @param id The ID of the user.
      * @param options Update user options.
-     * @see {@link UpdateUserOptions}.
      * @returns The updated user.
+     * @example
+     * ```
+     * app.users.update(7, { externalId: 'admin2', isAdmin: true })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async update(id: number, options: Partial<UpdateUserOptions>): Promise<User> {
         if (!Object.keys(options).length)
@@ -213,6 +305,7 @@ export class UserManager extends BaseManager {
         options.lastname ||= user.lastname;
         options.email ||= user.email;
         options.isAdmin ??= user.isAdmin;
+        if (!('externalId' in options)) options.externalId = user.externalId;
 
         const payload = caseConv.toSnakeCase<object>(
             options,
@@ -234,6 +327,10 @@ export class UserManager extends BaseManager {
     /**
      * Deletes a user account.
      * @param id The ID of the user.
+     * @example
+     * ```
+     * app.users.delete(8).catch(console.error);
+     * ```
      */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.users.get(id));

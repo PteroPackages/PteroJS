@@ -1,6 +1,47 @@
 # Changelog
 Tracking changes for PteroJS and extensions from v2 onwards (using [SemVer 2](http://semver.org/)).
 
+## [2.1.0] - 08-10-2022
+A lot of bug fixes and some new useful QOL features for the library and developers.
+
+### Added
+- `Dict#update()` updates the dict instance in place with another dict
+- `Shard#request()` method for making sendable requests to the server
+- `WebSocketManager#broadcast()` method to broadcast events to all shards and collect the responses
+- `ApplicationServer#container` property
+- `ClientServer#internalId` property
+- `ClientServer#eggFeatures` optional property
+- `ClientServer#invocation` property
+- `ClientServer#transferring` boolean property
+- `UserBuilder` class
+- `ServerBuilder` class
+- `NodeBuilder` class
+- Activity logs support (`Account#fetchActivities()`)
+- SSH keys support (`Account#fetchSSHKeys()`, `Account#createSSHKey()`, `Account#removeSSHKey()`)
+- Jest testing instead of custom testing
+- Additional documentation and examples for application API
+- Support including servers for `UserManager`
+- Documentation with examples for the application and client API
+- Include `token` field from metadata when creating API keys
+- Cache metadata from all `fetch()` methods in the application API
+- Support `origin` header for websocket connections
+
+### Changed
+- all managers with caches now uses the `Dict#update()` method
+- `ClientServer#state` -> `ClientServer#status` matches API data
+- Overloaded `PteroClient#addSocketServer()` to not return an array if only one ID is present
+
+### Fixed
+- `Node#daemon` now shows the actual daemon data object
+- `caseConv` functions handling arrays incorrectly
+- Node creation method now uses the correct endpoint
+- `NodeCreationOptions` is now updated to use actual creation options in the API
+- `ApplicationServerManager#updateBuild()` applies missing limits and feature limits
+- `UserManager#query()` now uses the correct endpoint (previously servers)
+- Export missing type/interface members for documentation
+- `UserUpdateOptions#externalId` now accepts `null` to remove the external ID
+- `UserManager#update()` now checks if `externalId` is set before defaulting
+
 ## [2.0.0] - 26-05-2022
 A huge turning point for the PteroJS library, having a new TypeScript look, updated classes/methods, and proper documentation. Thanks to everyone that contributed! :D
 

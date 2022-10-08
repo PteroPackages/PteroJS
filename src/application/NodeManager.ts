@@ -9,12 +9,13 @@ import {
     NodeDeploymentOptions
 } from '../common/app';
 import {
+    FetchOptions,
     Filter,
     FilterArray,
     Include,
-    Sort,
+    PaginationMeta,
     Resolvable,
-    FetchOptions
+    Sort
 } from '../common';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -22,18 +23,38 @@ import endpoints from './endpoints';
 export class NodeManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, Node>;
+    public meta: PaginationMeta;
 
-    /** Allowed filter arguments for nodes. */
+    /**
+     * Allowed filter arguments for nodes:
+     * * uuid
+     * * name
+     * * fqdn
+     * * daemonTokenId
+     */
     get FILTERS() {
         return Object.freeze(['uuid', 'name', 'fqdn', 'daemon_token_id']);
     }
 
-    /** Allowed include arguments for nodes. */
+    /**
+     * Allowed include arguments for nodes:
+     * * allocations
+     * * location
+     * * servers
+     * 
+     * Note: not all of these include options have been implemented yet.
+     */
     get INCLUDES() {
         return Object.freeze(['allocations', 'location', 'servers']);
     }
 
-    /** Allowed sort arguments for nodes. */
+    /**
+     * Allowed sort arguments for nodes:
+     * * id
+     * * uuid
+     * * memory
+     * * disk
+     */
     get SORTS() {
         return Object.freeze(['id', 'uuid', 'memory', 'disk']);
     }
@@ -42,16 +63,33 @@ export class NodeManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
+    /**
+     * Transforms the raw node object(s) into class objects.
+     * @param data The resolvable node object(s).
+     * @returns The resolved node object(s).
+     */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data?.data) {
             const res = new Dict<number, Node>();
             for (const obj of data.data) {
                 const s = new Node(this.client, obj.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.servers.cache) this.cache.update(res);
             return res;
         }
 
@@ -90,33 +128,62 @@ export class NodeManager extends BaseManager {
     }
 
     /**
-     * Fetches a node or a list of nodes from the Pterodactyl API.
-     * @param [id] The ID of the node.
+     * Fetches a node from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
+     * @param id The ID of the node.
      * @param [options] Additional fetch options.
-     * @returns The fetched node(s).
+     * @returns The fetched node.
+     * @example
+     * ```
+     * app.nodes.fetch(2).then(console.log).catch(console.error);
+     * ```
      */
-    async fetch<T extends number | undefined>(
-        id?: T,
-        options: Include<FetchOptions> = {}
-    ): Promise<T extends undefined ? Dict<number, Node> : Node> {
-        if (id && !options.force) {
-            const n = this.cache.get(id);
-            if (n) return Promise.resolve<any>(n);
+    async fetch(id: number, options?: Include<FetchOptions>): Promise<Node>;
+    /**
+     * Fetches a list of nodes from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched nodes.
+     * @example
+     * ```
+     * app.nodes.fetch({ include:['servers'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, Node>>;
+    async fetch(
+        op?: number | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path = endpoints.nodes.main;
+        if (typeof op === 'number') {
+            if (!ops.force && this.cache.has(op))
+                return this.cache.get(op);
+
+            path = endpoints.nodes.get(op);
+        } else {
+            if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(
-            (id ? endpoints.nodes.get(id) : endpoints.nodes.main),
-            options, null, this
-        );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 
     /**
      * Fetches the deployable nodes from the API following the specified deployable
-     * node options.
-     * @param options Deployable node options.
+     * node options. Note that memory and disk are required for deployment options.
      * @see {@link NodeDeploymentOptions}.
+     * @param options Deployable node options.
      * @returns The deployable nodes.
+     * @example
+     * ```
+     * app.nodes.fetchDeployable({ memory: 1024, disk: 4000 })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async fetchDeployable(
         options: NodeDeploymentOptions
@@ -128,9 +195,9 @@ export class NodeManager extends BaseManager {
     }
 
     /**
-     * Queries the Pterodactyl API for nodes that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods
-     * for filtering and sorting.
+     * Queries the API for nodes that match the specified query filters. This fetches from the
+     * API directly and does not check the cache. Use cache methods for filtering and sorting.
+     * 
      * Available query filters:
      * * uuid
      * * name
@@ -146,6 +213,12 @@ export class NodeManager extends BaseManager {
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried nodes.
+     * @example
+     * ```
+     * app.nodes.query('nodes.pterodactyl.test', { filter: 'daemonTokenId' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async query(
         entity: string,
@@ -172,6 +245,10 @@ export class NodeManager extends BaseManager {
      * Fetches the node configuration.
      * @param id The ID of the node.
      * @returns The node configuration.
+     * @example
+     * ```
+     * app.nodes.getConfig(2).then(console.log).catch(console.error);
+     * ```
      */
     async getConfig(id: number): Promise<NodeConfiguration> {
         const data = await this.client.requests.get(
@@ -185,11 +262,29 @@ export class NodeManager extends BaseManager {
      * @param options Create node options.
      * @see {@link CreateNodeOptions}.
      * @returns The new node.
+     * @example
+     * ```
+     * app.nodes.create({
+     *  name: 'node04',
+     *  locationId: 2,
+     *  public: false,
+     *  fqdn: 'n4.nodes.pterodactyl.test',
+     *  scheme: 'https',
+     *  behindProxy: false,
+     *  memory: 1024,
+     *  disk: 4000,
+     *  daemonSftp: 2022,
+     *  daemonListen: 8080,
+     *  maintenanceMode: false
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async create(options: CreateNodeOptions): Promise<Node> {
         const payload = caseConv.toSnakeCase<object>(options);
         const data = await this.client.requests.post(
-            endpoints.users.main, payload
+            endpoints.nodes.main, payload
         );
         return this._patch(data);
     }
@@ -200,6 +295,12 @@ export class NodeManager extends BaseManager {
      * @param options Update node options.
      * @see {@link CreateNodeOptions}.
      * @returns The updated node.
+     * @example
+     * ```
+     * app.nodes.update(4, { maintenanceMode: true })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async update(
         id: number,
@@ -223,6 +324,10 @@ export class NodeManager extends BaseManager {
      * Note: there must be no servers on the node for this operation to work.
      * Please ensure this before attempting to delete the node.
      * @param id The ID of the node.
+     * @example
+     * ```
+     * app.nodes.delete(3).catch(console.error);
+     * ```
      */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(endpoints.nodes.get(id));

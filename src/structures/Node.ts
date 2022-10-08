@@ -91,7 +91,10 @@ export class Node {
         if ('disk' in data) this.disk = data.disk;
         if ('disk_overallocate' in data) this.overallocatedDisk = data.disk_overallocate;
         if ('upload_size' in data) this.uploadSize = data.upload_size;
-        if ('daemon_listen' in data) this.daemon = data.daemon_listen;
+        if (!this.daemon) this.daemon = {} as DaemonData;
+        if ('daemon_listen' in data) this.daemon.listening = data.daemon_listen;
+        if ('daemon_sftp' in data) this.daemon.sftp = data.daemon_sftp;
+        if ('daemon_base' in data) this.daemon.base = data.daemon_base;
     }
 
     /**

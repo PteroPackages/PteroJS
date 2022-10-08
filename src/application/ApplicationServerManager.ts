@@ -4,13 +4,13 @@ import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import {
-    External,
     FeatureLimits,
     FetchOptions,
     Filter,
     FilterArray,
     Include,
     Limits,
+    PaginationMeta,
     Resolvable,
     Sort
 } from '../common';
@@ -26,8 +26,17 @@ import endpoints from './endpoints';
 export class ApplicationServerManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
+    public meta: PaginationMeta;
 
-    /** Allowed filter arguments for servers. */
+    /**
+     * Allowed filter arguments for servers:
+     * * name
+     * * uuid
+     * * uuidShort
+     * * identifier (alias for uuidShort)
+     * * externalId
+     * * image
+     */
     get FILTERS() {
         return Object.freeze([
             'name', 'uuid', 'uuidShort',
@@ -35,7 +44,20 @@ export class ApplicationServerManager extends BaseManager {
         ]);
     }
 
-    /** Allowed include arguments for servers. */
+    /**
+     * Allowed include arguments for servers:
+     * * allocations
+     * * user
+     * * subusers
+     * * nest
+     * * egg
+     * * variables
+     * * location
+     * * node
+     * * databases
+     * 
+     * Note: not all of these include options have been implemented yet.
+     */
     get INCLUDES() {
         return Object.freeze([
             'allocations', 'user', 'subusers',
@@ -44,7 +66,15 @@ export class ApplicationServerManager extends BaseManager {
         ]);
     }
 
-    /** Allowed sort arguments for servers. */
+    /**
+     * Allowed sort arguments for servers:
+     * * id
+     * * -id
+     * * uuid
+     * * -uuid
+     * 
+     * Negative arguments reverse the sorted results.
+     */
     get SORTS() {
         return Object.freeze(['id', '-id', 'uuid', '-uuid']);
     }
@@ -53,6 +83,13 @@ export class ApplicationServerManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
+        this.meta = {
+            current: 0,
+            total: 0,
+            count: 0,
+            perPage: 0,
+            totalPages: 0
+        };
     }
 
     get defaultLimits(): Limits {
@@ -69,19 +106,29 @@ export class ApplicationServerManager extends BaseManager {
     get defaultFeatureLimits(): FeatureLimits {
         return {
             allocations: 1,
-            databases: 5,
+            databases: 1,
             backups: 1
         }
     }
 
+    /**
+     * Transforms the raw server object(s) into class objects.
+     * @param data The resolvable server object(s).
+     * @returns The resolved server object(s).
+     */
     _patch(data: any): any {
+        if (data?.meta?.pagination) {
+            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta.current = data.meta.pagination.current_page;
+        }
+
         if (data.data) {
             const res = new Dict<number, ApplicationServer>();
             for (let o of data.data) {
                 const s = new ApplicationServer(this.client, o.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.servers.cache) this.cache.update(res);
             return res;
         }
 
@@ -99,11 +146,11 @@ export class ApplicationServerManager extends BaseManager {
      * @param obj The object to resolve from.
      * @returns The resolved server or undefined if not found.
      */
-    resolve(obj: Resolvable<ApplicationServer>): ApplicationServer | undefined {
+    resolve(obj: Resolvable<ApplicationServer>): ApplicationServer | Dict<number, ApplicationServer> | undefined {
         if (obj instanceof ApplicationServer) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
-        if (obj.relationships?.servers) return this._patch(obj) as ApplicationServer;
+        if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
         return undefined;
     }
 
@@ -124,44 +171,85 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     /**
-     * Fetches a server or a list of servers from the Pterodactyl API.
-     * @param [id] The ID or external ID of the server.
+     * Fetches a server from the API by its ID. This will check the cache first unless the force
+     * option is specified.
+     *
+     * @param id The ID of the server.
      * @param [options] Additional fetch options.
-     * @returns The fetched server(s).
+     * @returns The fetched server.
+     * @example
+     * ```
+     * app.servers.fetch(12).then(console.log).catch(console.error);
+     * ```
      */
-    async fetch<T extends number | string | undefined>(
-        id?: T,
-        options: External<Include<FetchOptions>> = {}
-    ): Promise<
-        T extends undefined ? Dict<number, ApplicationServer> : ApplicationServer
-    > {
-        if (id && !options.force) {
-            if (typeof id === 'number') {
-                if (this.cache.has(id)) return Promise.resolve<any>(this.cache.get(id)!);
-            } else {
-                const s = this.cache.find(s => s.externalId === id);
-                if (s) return Promise.resolve<any>(s);
+    async fetch(id: number, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    /**
+     * Fetches a server from the API by its external ID. This will check the cache first unless the
+     * force option is specified.
+     *
+     * @param id The external ID of the server.
+     * @param [options] Additional fetch options.
+     * @returns The fetched server.
+     * @example
+     * ```
+     * app.servers.fetch('minecraft').then(console.log).catch(console.error);
+     * ```
+     */
+    async fetch(id: string, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    /**
+     * Fetches a list of servers from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched servers.
+     * @example
+     * ```
+     * app.servers.fetch({ page: 2 }).then(console.log).catch(console.error);
+     * ```
+     */
+    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ApplicationServer>>;
+    async fetch(
+        op?: number | string | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {}
+    ): Promise<any> {
+        let path: string;
+        switch (typeof op) {
+            case 'number':{
+                if (!ops.force && this.cache.has(op))
+                    return this.cache.get(op);
+
+                path = endpoints.servers.get(op);
+                break;
             }
+            case 'string':{
+                if (!ops.force) {
+                    const u = this.cache.find(u => u.externalId === op);
+                    if (u) return u;
+                }
+
+                path = endpoints.servers.ext(op);
+                break;
+            }
+            case 'undefined':
+            case 'object':{
+                path = endpoints.servers.main;
+                if (op) ops = op;
+                break;
+            }
+            default:
+                throw new ValidationError(
+                    `expected server id, external id or fetch options; got ${typeof op}`
+                );
         }
 
-        if (typeof id === 'string' && !options.external)
-            throw new ValidationError(
-                "The 'external' option must be set to fetch externally"
-            );
-
-            const data = await this.client.requests.get(
-                options.external && id
-                    ? endpoints.servers.ext(id as string)
-                    : (id ? endpoints.servers.get(id as number) : endpoints.servers.main),
-                options, null, this
-            );
+        const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
     }
 
     /**
-     * Queries the Pterodactyl API for servers that match the specified query filters.
-     * This fetches from the API directly and does not check the cache. Use cache methods
-     * for filtering and sorting.
+     * Queries the API for servers that match the specified query filters. This fetches from the
+     * API directly and does not check the cache. Use cache methods for filtering and sorting.
+     * 
      * Available query filters:
      * * name
      * * uuid
@@ -179,6 +267,12 @@ export class ApplicationServerManager extends BaseManager {
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried servers.
+     * @example
+     * ```
+     * app.servers.query('ARK', { filter: 'name', sort: 'id' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async query(
         entity: string,
@@ -204,9 +298,31 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Creates a server with the specified options.
-     * @param options Create server options.
      * @see {@link CreateServerOptions}.
+     * @param options Create server options.
      * @returns The new server.
+     * @example
+     * ```
+     * app.servers.create({
+     *  name: 'ptero bot',
+     *  user: 5,
+     *  egg: 16,
+     *  dockerImage: 'ghcr.io/parkervcp/yolks:nodejs_17',
+     *  startup: 'if [ -f /home/container/package.json ];' +
+     *   'then /usr/local/bin/npm install; fi;' +
+     *   '/usr/local/bin/node /home/container/{{BOT_JS_FILE}}',
+     *  environment:{
+     *   USER_UPLOAD: false,
+     *   AUTO_UPDATE: false,
+     *   BOT_JS_FILE: 'index.js'
+     *  },
+     *  allocation:{
+     *   default: 24
+     *  }
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async create(options: CreateServerOptions): Promise<ApplicationServer> {
         options.limits = Object.assign(
@@ -231,10 +347,16 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Updates the details of a server.
+     * @see {@link UpdateDetailsOptions}.
      * @param id The ID of the server.
      * @param options Update details options.
-     * @see {@link UpdateDetailsOptions}.
      * @returns The updated server.
+     * @example
+     * ```
+     * app.servers.updateDetails(12, { externalId: 'mc01' })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async updateDetails(
         id: number,
@@ -258,10 +380,21 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Updates the build configuration of a server.
+     * @see {@link UpdateBuildOptions}.
      * @param id The ID of the server.
      * @param options Update build options.
-     * @see {@link UpdateBuildOptions}.
      * @returns The updated server.
+     * @example
+     * ```
+     * app.servers.updateBuild(12, {
+     *  limits:{
+     *   memory: 2048
+     *  },
+     *  addAllocations:[32]
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
     async updateBuild(
         id: number,
@@ -271,8 +404,8 @@ export class ApplicationServerManager extends BaseManager {
             throw new ValidationError('Too few options to update the server.');
 
         const server = await this.fetch(id, { force: true });
-        options = Object.assign(server.limits, options);
-        options = Object.assign(server.featureLimits, options);
+        options.limits = Object.assign(server.limits, options.limits);
+        options.featureLimits = Object.assign(server.featureLimits, options.featureLimits);
         options.allocation ??= server.allocation;
 
         const data = await this.client.requests.patch(
@@ -284,52 +417,91 @@ export class ApplicationServerManager extends BaseManager {
 
     /**
      * Updates the startup configuration of a server.
+     * @see {@link UpdateStartupOptions}.
      * @param id The ID of the server.
      * @param options Update startup options.
-     * @see {@link UpdateStartupOptions}.
-     * @todo
+     * @returns The updated server.
+     * @example
+     * ```
+     * app.servers.updateStartup(12, {
+     *  image: 'ghcr.io/pterodactyl/yolks:java_17',
+     *  skipScripts: false
+     * })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
      */
-    private async updateStartup(
+    async updateStartup(
         id: number,
         options: UpdateStartupOptions
-    ) {}
+    ): Promise<ApplicationServer> {
+        if (!Object.keys(options).length)
+            throw new ValidationError('Too few options to update the server.');
+
+        const server = await this.fetch(id, { force: true });
+        options.egg ??= server.egg;
+        options.environment ||= server.container.environment;
+        options.image ||= server.container.image;
+        options.skipScripts ??= false;
+        options.startup ||= server.container.startupCommand;
+
+        const payload = caseConv.toSnakeCase<any>(options, { ignore:['environment'] });
+        payload.environment = options.environment;
+
+        const data = await this.client.requests.patch(
+            endpoints.servers.startup(id),
+            payload
+        );
+        return this._patch(data);
+    }
 
     /**
      * Suspends a server.
      * @param id The ID of the server.
+     * @example
+     * ```
+     * app.servers.suspend(14).catch(console.error);
+     * ```
      */
-    async suspend(id: number): Promise<void> {
-        await this.client.requests.post(endpoints.servers.suspend(id));
+    suspend(id: number): Promise<void> {
+        return this.client.requests.post(endpoints.servers.suspend(id));
     }
 
     /**
      * Unsuspends a server.
      * @param id The ID of the server.
+     * @example
+     * ```
+     * app.servers.unsuspend(16).catch(console.error);
+     * ```
      */
-    async unsuspend(id: number): Promise<void> {
-        await this.client.requests.post(endpoints.servers.unsuspend(id));
+    unsuspend(id: number): Promise<void> {
+        return this.client.requests.post(endpoints.servers.unsuspend(id));
     }
 
     /**
      * Triggers the reinstall process of a server.
      * @param id The ID of the server.
+     * @example
+     * ```
+     * app.servers.reinstall(17).catch(console.error);
+     * ```
      */
-    async reinstall(id: number): Promise<void> {
-        await this.client.requests.post(endpoints.servers.reinstall(id));
+    reinstall(id: number): Promise<void> {
+        return this.client.requests.post(endpoints.servers.reinstall(id));
     }
 
     /**
      * Deletes a server.
      * @param id The ID of the server.
      * @param [force] Whether to force delete the server.
+     * @example
+     * ```
+     * app.servers.delete(21, true).catch(console.error);
+     * ```
      */
-    async delete(
-        id: number,
-        force: boolean = false
-    ): Promise<void> {
-        await this.client.requests.delete(
-            endpoints.servers.get(id) + (force ? '/force' : '')
-        );
+    async delete(id: number, force: boolean = false): Promise<void> {
+        await this.client.requests.delete(endpoints.servers.get(id) + (force ? '/force' : ''));
         this.cache.delete(id);
     }
 }
