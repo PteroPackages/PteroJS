@@ -28,9 +28,15 @@
   "engines": {
     "node": ">=14.16"
   },
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "prepublish": "tsc",
-    "build": "tsc",
+    "prepublish": "tsup-node",
+    "build": "tsup-node",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
     "test": "jest",
     "test:watch": "jest --watchAll"
@@ -54,6 +60,7 @@
     "@types/jest": "^29.1.2",
     "@types/node": "^18.8.4",
     "@types/ws": "^8.5.3",
+    "tsup": "^6.2.3",
     "jest": "^29.1.2",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
