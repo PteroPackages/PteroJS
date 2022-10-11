@@ -16,8 +16,8 @@
     "type": "git",
     "url": "git+https://github.com/PteroPackages/PteroJS.git"
   },
-  "main": "./dist/src/index.js",
-  "types": "./dist/src/types/src",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "CHANGELOG.md",
