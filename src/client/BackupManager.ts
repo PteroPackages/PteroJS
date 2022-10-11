@@ -14,7 +14,9 @@ export class BackupManager extends BaseManager {
     public serverId: string;
 
     /** Allowed filter arguments for backups (none). */
-    get FILTERS() { return Object.freeze([]); }
+    get FILTERS() {
+        return Object.freeze([]);
+    }
 
     /** Allowed include arguments for backups (none). */
     get INCLUDES() {
@@ -22,7 +24,9 @@ export class BackupManager extends BaseManager {
     }
 
     /** Allowed sort arguments for backups (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroClient, serverId: string) {
         super();
@@ -41,10 +45,10 @@ export class BackupManager extends BaseManager {
             const res = new Dict<string, Backup>();
             for (let o of data.data) {
                 const b = caseConv.toCamelCase<Backup>(o.attributes, {
-                    map:{
+                    map: {
                         is_successful: 'successful',
-                        is_locked: 'locked'
-                    }
+                        is_locked: 'locked',
+                    },
                 });
                 b.createdAt = new Date(b.createdAt);
                 b.completedAt &&= new Date(b.completedAt);
@@ -55,10 +59,10 @@ export class BackupManager extends BaseManager {
         }
 
         const b = caseConv.toCamelCase<Backup>(data.attributes, {
-            map:{
+            map: {
                 is_successful: 'successful',
-                is_locked: 'locked'
-            }
+                is_locked: 'locked',
+            },
         });
         b.createdAt = new Date(b.createdAt);
         b.completedAt &&= new Date(b.completedAt);
@@ -69,7 +73,7 @@ export class BackupManager extends BaseManager {
     /**
      * Fetches a backup from the API by its identifier. This will check the cache first unless the
      * force option is specified.
-     * 
+     *
      * @param id The identifier of the backup.
      * @param [options] Additional fetch options.
      * @returns The fetched backup.
@@ -84,7 +88,7 @@ export class BackupManager extends BaseManager {
     async fetch(id: string, options?: Include<FetchOptions>): Promise<Backup>;
     /**
      * Fetches a list of backups from the API with the given options (default is undefined).
-     * 
+     *
      * @param [options] Additional fetch options.
      * @returns The fetched backups.
      * @example
@@ -98,12 +102,11 @@ export class BackupManager extends BaseManager {
     async fetch(options?: Include<FetchOptions>): Promise<Dict<number, Backup>>;
     async fetch(
         op?: string | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        ops: Include<FetchOptions> = {},
     ): Promise<any> {
         let path = endpoints.servers.backups.main(this.serverId);
         if (typeof op === 'string') {
-            if (!ops.force && this.cache.has(op))
-                return this.cache.get(op);
+            if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
             path = endpoints.servers.backups.get(this.serverId, op);
         } else {
@@ -117,7 +120,7 @@ export class BackupManager extends BaseManager {
     /**
      * Creates a new backup on the server.
      * @see {@link CreateBackupOptions}.
-     * 
+     *
      * @param options Create backup options.
      * @returns The new backup.
      * @example
@@ -131,7 +134,7 @@ export class BackupManager extends BaseManager {
     async create(options: CreateBackupOptions = {}): Promise<Backup> {
         const data = await this.client.requests.post(
             endpoints.servers.backups.main(this.serverId),
-            options
+            options,
         );
         return this._patch(data);
     }
@@ -150,7 +153,7 @@ export class BackupManager extends BaseManager {
      */
     async toggleLock(id: string): Promise<Backup> {
         const data = await this.client.requests.post(
-            endpoints.servers.backups.lock(this.serverId, id)
+            endpoints.servers.backups.lock(this.serverId, id),
         );
         return this._patch(data);
     }
@@ -169,7 +172,7 @@ export class BackupManager extends BaseManager {
      */
     async getDownloadURL(id: string): Promise<string> {
         const data = await this.client.requests.get(
-            endpoints.servers.backups.download(this.serverId, id)
+            endpoints.servers.backups.download(this.serverId, id),
         );
         return data.attributes.url;
     }
@@ -186,9 +189,10 @@ export class BackupManager extends BaseManager {
      * ```
      */
     async download(id: string, dest: string): Promise<void> {
-        if (existsSync(dest)) throw new ValidationError(
-            'A file or directory exists at this path.'
-        );
+        if (existsSync(dest))
+            throw new ValidationError(
+                'A file or directory exists at this path.',
+            );
 
         const url = await this.getDownloadURL(id);
         const data = await this.client.requests.raw('GET', url);
@@ -206,7 +210,7 @@ export class BackupManager extends BaseManager {
      */
     async restore(id: string): Promise<void> {
         await this.client.requests.post(
-            endpoints.servers.backups.restore(this.serverId, id)
+            endpoints.servers.backups.restore(this.serverId, id),
         );
     }
 
@@ -221,7 +225,7 @@ export class BackupManager extends BaseManager {
      */
     async delete(id: string): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.backups.get(this.serverId, id)
+            endpoints.servers.backups.get(this.serverId, id),
         );
         this.cache.delete(id);
     }

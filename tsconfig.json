@@ -1,18 +1,18 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "outDir": "./dist",
-    "lib": ["ES2021"],
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "CommonJS",
+        "outDir": "./dist",
+        "lib": ["ES2021"],
 
-    "declaration": true,
-    "noImplicitAny": true,
-    "removeComments": false,
-    "strictNullChecks": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "Node",
-    "preserveConstEnums": true,
-    "useDefineForClassFields": false
-  },
-  "include": ["src/**.ts"]
+        "declaration": true,
+        "noImplicitAny": true,
+        "removeComments": false,
+        "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "moduleResolution": "Node",
+        "preserveConstEnums": true,
+        "useDefineForClassFields": false
+    },
+    "include": ["src/**.ts"]
 }

@@ -80,16 +80,20 @@ export class Node {
     public _patch(data: any): void {
         if ('public' in data) this.public = data.public;
         if ('name' in data) this.name = data.name;
-        if ('description' in data) this.description = data.description || undefined;
+        if ('description' in data)
+            this.description = data.description || undefined;
         if ('location_id' in data) this.locationId = data.location_id;
         if ('fqdn' in data) this.fqdn = data.fqdn;
         if ('scheme' in data) this.scheme = data.scheme;
         if ('behind_proxy' in data) this.behindProxy = data.behind_proxy;
-        if ('maintenance_mode' in data) this.maintenance = data.maintenance_mode;
+        if ('maintenance_mode' in data)
+            this.maintenance = data.maintenance_mode;
         if ('memory' in data) this.memory = data.memory;
-        if ('memory_overallocate' in data) this.overallocatedMemory = data.memory_overallocate;
+        if ('memory_overallocate' in data)
+            this.overallocatedMemory = data.memory_overallocate;
         if ('disk' in data) this.disk = data.disk;
-        if ('disk_overallocate' in data) this.overallocatedDisk = data.disk_overallocate;
+        if ('disk_overallocate' in data)
+            this.overallocatedDisk = data.disk_overallocate;
         if ('upload_size' in data) this.uploadSize = data.upload_size;
         if (!this.daemon) this.daemon = {} as DaemonData;
         if ('daemon_listen' in data) this.daemon.listening = data.daemon_listen;
@@ -132,12 +136,12 @@ export class Node {
      */
     toJSON(): object {
         return caseConv.toSnakeCase(this, {
-            ignore:['client', 'location', 'servers'],
-            map:{
+            ignore: ['client', 'location', 'servers'],
+            map: {
                 maintainance: 'maintenance_mode',
                 overallocatedMemory: 'memory_overallocate',
-                overallocatedDisk: 'disk_overallocate'
-            }
+                overallocatedDisk: 'disk_overallocate',
+            },
         });
     }
 

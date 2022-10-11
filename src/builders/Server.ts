@@ -17,15 +17,15 @@ export class ServerBuilder extends Builder {
     private oomDisabled?: boolean;
     private limits: Limits;
     private featureLimits: FeatureLimits;
-    private allocation?:{
+    private allocation?: {
         default: number;
         additional?: number[];
-    }
-    private deploy?:{
+    };
+    private deploy?: {
         locations: number[];
         dedicatedIp: boolean;
         portRange: string[];
-    }
+    };
     private startOnCompletion?: boolean;
 
     constructor() {
@@ -38,18 +38,18 @@ export class ServerBuilder extends Builder {
             disk: 512,
             io: 500,
             cpu: 100,
-            threads: null
+            threads: null,
         };
         this.featureLimits = {
             allocations: 1,
             databases: 1,
-            backups: 1
+            backups: 1,
         };
         this.allocation = { default: 0 };
         this.deploy = {
             locations: [],
             dedicatedIp: false,
-            portRange: []
+            portRange: [],
         };
     }
 
@@ -125,30 +125,33 @@ export class ServerBuilder extends Builder {
         return this;
     }
 
-    setAllocation(options:{ default?: number; additional?: number[] }): this {
+    setAllocation(options: { default?: number; additional?: number[] }): this {
         if (options.default) this.allocation!.default = options.default;
         if (options.additional?.length)
-            this.allocation!.additional =
-                (this.allocation!.additional || []).concat(options.additional);
+            this.allocation!.additional = (
+                this.allocation!.additional || []
+            ).concat(options.additional);
 
         return this;
     }
 
-    setDeployment(options:{
+    setDeployment(options: {
         locations?: number[];
         dedicatedIp?: boolean;
-        portRange?: string[]
+        portRange?: string[];
     }): this {
         if (options.locations?.length)
-            this.deploy!.locations =
-                (this.deploy!.locations || []).concat(options.locations);
+            this.deploy!.locations = (this.deploy!.locations || []).concat(
+                options.locations,
+            );
 
         if (options.dedicatedIp != undefined)
             this.deploy!.dedicatedIp = options.dedicatedIp;
 
         if (options.portRange?.length)
-            this.deploy!.portRange =
-                (this.deploy!.portRange || []).concat(options.portRange);
+            this.deploy!.portRange = (this.deploy!.portRange || []).concat(
+                options.portRange,
+            );
 
         return this;
     }
@@ -160,18 +163,19 @@ export class ServerBuilder extends Builder {
 
     build(): CreateServerOptions {
         if (!this.name) throw new ValidationError('A server name is required');
-        if (!this.user) throw new ValidationError('A server owner (user) is required');
+        if (!this.user)
+            throw new ValidationError('A server owner (user) is required');
         if (!this.egg) throw new ValidationError('An egg is required');
-        if (!this.dockerImage) throw new ValidationError('A docker image is required');
-        if (!this.startup) throw new ValidationError('A startup command is required');
+        if (!this.dockerImage)
+            throw new ValidationError('A docker image is required');
+        if (!this.startup)
+            throw new ValidationError('A startup command is required');
 
-        if (
-            !this.deploy!.locations.length ||
-            !this.deploy!.portRange.length
-        ) {
-            if (!this.allocation!.default) throw new ValidationError(
-                'A default allocation or deployment options is required'
-            );
+        if (!this.deploy!.locations.length || !this.deploy!.portRange.length) {
+            if (!this.allocation!.default)
+                throw new ValidationError(
+                    'A default allocation or deployment options is required',
+                );
         }
 
         return super.build();

@@ -4,7 +4,7 @@ import {
     Cron,
     ScheduleTask,
     ScheduleTaskAction,
-    CreateScheduleOptions
+    CreateScheduleOptions,
 } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
@@ -46,7 +46,7 @@ export class Schedule {
     constructor(
         public client: PteroClient,
         public serverId: string,
-        data: any
+        data: any,
     ) {
         this.id = data.id;
         this.createdAt = new Date(data.created_at);
@@ -60,24 +60,25 @@ export class Schedule {
         if ('cron' in data) this.cron = caseConv.toCamelCase(data.cron);
         if ('is_active' in data) this.active = data.is_active;
         if ('is_processing' in data) this.processing = data.is_processing;
-        if ('only_when_online' in data) this.onlyWhenOnline = data.only_when_online;
+        if ('only_when_online' in data)
+            this.onlyWhenOnline = data.only_when_online;
         if ('updated_at' in data) this.updatedAt = new Date(data.updated_at);
         if ('last_run_at' in data) this.lastRunAt = new Date(data.last_run_at);
-        if('next_run_at' in data) this.nextRunAt = new Date(data.next_run_at);
+        if ('next_run_at' in data) this.nextRunAt = new Date(data.next_run_at);
         if ('relationships' in data) {
             if ('tasks' in data.relationships)
-                data.relationships.tasks.data.forEach(
-                    (t: any) => this._resolveTask(t)
+                data.relationships.tasks.data.forEach((t: any) =>
+                    this._resolveTask(t),
                 );
         }
     }
 
     _resolveTask(data: any): ScheduleTask {
         const t = caseConv.toCamelCase<ScheduleTask>(data.attributes, {
-            map:{
+            map: {
                 time_offset: 'offset',
-                is_queued: 'queued'
-            }
+                is_queued: 'queued',
+            },
         });
         t.createdAt = new Date(t.createdAt);
         t.updatedAt &&= new Date(t.updatedAt);
@@ -89,7 +90,7 @@ export class Schedule {
     /** Executes the schedule immediately. */
     async execute(): Promise<void> {
         await this.client.requests.post(
-            endpoints.servers.schedules.exec(this.serverId, this.id)
+            endpoints.servers.schedules.exec(this.serverId, this.id),
         );
         this.processing = true;
     }
@@ -101,7 +102,11 @@ export class Schedule {
      * @returns The updated instance.
      */
     async update(options: CreateScheduleOptions): Promise<this> {
-        const data = await this.client.schedules.update(this.serverId, this.id, options);
+        const data = await this.client.schedules.update(
+            this.serverId,
+            this.id,
+            options,
+        );
         this._patch(data.toJSON());
         return this;
     }
@@ -117,11 +122,11 @@ export class Schedule {
         action: ScheduleTaskAction,
         payload: string,
         offset: number,
-        sequenceId?: number
+        sequenceId?: number,
     ): Promise<ScheduleTask> {
         const data = await this.client.requests.post(
             endpoints.servers.schedules.tasks.main(this.serverId, this.id),
-            { action, payload, time_offset: offset, sequence_id: sequenceId }
+            { action, payload, time_offset: offset, sequence_id: sequenceId },
         );
         return this._resolveTask(data);
     }
@@ -134,21 +139,21 @@ export class Schedule {
      */
     async updateTask(
         id: number,
-        options:{
-            action: ScheduleTaskAction,
-            payload: string,
-            offset: number
-        }
+        options: {
+            action: ScheduleTaskAction;
+            payload: string;
+            offset: number;
+        },
     ): Promise<ScheduleTask> {
         if (!Object.keys(options).length)
             throw new Error('Too few options to update schedule task.');
 
-        const payload = caseConv.toSnakeCase(
-            options, { map:{ offset: 'time_offset' }}
-        );
+        const payload = caseConv.toSnakeCase(options, {
+            map: { offset: 'time_offset' },
+        });
         const data = await this.client.requests.post(
             endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
-            payload
+            payload,
         );
         return this._resolveTask(data);
     }
@@ -159,7 +164,7 @@ export class Schedule {
      */
     async deleteTask(id: number): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.schedules.tasks.get(this.serverId, this.id, id)
+            endpoints.servers.schedules.tasks.get(this.serverId, this.id, id),
         );
         this.tasks.delete(id);
     }
@@ -171,13 +176,13 @@ export class Schedule {
      */
     toJSON(): object {
         const o = caseConv.toSnakeCase<any>(this, {
-            ignore:['client', 'cron']
+            ignore: ['client', 'cron'],
         });
         o.cron = caseConv.toSnakeCase(this.cron, {
-            map:{
+            map: {
                 week: 'day_of_week',
-                month: 'day_of_month'
-            }
+                month: 'day_of_month',
+            },
         });
         return o;
     }

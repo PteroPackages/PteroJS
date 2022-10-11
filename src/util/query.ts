@@ -1,9 +1,9 @@
 import { FetchOptions, Include, Sort, FilterArray } from '../common';
 import { ValidationError } from '../structures/Errors';
 export interface AllowedQueryOptions {
-    filters:    readonly string[];
-    includes:   readonly string[];
-    sorts:      readonly string[];
+    filters: readonly string[];
+    includes: readonly string[];
+    sorts: readonly string[];
 }
 
 /**
@@ -14,7 +14,7 @@ export interface AllowedQueryOptions {
  */
 export const buildQuery = (
     args: FilterArray<Include<Sort<FetchOptions>>>,
-    allowed: AllowedQueryOptions
+    allowed: AllowedQueryOptions,
 ): string => {
     const parsed: string[] = [];
 
@@ -28,7 +28,7 @@ export const buildQuery = (
     if (args.filter) {
         if (!allowed.filters?.includes(args.filter[0]))
             throw new ValidationError(
-                `Invalid filter argument '${args.filter[0]}'.`
+                `Invalid filter argument '${args.filter[0]}'.`,
             );
 
         parsed.push(`filter[${args.filter[0]}]=${args.filter[1]}`);
@@ -37,9 +37,7 @@ export const buildQuery = (
     if (args.include) {
         for (const arg of args.include) {
             if (!allowed.includes.includes(arg))
-                throw new ValidationError(
-                    `Invalid include argument '${arg}'.`
-                );
+                throw new ValidationError(`Invalid include argument '${arg}'.`);
         }
         if (args.include?.length) parsed.push(`include=${args.include}`);
     }
@@ -53,4 +51,4 @@ export const buildQuery = (
 
     if (!parsed.length) return '';
     return '?' + parsed.join('&');
-}
+};

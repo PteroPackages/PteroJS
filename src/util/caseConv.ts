@@ -1,14 +1,14 @@
 export interface ConvertOptions {
-    ignore?:    string[];
-    map?:       Record<string, string>;
-    cast?:      Record<string, any>;
+    ignore?: string[];
+    map?: Record<string, string>;
+    cast?: Record<string, any>;
 }
 
 function camelCase(str: string): string {
     let res = '';
     let next = false;
 
-    str.split('').forEach(c => {
+    str.split('').forEach((c) => {
         if (next) {
             next = false;
             res += c.toUpperCase();
@@ -27,7 +27,7 @@ function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
     const parsed: Record<string, any> = {};
 
     if (Array.isArray(obj)) {
-        return <any> obj.map(i => toCamelCase(i));
+        return <any>obj.map((i) => toCamelCase(i));
     }
 
     for (let [k, v] of Object.entries(obj)) {
@@ -43,7 +43,7 @@ function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
             }
         }
         if (Array.isArray(v)) {
-            v = v.map(i => toCamelCase(i));
+            v = v.map((i) => toCamelCase(i));
         } else if (typeof v === 'object' && !!v) {
             v = toCamelCase(v);
         }
@@ -58,7 +58,7 @@ function snakeCase(str: string): string {
     const isUpper = (c: string) =>
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').includes(c);
 
-    str.split('').forEach(c => {
+    str.split('').forEach((c) => {
         if (isUpper(c)) res += '_';
         res += c.toLowerCase();
     });
@@ -71,7 +71,7 @@ function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
     const parsed: Record<string, any> = {};
 
     if (Array.isArray(obj)) {
-        return <any> obj.map(i => toSnakeCase(i));
+        return <any>obj.map((i) => toSnakeCase(i));
     }
 
     for (let [k, v] of Object.entries(obj)) {
@@ -87,7 +87,7 @@ function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
             }
         }
         if (Array.isArray(v)) {
-            v = v.map(i => toSnakeCase(i));
+            v = v.map((i) => toSnakeCase(i));
         } else if (typeof v === 'object' && !!v) {
             v = toSnakeCase(v);
         }
@@ -99,5 +99,5 @@ function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
 
 export default {
     toCamelCase,
-    toSnakeCase
-}
+    toSnakeCase,
+};

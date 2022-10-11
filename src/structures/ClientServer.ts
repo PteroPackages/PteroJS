@@ -34,10 +34,10 @@ export class ClientServer {
     public node: string;
 
     /** An object containing the SFTP details. */
-    public sftpDetails:{
+    public sftpDetails: {
         ip: string;
         port: number;
-    }
+    };
 
     /** An object containing the server limits. */
     public limits: Limits;
@@ -88,13 +88,15 @@ export class ClientServer {
 
     _patch(data: any): void {
         if ('name' in data) this.name = data.name;
-        if ('description' in data) this.description = data.description || undefined;
+        if ('description' in data)
+            this.description = data.description || undefined;
         if ('is_owner' in data) this.isOwner = data.is_owner;
         if ('node' in data) this.node = data.node;
         if ('sftp_details' in data) this.sftpDetails = data.sftp_details;
         if ('limits' in data) this.limits = caseConv.toCamelCase(data.limits);
         if ('feature_limits' in data) this.featureLimits = data.feature_limits;
-        if ('egg_features' in data) this.eggFeatures = data.egg_features || undefined;
+        if ('egg_features' in data)
+            this.eggFeatures = data.egg_features || undefined;
         if ('invocation' in data) this.invocation = data.invocation;
         if ('docker_image' in data) this.dockerImage = data.docker_image;
         if ('status' in data) this.status = data.status || undefined;
@@ -134,7 +136,8 @@ export class ClientServer {
      */
     async sendCommand(command: string): Promise<void> {
         await this.client.requests.post(
-            endpoints.servers.command(this.identifier), { command }
+            endpoints.servers.command(this.identifier),
+            { command },
         );
     }
 
@@ -142,7 +145,9 @@ export class ClientServer {
      * Sets the power state of the server.
      * @param state The power state.
      */
-    async setPowerState(state: 'start' | 'stop' | 'restart' | 'kill'): Promise<void> {
+    async setPowerState(
+        state: 'start' | 'stop' | 'restart' | 'kill',
+    ): Promise<void> {
         await this.client.servers.setPowerState(this.identifier, state);
         this.status = state;
     }
@@ -166,7 +171,9 @@ export class ClientServer {
      */
     async setVariable(key: string, value: string): Promise<EggVariable> {
         return await this.client.servers.setVariable(
-            this.identifier, key, value
+            this.identifier,
+            key,
+            value,
         );
     }
 
@@ -192,11 +199,11 @@ export class ClientServer {
      */
     toJSON(): object {
         return caseConv.toSnakeCase(this, {
-            ignore:['client'],
-            map:{
+            ignore: ['client'],
+            map: {
                 suspended: 'is_suspended',
-                installing: 'is_installing'
-            }
+                installing: 'is_installing',
+            },
         });
     }
 

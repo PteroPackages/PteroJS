@@ -13,7 +13,7 @@ import loader from '../util/config';
  * The base class for the Pterodactyl application API.
  * This operates using a Pterodactyl API key which can be found at <your.domain.name/admin/api>
  * or <your.domain.name/account/api> if you are using a client API key.
- * 
+ *
  * **Warning:** Keep your API key private at all times. Exposing this can lead
  * to your servers, nodes, configurations and more being corrupted and/or deleted.
  */
@@ -44,15 +44,15 @@ export class PteroApp {
     constructor(
         domain: string,
         auth: string,
-        options: Record<string, OptionSpec> = {}
+        options: Record<string, OptionSpec> = {},
     ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new ValidationError(
                 "Domain URL must start with 'http://' or 'https://' and " +
-                'must be bound to a port if using localhost.'
+                    'must be bound to a port if using localhost.',
             );
 
-        if (domain.endsWith("/")) domain = domain.slice(0, -1);
+        if (domain.endsWith('/')) domain = domain.slice(0, -1);
         this.domain = domain;
         this.auth = auth;
         this.options = loader.appConfig({ application: options });

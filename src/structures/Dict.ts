@@ -1,7 +1,7 @@
 export interface DictConstructor {
-    new(): Dict<any, any>;
-    new<K, V>(entries?: readonly [K, V][]): Dict<K, V>;
-    new<K, V>(iterable?: Iterable<readonly [K, V]>): Dict<K, V>;
+    new (): Dict<any, any>;
+    new <K, V>(entries?: readonly [K, V][]): Dict<K, V>;
+    new <K, V>(iterable?: Iterable<readonly [K, V]>): Dict<K, V>;
     readonly [Symbol.iterator]: DictConstructor;
     readonly [Symbol.species]: DictConstructor;
 }
@@ -35,7 +35,8 @@ export class Dict<K, V> extends Map<K, V> {
     }
 
     set(key: K, value: V): this {
-        if (this.isLimited()) throw new Error(`Dict has reached its limit (${this._limit})`);
+        if (this.isLimited())
+            throw new Error(`Dict has reached its limit (${this._limit})`);
         return super.set(key, value);
     }
 
@@ -62,7 +63,7 @@ export class Dict<K, V> extends Map<K, V> {
      * @param keys The keys to check for.
      */
     hasAny(...keys: K[]): boolean {
-        return keys.some(k => super.has(k));
+        return keys.some((k) => super.has(k));
     }
 
     /**
@@ -70,75 +71,91 @@ export class Dict<K, V> extends Map<K, V> {
      * @param keys The keys to check for.
      */
     hasAll(...keys: K[]): boolean {
-        return keys.every(k => super.has(k));
+        return keys.every((k) => super.has(k));
     }
 
     /**
      * Returns the first entry (or entries if otherwise specified) in the dict.
      * @param [amount] The number of entries to return from the start of the dict.
      */
-    first<T extends number | undefined>(amount?: T): T extends undefined ? V : V[] {
+    first<T extends number | undefined>(
+        amount?: T,
+    ): T extends undefined ? V : V[] {
         const v = [...super.values()];
         if (amount === undefined) return v[0] as any;
         const s = v.splice(0, amount);
-        return s.length === 1 ? s[0] : s as any;
+        return s.length === 1 ? s[0] : (s as any);
     }
 
     /**
      * Returns the first key (or keys if otherwise specified) in the dict.
      * @param [amount] The number of keys to return from the start of the dict.
      */
-    firstKey<T extends number | undefined>(amount?: T): T extends undefined ? K : K[] {
+    firstKey<T extends number | undefined>(
+        amount?: T,
+    ): T extends undefined ? K : K[] {
         const k = [...super.keys()];
         if (amount === undefined) return k[0] as any;
         const s = k.splice(0, amount);
-        return s.length === 1 ? s[0] : s as any;
+        return s.length === 1 ? s[0] : (s as any);
     }
 
     /**
      * Returns the last entry (or entries if otherwise specified) in the dict.
      * @param [amount] The number of entries to return from the end of the dict.
      */
-    last<T extends number | undefined>(amount?: T): T extends undefined ? V : V[] {
+    last<T extends number | undefined>(
+        amount?: T,
+    ): T extends undefined ? V : V[] {
         const v = [...super.values()];
-        if (amount === undefined) return v[v.length-1] as any;
+        if (amount === undefined) return v[v.length - 1] as any;
         const s = v.slice(-amount);
-        return s.length === 1 ? s[0] : s as any;
+        return s.length === 1 ? s[0] : (s as any);
     }
 
     /**
      * Returns the last key (or keys if otherwise specified) in the dict.
      * @param [amount] The number of keys to return from the end of the dict.
      */
-    lastKey<T extends number | undefined>(amount?: T): T extends undefined ? K : K[] {
+    lastKey<T extends number | undefined>(
+        amount?: T,
+    ): T extends undefined ? K : K[] {
         const k = [...super.keys()];
-        if (amount === undefined) return k[k.length-1] as any;
+        if (amount === undefined) return k[k.length - 1] as any;
         const s = k.slice(-amount);
-        return s.length === 1 ? s[0] : s as any;
+        return s.length === 1 ? s[0] : (s as any);
     }
 
     /**
      * Returns a random entry (or entries if otherwise specified) in the dict.
      * @param [amount] The number of entries to return from the dict.
      */
-    random<T extends number | undefined>(amount?: T): T extends undefined ? V : V[] {
+    random<T extends number | undefined>(
+        amount?: T,
+    ): T extends undefined ? V : V[] {
         const v = [...super.values()];
-        if (amount === undefined) return v[Math.floor(Math.random() * v.length)] as any;
+        if (amount === undefined)
+            return v[Math.floor(Math.random() * v.length)] as any;
         const s = [];
-        for (let i=0; i<amount; i++) s.push(v[Math.floor(Math.random() * v.length)]);
-        return s.length === 1 ? s[0] : s as any;
+        for (let i = 0; i < amount; i++)
+            s.push(v[Math.floor(Math.random() * v.length)]);
+        return s.length === 1 ? s[0] : (s as any);
     }
 
     /**
      * Returns a random key (or keys if otherwise specified) in the dict.
      * @param [amount] The number of keys to return from the dict.
      */
-    randomKey<T extends number | undefined>(amount?: T): T extends undefined ? K : K[] {
+    randomKey<T extends number | undefined>(
+        amount?: T,
+    ): T extends undefined ? K : K[] {
         const k = [...super.keys()];
-        if (amount === undefined) return k[Math.floor(Math.random() * k.length)] as any;
+        if (amount === undefined)
+            return k[Math.floor(Math.random() * k.length)] as any;
         const s = [];
-        for (let i=0; i<amount; i++) s.push(k[Math.floor(Math.random() * k.length)]);
-        return s.length === 1 ? s[0] : s as any;
+        for (let i = 0; i < amount; i++)
+            s.push(k[Math.floor(Math.random() * k.length)]);
+        return s.length === 1 ? s[0] : (s as any);
     }
 
     /**
@@ -160,7 +177,9 @@ export class Dict<K, V> extends Map<K, V> {
      * @returns The filtered dict.
      */
     filter(fn: (value: V, key: K, dict: this) => boolean): Dict<K, V>;
-    filter<k extends K>(fn: (value: V, key: K, dict: this) => key is k): Dict<K, V> {
+    filter<k extends K>(
+        fn: (value: V, key: K, dict: this) => key is k,
+    ): Dict<K, V> {
         const res = new Dict<K, V>();
         for (const [k, v] of this) if (fn(v, k, this)) res.set(k, v);
         return res;
@@ -172,7 +191,9 @@ export class Dict<K, V> extends Map<K, V> {
      * @param fn The function to apply to the dict.
      */
     find(fn: (value: V, key: K, dict: this) => boolean): V | undefined;
-    find<k extends K>(fn: (value: V, key: K, dict: this) => key is k): V | undefined {
+    find<k extends K>(
+        fn: (value: V, key: K, dict: this) => key is k,
+    ): V | undefined {
         for (const [k, v] of this) if (fn(v, k, this)) return v;
         return undefined;
     }
@@ -199,7 +220,9 @@ export class Dict<K, V> extends Map<K, V> {
     part(fn: (value: V, key: K, dict: this) => boolean): Dict<K, V>[] {
         const pass = new Dict<K, V>();
         const fail = new Dict<K, V>();
-        for (const [k, v] of this) if (fn(v, k, this)) pass.set(k, v); else fail.set(k, v);
+        for (const [k, v] of this)
+            if (fn(v, k, this)) pass.set(k, v);
+            else fail.set(k, v);
         return [pass, fail];
     }
 

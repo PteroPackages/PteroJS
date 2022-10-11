@@ -1,20 +1,20 @@
 export default {
-    users:{
+    users: {
         main: '/users',
         get: (u: number) => `/users/${u}`,
-        ext: (u: string) => `/users/external/${u}`
+        ext: (u: string) => `/users/external/${u}`,
     },
-    nodes:{
+    nodes: {
         main: '/nodes',
         get: (n: number) => `/nodes/${n}`,
         deploy: '/nodes/deployable',
         config: (n: number) => `/nodes/${n}/configuration`,
-        allocations:{
+        allocations: {
             main: (n: number) => `/nodes/${n}/allocations`,
-            get: (n: number, a: number) => `/nodes/${n}/allocations/${a}`
-        }
+            get: (n: number, a: number) => `/nodes/${n}/allocations/${a}`,
+        },
     },
-    servers:{
+    servers: {
         main: '/servers',
         get: (s: number) => `/servers/${s}`,
         ext: (s: string) => `/servers/external/${s}`,
@@ -24,22 +24,23 @@ export default {
         suspend: (s: number) => `/servers/${s}/suspend`,
         unsuspend: (s: number) => `/servers/${s}/unsuspend`,
         reinstall: (s: number) => `/servers/${s}/reinstall`,
-        databases:{
+        databases: {
             main: (s: number) => `/servers/${s}/databases`,
             get: (s: number, id: number) => `/servers/${s}/databases/${id}`,
-            reset: (s: number, id: number) => `/servers/${s}/databases/${id}/reset-password`
-        }
+            reset: (s: number, id: number) =>
+                `/servers/${s}/databases/${id}/reset-password`,
+        },
     },
-    locations:{
+    locations: {
         main: '/locations',
-        get: (l: number) => `/locations/${l}`
+        get: (l: number) => `/locations/${l}`,
     },
-    nests:{
+    nests: {
         main: '/nests',
         get: (n: number) => `/nests/${n}`,
-        eggs:{
+        eggs: {
             main: (n: number) => `/nests/${n}/eggs`,
-            get: (n: number, e: number) => `/nests/${n}/eggs/${e}`
-        }
-    }
-}
+            get: (n: number, e: number) => `/nests/${n}/eggs/${e}`,
+        },
+    },
+};

@@ -18,7 +18,9 @@ describe('Application: Nodes', () => {
     it('fetches a node', () => {
         expect(app.nodes.fetch(0)).rejects.toThrowError(PteroAPIError);
         expect(app.nodes.fetch(2)).resolves.toBeInstanceOf(Node);
-        expect(app.nodes.query('01', { filter: 'name' })).resolves.toBeInstanceOf(Dict);
+        expect(
+            app.nodes.query('01', { filter: 'name' }),
+        ).resolves.toBeInstanceOf(Dict);
     });
 
     it('fetches a node configuration', () => {

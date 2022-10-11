@@ -51,7 +51,7 @@ export class NetworkManager {
      */
     async fetch(): Promise<Dict<number, NetworkAllocation>> {
         const data = await this.client.requests.get(
-            endpoints.servers.network.main(this.serverId)
+            endpoints.servers.network.main(this.serverId),
         );
         return this._patch(data);
     }
@@ -72,7 +72,7 @@ export class NetworkManager {
     async setNote(id: number, notes: string): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
             endpoints.servers.network.get(this.serverId, id),
-            { notes }
+            { notes },
         );
         return this._patch(data);
     }
@@ -91,7 +91,7 @@ export class NetworkManager {
      */
     async setPrimary(id: number): Promise<NetworkAllocation> {
         const data = await this.client.requests.post(
-            endpoints.servers.network.primary(this.serverId, id)
+            endpoints.servers.network.primary(this.serverId, id),
         );
         return this._patch(data);
     }
@@ -107,7 +107,7 @@ export class NetworkManager {
      */
     async unassign(id: number): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.network.get(this.serverId, id)
+            endpoints.servers.network.get(this.serverId, id),
         );
     }
 }

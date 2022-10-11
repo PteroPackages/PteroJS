@@ -4,18 +4,13 @@ import type { BaseManager } from '../structures/BaseManager';
 import {
     APIErrorResponse,
     PteroAPIError,
-    RequestError
+    RequestError,
 } from '../structures/Errors';
 import { FetchOptions, RequestEvents } from '../common';
 import { buildQuery } from '../util/query';
 import { version } from '../../package.json';
 
-export type Method =
-    | 'GET'
-    | 'POST'
-    | 'PATCH'
-    | 'PUT'
-    | 'DELETE';
+export type Method = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
 export class RequestManager extends EventEmitter {
     public instance: Axios;
@@ -25,11 +20,11 @@ export class RequestManager extends EventEmitter {
     constructor(
         private _type: string,
         public _domain: string,
-        public _auth: string
+        public _auth: string,
     ) {
         super();
         this.instance = axios.create({
-            baseURL: `${this._domain}/api/${this._type.toLowerCase()}`
+            baseURL: `${this._domain}/api/${this._type.toLowerCase()}`,
         });
         this._ping = -1;
         this._start = 0;
@@ -44,7 +39,7 @@ export class RequestManager extends EventEmitter {
 
     on<E extends keyof RequestEvents>(
         event: E,
-        listener: (...args: RequestEvents[E]) => void
+        listener: (...args: RequestEvents[E]) => void,
     ): this {
         super.on(event, listener);
         return this;
@@ -52,7 +47,7 @@ export class RequestManager extends EventEmitter {
 
     once<E extends keyof RequestEvents>(
         event: E,
-        listener: (...args: RequestEvents[E]) => void
+        listener: (...args: RequestEvents[E]) => void,
     ): this {
         super.once(event, listener);
         return this;
@@ -60,7 +55,7 @@ export class RequestManager extends EventEmitter {
 
     off<E extends keyof RequestEvents>(
         event: E,
-        listener: (...args: RequestEvents[E]) => void
+        listener: (...args: RequestEvents[E]) => void,
     ): this {
         super.off(event, listener);
         return this;
@@ -70,15 +65,13 @@ export class RequestManager extends EventEmitter {
         return {
             'User-Agent': `PteroJS ${this._type} v${version}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json, text/plain',
-            'Authorization': `Bearer ${this._auth}`
-        }
+            Accept: 'application/json, text/plain',
+            Authorization: `Bearer ${this._auth}`,
+        };
     }
 
     private debug(...data: string[]): void {
-        data
-            .map(d => `[HTTP] ${d}`)
-            .forEach(d => super.emit('debug', d));
+        data.map((d) => `[HTTP] ${d}`).forEach((d) => super.emit('debug', d));
     }
 
     async _make(method: Method, path: string, body?: any) {
@@ -94,17 +87,18 @@ export class RequestManager extends EventEmitter {
 
         this.debug(
             `requesting: ${method} ${path}`,
-            `payload: ${body ? headers['Content-Type'] : 'none'}`
+            `payload: ${body ? headers['Content-Type'] : 'none'}`,
         );
         this._start = Date.now();
-        return await this.instance.request({
-            method,
-            url: path,
-            headers,
-            data: body
-        })
-            .then(r => this.handleResponse(r))
-            .catch(e => this.handleError(e));
+        return await this.instance
+            .request({
+                method,
+                url: path,
+                headers,
+                data: body,
+            })
+            .then((r) => this.handleResponse(r))
+            .catch((e) => this.handleError(e));
     }
 
     async raw(method: Method, url: string, body?: any) {
@@ -120,24 +114,25 @@ export class RequestManager extends EventEmitter {
 
         this.debug(
             `requesting: ${method} ${url}`,
-            `payload: ${body ? headers['Content-Type'] : 'none'}`
+            `payload: ${body ? headers['Content-Type'] : 'none'}`,
         );
         this._start = Date.now();
-        return await axios.request({
-            url,
-            method,
-            headers,
-            data: body
-        })
-            .then(r => this.handleResponse(r))
-            .catch(e => this.handleError(e));
+        return await axios
+            .request({
+                url,
+                method,
+                headers,
+                data: body,
+            })
+            .then((r) => this.handleResponse(r))
+            .catch((e) => this.handleError(e));
     }
 
     private handleResponse(res: AxiosResponse): any {
         this._ping = Date.now() - this._start;
         this.debug(
             `received status: ${res.status} (${this._ping}ms)`,
-            `body: ${res.data ? res.headers['content-type'] : 'none'}`
+            `body: ${res.data ? res.headers['content-type'] : 'none'}`,
         );
 
         if ([202, 204].includes(res.status)) return;
@@ -154,25 +149,26 @@ export class RequestManager extends EventEmitter {
         this._ping = Date.now() - this._start;
         this.debug(
             `received error: ${err.name} (${this._ping}ms)`,
-            `message: ${err.message}`
+            `message: ${err.message}`,
         );
 
-        if (err.response === undefined) throw new RequestError(
-            `An unknown request error occurred: ${err.message}`
-        );
+        if (err.response === undefined)
+            throw new RequestError(
+                `An unknown request error occurred: ${err.message}`,
+            );
 
-        if (err.response!.status >= 500) throw new RequestError(
-            `Received an unexpected response from the API `+
-            `(code ${err.response.status})`
-        );
+        if (err.response!.status >= 500)
+            throw new RequestError(
+                `Received an unexpected response from the API ` +
+                    `(code ${err.response.status})`,
+            );
 
         throw new PteroAPIError(err.response.data as APIErrorResponse);
     }
 
     get(path: string, params?: FetchOptions, body?: any, cls?: BaseManager) {
-        const query = params && cls
-            ? buildQuery(params, cls.getQueryOptions())
-            : '';
+        const query =
+            params && cls ? buildQuery(params, cls.getQueryOptions()) : '';
 
         return this._make('GET', path + query, body);
     }
