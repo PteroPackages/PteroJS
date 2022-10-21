@@ -12,7 +12,7 @@ export abstract class BaseManager {
         return {
             filters: this.FILTERS,
             sorts: this.SORTS,
-            includes: this.INCLUDES
-        }
+            includes: this.INCLUDES,
+        };
     }
 }

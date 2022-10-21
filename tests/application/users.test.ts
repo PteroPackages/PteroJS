@@ -25,7 +25,7 @@ describe('Application: Users', () => {
             email: 'jest@example.com',
             firstname: 'jest',
             lastname: 'jest',
-            externalId: 'jester'
+            externalId: 'jester',
         });
 
         expect(user).toBeInstanceOf(User);
@@ -43,7 +43,9 @@ describe('Application: Users', () => {
         expect(app.users.fetch(0)).rejects.toThrowError(PteroAPIError);
         expect(app.users.fetch(id)).resolves.toBeInstanceOf(User);
         expect(app.users.fetch('jester')).resolves.toBeInstanceOf(User);
-        expect(app.users.query('jest', { filter: 'username' })).resolves.toBeInstanceOf(Dict);
+        expect(
+            app.users.query('jest', { filter: 'username' }),
+        ).resolves.toBeInstanceOf(Dict);
 
         let user = await app.users.fetch(id);
 
@@ -54,10 +56,12 @@ describe('Application: Users', () => {
     it('updates a user', async () => {
         let user = await app.users.fetch('jester');
 
-        expect(app.users.update(user.id, {
-            externalId: null,
-            isAdmin: true
-        })).resolves.toBeInstanceOf(User);
+        expect(
+            app.users.update(user.id, {
+                externalId: null,
+                isAdmin: true,
+            }),
+        ).resolves.toBeInstanceOf(User);
 
         user = await app.users.fetch(id, { force: true });
 

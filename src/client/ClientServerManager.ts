@@ -8,7 +8,7 @@ import {
     ClientMeta,
     ClientResources,
     EggVariable,
-    StartupData
+    StartupData,
 } from '../common/client';
 import type { WebSocketManager } from './ws/WebSocketManager';
 import caseConv from '../util/caseConv';
@@ -25,7 +25,9 @@ export class ClientServerManager extends BaseManager {
     public meta: ClientMeta | undefined;
 
     /** Allowed filter arguments for servers (none). */
-    get FILTERS() { return Object.freeze([]); }
+    get FILTERS() {
+        return Object.freeze([]);
+    }
 
     /**
      * Allowed include arguments for servers:
@@ -37,7 +39,9 @@ export class ClientServerManager extends BaseManager {
     }
 
     /** Allowed sort arguments for servers (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroClient) {
         super();
@@ -80,7 +84,7 @@ export class ClientServerManager extends BaseManager {
     /**
      * Fetches a server from the API by its identifier. This will check the cache first unless the
      * force option is specified.
-     * 
+     *
      * @param id The identifier of the server.
      * @param [options] Additional fetch options.
      * @returns The fetched server.
@@ -91,11 +95,14 @@ export class ClientServerManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(id: string, options?: Include<FetchOptions>): Promise<ClientServer>;
+    async fetch(
+        id: string,
+        options?: Include<FetchOptions>,
+    ): Promise<ClientServer>;
     /**
      * Fetches a list of servers from the API with the given options (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.
-     * 
+     *
      * @param [options] Additional fetch options.
      * @returns The fetched servers.
      * @example
@@ -105,15 +112,16 @@ export class ClientServerManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ClientServer>>;
+    async fetch(
+        options?: Include<FetchOptions>,
+    ): Promise<Dict<number, ClientServer>>;
     async fetch(
         op?: string | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        ops: Include<FetchOptions> = {},
     ): Promise<any> {
         let path = endpoints.servers.main;
         if (typeof op === 'string') {
-            if (!ops.force && this.cache.has(op))
-                return this.cache.get(op);
+            if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
             path = endpoints.servers.get(op);
         } else {
@@ -137,7 +145,7 @@ export class ClientServerManager extends BaseManager {
      */
     async fetchResources(id: string): Promise<ClientResources> {
         const data: any = await this.client.requests.get(
-            endpoints.servers.resources(id)
+            endpoints.servers.resources(id),
         );
         return caseConv.toCamelCase(data.attributes);
     }
@@ -145,7 +153,7 @@ export class ClientServerManager extends BaseManager {
     /**
      * Fetches the server startup and egg variables data.
      * @see {@link StartupData}.
-     * 
+     *
      * @param id The identifier of the server.
      * @returns The startup and egg variable data.
      * @example
@@ -157,12 +165,12 @@ export class ClientServerManager extends BaseManager {
      */
     async fetchStartup(id: string): Promise<StartupData> {
         const data = await this.client.requests.get(
-            endpoints.servers.startup.get(id)
+            endpoints.servers.startup.get(id),
         );
 
         const parsed = caseConv.toCamelCase<StartupData>(data.meta);
-        parsed.variables = data.data.map(
-            (v: any) => caseConv.toCamelCase(v.attributes)
+        parsed.variables = data.data.map((v: any) =>
+            caseConv.toCamelCase(v.attributes),
         );
         return parsed;
     }
@@ -179,9 +187,9 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async sendCommand(id: string, command: string): Promise<void> {
-        await this.client.requests.post(
-            endpoints.servers.command(id), { command }
-        );
+        await this.client.requests.post(endpoints.servers.command(id), {
+            command,
+        });
     }
 
     /**
@@ -196,16 +204,16 @@ export class ClientServerManager extends BaseManager {
      */
     async setPowerState(
         id: string,
-        state: 'start' | 'stop' | 'restart' | 'kill'
+        state: 'start' | 'stop' | 'restart' | 'kill',
     ): Promise<void> {
         if (!['start', 'stop', 'restart', 'kill'].includes(state))
             throw new ValidationError(
-                'Invalid power state, must be: start, stop, restart, or kill.'
+                'Invalid power state, must be: start, stop, restart, or kill.',
             );
 
-        await this.client.requests.post(
-            endpoints.servers.power(id), { signal: state }
-        );
+        await this.client.requests.post(endpoints.servers.power(id), {
+            signal: state,
+        });
     }
 
     /**
@@ -222,9 +230,9 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async setDockerImage(id: string, image: string): Promise<void> {
-        await this.client.requests.put(
-            endpoints.servers.settings.image(id), { docker_image: image }
-        );
+        await this.client.requests.put(endpoints.servers.settings.image(id), {
+            docker_image: image,
+        });
     }
 
     /**
@@ -245,18 +253,16 @@ export class ClientServerManager extends BaseManager {
     async setVariable(
         id: string,
         key: string,
-        value: string
+        value: string,
     ): Promise<EggVariable> {
-        if (typeof key !== 'string') throw new ValidationError(
-            'variable key', 'string', typeof key
-        );
-        if (typeof value !== 'string') throw new ValidationError(
-            'variable value', 'string', typeof value
-        );
+        if (typeof key !== 'string')
+            throw new ValidationError('variable key', 'string', typeof key);
+        if (typeof value !== 'string')
+            throw new ValidationError('variable value', 'string', typeof value);
 
         const data = await this.client.requests.put(
             endpoints.servers.startup.var(id),
-            { key, value }
+            { key, value },
         );
         return caseConv.toCamelCase(data.attributes);
     }
@@ -272,9 +278,9 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async rename(id: string, name: string): Promise<void> {
-        await this.client.requests.post(
-            endpoints.servers.settings.rename(id), { name }
-        );
+        await this.client.requests.post(endpoints.servers.settings.rename(id), {
+            name,
+        });
         if (this.cache.has(id)) {
             const s = this.cache.get(id)!;
             s.name = name;
@@ -292,7 +298,7 @@ export class ClientServerManager extends BaseManager {
      */
     async reinstall(id: string): Promise<void> {
         await this.client.requests.post(
-            endpoints.servers.settings.reinstall(id)
+            endpoints.servers.settings.reinstall(id),
         );
     }
 }

@@ -14,27 +14,23 @@ export type Include<T> = { include?: string[] } & T;
 export type Sort<T> = { sort?: string } & T;
 
 /** The types object `T` can be resolved from, including itself. */
-export type Resolvable<T> =
-    | string
-    | number
-    | Record<string, any>
-    | T;
+export type Resolvable<T> = string | number | Record<string, any> | T;
 
 /** Represents the daemon information on a node. */
 export interface DaemonData {
-    listening:  number;
-    sftp:       number;
-    base:       string;
+    listening: number;
+    sftp: number;
+    base: string;
 }
 
 /** Represents the feature limits of a server. */
 export interface FeatureLimits {
     /** The total number of allocations for the server. */
-    allocations:    number;
+    allocations: number;
     /** The total number of backups allowed on the server. */
-    backups:        number;
+    backups: number;
     /** The total number of databases on the server. */
-    databases:      number;
+    databases: number;
 }
 
 /** General fetch options for requests. */
@@ -45,51 +41,51 @@ export interface FetchOptions {
      * check the specific method docs for more information.
      * @default false
      */
-    force?:     boolean;
+    force?: boolean;
     /**
      * The page number to get results from.
      * @default 1
      */
-    page?:      number;
+    page?: number;
     /**
      * The number of results to return per-page.
      * @default 50
      */
-    perPage?:   number;
+    perPage?: number;
 }
 
 /** Represents the configuration for the pterojs.json file. */
 export interface FileConfig {
-    application?:   Record<string, OptionSpec>;
-    client?:        Record<string, OptionSpec>;
+    application?: Record<string, OptionSpec>;
+    client?: Record<string, OptionSpec>;
 }
 
 /** Represents the limits of a server. */
 export interface Limits {
     /** The amount of memory allocated to the server. */
-    memory:     number;
+    memory: number;
     /** The amount of swap space allocated to the server. */
-    swap:       number;
+    swap: number;
     /** The amount of disk allocated to the server. */
-    disk:       number;
+    disk: number;
     /** The amount of block IO bandwidth allowed for the server. */
-    io:         number;
+    io: number;
     /**
      * The number of threads (or specific threads) the server can use.
      * `null` means unlimited.
      */
-    threads:    string | null;
+    threads: string | null;
     /** The amount of CPU allocated to the server. */
-    cpu:        number;
+    cpu: number;
 }
 
 /** Represents a location object. */
 export interface NodeLocation {
-    id:         number;
-    long:       string;
-    short:      string;
-    createdAt:  Date;
-    updatedAt:  Date | null;
+    id: number;
+    long: string;
+    short: string;
+    createdAt: Date;
+    updatedAt: Date | null;
 }
 
 /**
@@ -107,14 +103,14 @@ export interface OptionSpec {
      * Whether to call the option manager's `fetch()` method
      * (used by the main class' `connect()` method).
      */
-    fetch?:  boolean;
+    fetch?: boolean;
     /** Whether to cache the option manager's values. */
-    cache?:  boolean;
+    cache?: boolean;
     /**
      * The maximum amount of entries to allow for the option manager's cache.
      * @experimental
      */
-    max?:    number;
+    max?: number;
 }
 
 /**
@@ -122,16 +118,16 @@ export interface OptionSpec {
  * paginated responses.
  */
 export interface PaginationMeta {
-    current:    number;
-    total:      number;
-    count:      number;
-    perPage:    number;
+    current: number;
+    total: number;
+    count: number;
+    perPage: number;
     totalPages: number;
-    links?:     string[];
+    links?: string[];
 }
 
 export interface RequestEvents {
-    debug:          [message: string];
-    preRequest:     [data: any];
-    postRequest:    [data: any];
+    debug: [message: string];
+    preRequest: [data: any];
+    postRequest: [data: any];
 }

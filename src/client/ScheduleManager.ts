@@ -40,7 +40,7 @@ export class ScheduleManager {
     /**
      * Fetches a schedule from the API by its ID. This will check the cache first unless the force
      * option is specified.
-     * 
+     *
      * @param server The identifier of the server.
      * @param id The ID of the schedule.
      * @param [options] Additional fetch options.
@@ -52,10 +52,14 @@ export class ScheduleManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(server: string, id: number, options?: FetchOptions): Promise<Schedule>;
+    async fetch(
+        server: string,
+        id: number,
+        options?: FetchOptions,
+    ): Promise<Schedule>;
     /**
      * Fetches a list of schedules from the API with the given options (default is undefined).
-     * 
+     *
      * @param server The identifier of the server.
      * @param [options] Additional fetch options.
      * @returns The fetched schedule.
@@ -66,11 +70,14 @@ export class ScheduleManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(server: string, options?: FetchOptions): Promise<Dict<number, Schedule>>;
+    async fetch(
+        server: string,
+        options?: FetchOptions,
+    ): Promise<Dict<number, Schedule>>;
     async fetch(
         server: string,
         op1?: number | FetchOptions,
-        op2: FetchOptions = {}
+        op2: FetchOptions = {},
     ): Promise<any> {
         let path = endpoints.servers.schedules.main(server);
         if (typeof op1 === 'number') {
@@ -89,7 +96,7 @@ export class ScheduleManager {
     /**
      * Creates a schedule for a specified server.
      * @see {@link CreateScheduleOptions}.
-     * 
+     *
      * @param server The identifier of the server.
      * @param options Create schedule options.
      * @returns The new schedule.
@@ -109,17 +116,21 @@ export class ScheduleManager {
      *  .catch(console.error);
      * ```
      */
-    async create(server: string, options: CreateScheduleOptions): Promise<Schedule> {
+    async create(
+        server: string,
+        options: CreateScheduleOptions,
+    ): Promise<Schedule> {
         options.dayOfWeek ||= '*';
         options.dayOfMonth ||= '*';
         options.onlyWhenOnline ??= false;
 
         const payload = caseConv.toSnakeCase(options, {
-            map:{ active: 'is_active' }
+            map: { active: 'is_active' },
         });
 
         const data = await this.client.requests.post(
-            endpoints.servers.schedules.main(server), payload
+            endpoints.servers.schedules.main(server),
+            payload,
         );
         return this._patch(server, data);
     }
@@ -127,7 +138,7 @@ export class ScheduleManager {
     /**
      * Updates a schedule on the specified server.
      * @see {@link CreateScheduleOptions}.
-     * 
+     *
      * @param server The identifier of the server.
      * @param id The ID of the schedule.
      * @param options Update schedule options.
@@ -142,7 +153,7 @@ export class ScheduleManager {
     async update(
         server: string,
         id: number,
-        options: Partial<CreateScheduleOptions>
+        options: Partial<CreateScheduleOptions>,
     ): Promise<Schedule> {
         if (!Object.keys(options).length)
             throw new ValidationError('Too few options to update schedule.');
@@ -158,7 +169,7 @@ export class ScheduleManager {
 
         const data = await this.client.requests.patch(
             endpoints.servers.schedules.get(server, id),
-            caseConv.toSnakeCase(options)
+            caseConv.toSnakeCase(options),
         );
         return this._patch(server, data);
     }
@@ -174,7 +185,7 @@ export class ScheduleManager {
      */
     async delete(server: string, id: number): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.schedules.get(server, id)
+            endpoints.servers.schedules.get(server, id),
         );
         this.cache.get(server)?.delete(id);
     }

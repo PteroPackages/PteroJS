@@ -1,14 +1,12 @@
 import type { Node } from './Node';
 import type { User } from './User';
 import type { PteroApp } from '../application';
-import {
-    ApplicationDatabaseManager
-} from '../application/ApplicationDatabaseManager';
+import { ApplicationDatabaseManager } from '../application/ApplicationDatabaseManager';
 import { Limits, FeatureLimits } from '../common';
 import {
     UpdateBuildOptions,
     UpdateDetailsOptions,
-    UpdateStartupOptions
+    UpdateStartupOptions,
 } from '../common/app';
 import caseConv from '../util/caseConv';
 
@@ -77,12 +75,12 @@ export class ApplicationServer {
     /** The ID of the egg the server uses. */
     public egg: number;
 
-    public container:{
+    public container: {
         startupCommand: string;
-        image:          string;
-        installed:      boolean;
-        environment:    Record<string, string>;
-    }
+        image: string;
+        installed: boolean;
+        environment: Record<string, string>;
+    };
 
     constructor(client: PteroApp, data: any) {
         this.client = client;
@@ -99,7 +97,8 @@ export class ApplicationServer {
     _patch(data: any): void {
         if ('external_id' in data) this.externalId = data.external_id;
         if ('name' in data) this.name = data.name;
-        if ('description' in data) this.description = data.description || undefined;
+        if ('description' in data)
+            this.description = data.description || undefined;
         if ('status' in data) this.status = data.status;
         if ('suspended' in data) this.suspended = data.suspended;
         if ('limits' in data) this.limits = caseConv.toCamelCase(data.limits);
@@ -110,22 +109,23 @@ export class ApplicationServer {
         if ('nest' in data) this.nest = data.nest;
         if ('egg' in data) this.egg = data.egg;
         if ('container' in data) {
-            this.container = caseConv.toCamelCase(
-                data.container,
-                { ignore:['environment'] }
-            );
+            this.container = caseConv.toCamelCase(data.container, {
+                ignore: ['environment'],
+            });
             this.container.environment = data.container.environment;
             this.container.installed = !!this.container.installed;
         }
 
         if ('relationships' in data) {
-            this.owner = 'user' in data.relationships
-                ? this.client.users.resolve(data)
-                : undefined;
+            this.owner =
+                'user' in data.relationships
+                    ? this.client.users.resolve(data)
+                    : undefined;
 
-            this.node = 'node' in data.relationships
-                ? this.client.nodes.resolve(data)
-                : undefined;
+            this.node =
+                'node' in data.relationships
+                    ? this.client.nodes.resolve(data)
+                    : undefined;
         }
     }
 
@@ -152,7 +152,9 @@ export class ApplicationServer {
      */
     async fetchOwner(): Promise<User> {
         if (this.owner) return this.owner;
-        const user = await this.client.users.fetch(this.ownerId, { force: true });
+        const user = await this.client.users.fetch(this.ownerId, {
+            force: true,
+        });
         this.owner = user;
         return user;
     }
@@ -217,8 +219,8 @@ export class ApplicationServer {
      */
     toJSON(): object {
         return caseConv.toSnakeCase(this, {
-            ignore:['client', 'user', 'node'],
-            map:{ ownerId: 'user', nodeId: 'node' }
+            ignore: ['client', 'user', 'node'],
+            map: { ownerId: 'user', nodeId: 'node' },
         });
     }
 

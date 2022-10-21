@@ -11,7 +11,9 @@ export class NestEggsManager extends BaseManager {
     public cache: Dict<number, Egg>;
 
     /** Allowed filter arguments for eggs (none). */
-    get FILTERS() { return Object.freeze([]); }
+    get FILTERS() {
+        return Object.freeze([]);
+    }
 
     /**
      * Allowed include arguments for eggs:
@@ -23,13 +25,18 @@ export class NestEggsManager extends BaseManager {
      */
     get INCLUDES() {
         return Object.freeze([
-            'nest', 'servers', 'config',
-            'script', 'variables'
+            'nest',
+            'servers',
+            'config',
+            'script',
+            'variables',
         ]);
     }
 
     /** Allowed sort arguments for eggs (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroApp) {
         super();
@@ -84,7 +91,11 @@ export class NestEggsManager extends BaseManager {
      * app.nests.eggs.fetch(1, 16).then(console.log).catch(console.error);
      * ```
      */
-    async fetch(nest: number, id: number, options?: Include<FetchOptions>): Promise<Egg>;
+    async fetch(
+        nest: number,
+        id: number,
+        options?: Include<FetchOptions>,
+    ): Promise<Egg>;
     /**
      * Fetches a list of eggs from the API by its ID. This will check the cache first unless the
      * force option is specified.
@@ -99,17 +110,19 @@ export class NestEggsManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(nest: number, options?: Include<FetchOptions>): Promise<Dict<number, Egg>>;
+    async fetch(
+        nest: number,
+        options?: Include<FetchOptions>,
+    ): Promise<Dict<number, Egg>>;
     async fetch(
         nest: number,
         op1?: number | Include<FetchOptions>,
-        op2: Include<FetchOptions> = {}
+        op2: Include<FetchOptions> = {},
     ): Promise<any> {
         let path = endpoints.nests.eggs.main(nest);
 
         if (typeof op1 === 'number') {
-            if (!op2.force && this.cache.has(op1))
-                return this.cache.get(op1);
+            if (!op2.force && this.cache.has(op1)) return this.cache.get(op1);
 
             path = endpoints.nests.eggs.get(nest, op1);
         } else {

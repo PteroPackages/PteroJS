@@ -6,7 +6,7 @@ import {
     ShardStatus,
     WebSocketAuth,
     WebSocketEvents,
-    WebSocketPayload
+    WebSocketPayload,
 } from '../../common/client';
 import endpoints from '../endpoints';
 import handle from './packetHandler';
@@ -42,7 +42,7 @@ export class Shard extends EventEmitter {
 
     on<E extends keyof WebSocketEvents>(
         event: E,
-        listener: (...args: WebSocketEvents[E]) => void
+        listener: (...args: WebSocketEvents[E]) => void,
     ): this {
         super.on(event, listener);
         return this;
@@ -50,7 +50,7 @@ export class Shard extends EventEmitter {
 
     once<E extends keyof WebSocketEvents>(
         event: E,
-        listener: (...args: WebSocketEvents[E]) => void
+        listener: (...args: WebSocketEvents[E]) => void,
     ): this {
         super.once(event, listener);
         return this;
@@ -58,14 +58,14 @@ export class Shard extends EventEmitter {
 
     off<E extends keyof WebSocketEvents>(
         event: E,
-        listener: (...args: WebSocketEvents[E]) => void
+        listener: (...args: WebSocketEvents[E]) => void,
     ): this {
         super.off(event, listener);
         return this;
     }
 
     private debug(message: string): void {
-        super.emit('debug',`[Shard ${this.id}] ${message}`);
+        super.emit('debug', `[Shard ${this.id}] ${message}`);
     }
 
     /** Initializes the connection to the server websocket after authentication. */
@@ -73,15 +73,15 @@ export class Shard extends EventEmitter {
         if (![0, 1].includes(this.status)) return;
 
         this.status = ShardStatus.CONNECTING;
-        const auth = await this.client.requests.get(
-            endpoints.servers.ws(this.id)
-        ) as WebSocketAuth;
+        const auth = (await this.client.requests.get(
+            endpoints.servers.ws(this.id),
+        )) as WebSocketAuth;
         const origin = this.origin ? { origin: this.client.domain } : undefined;
         this.socket = new WebSocket(auth.data.socket, origin);
 
         this.socket.on('open', () => this.onOpen(auth.data.token));
-        this.socket.on('message', m => this.onMessage(m.toString()));
-        this.socket.on('error', e => this.onError(e));
+        this.socket.on('message', (m) => this.onMessage(m.toString()));
+        this.socket.on('error', (e) => this.onError(e));
         this.socket.on('close', () => this.onClose());
     }
 
@@ -89,9 +89,9 @@ export class Shard extends EventEmitter {
         if (this.status !== ShardStatus.CONNECTED)
             throw new Error('Shard is not connected.');
 
-        const auth = await this.client.requests.get(
-            endpoints.servers.ws(this.id)
-        ) as WebSocketAuth;
+        const auth = (await this.client.requests.get(
+            endpoints.servers.ws(this.id),
+        )) as WebSocketAuth;
         this.send('auth', [auth.data.token]);
     }
 
@@ -107,7 +107,8 @@ export class Shard extends EventEmitter {
      * ```
      */
     send(event: string, args: string[] = []): void {
-        if (!this.socket) throw new Error('Socket for this shard is unavailable.');
+        if (!this.socket)
+            throw new Error('Socket for this shard is unavailable.');
         this.debug(`sending event '${event}'`);
         this.socket.send(JSON.stringify({ event, args }));
     }
@@ -187,26 +188,28 @@ export class Shard extends EventEmitter {
     async request(event: 'setState', state: string): Promise<void>;
     async request(event: string, args: string = ''): Promise<any> {
         switch (event) {
-            case 'auth':{
+            case 'auth': {
                 this.send('auth', [args]);
-                return new Promise<void>(res => this.once('authSuccess', res));
+                return new Promise<void>((res) =>
+                    this.once('authSuccess', res),
+                );
             }
-            case 'sendCommand':{
+            case 'sendCommand': {
                 this.send('send command', [args]);
                 // unsafe to return response
                 return Promise.resolve();
             }
-            case 'sendLogs':{
+            case 'sendLogs': {
                 this.send('send logs');
-                return new Promise(res => this.once('serverOutput', res));
+                return new Promise((res) => this.once('serverOutput', res));
             }
-            case 'sendStats':{
+            case 'sendStats': {
                 this.send('send stats');
-                return new Promise(res => this.once('statsUpdate', res));
+                return new Promise((res) => this.once('statsUpdate', res));
             }
-            case 'setState':{
+            case 'setState': {
                 this.send('set state', [args]);
-                return new Promise(res => this.once('statusUpdate', res));
+                return new Promise((res) => this.once('statusUpdate', res));
             }
             default:
                 throw new WebSocketError('Invalid sendable websocket event');

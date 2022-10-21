@@ -14,7 +14,7 @@ import loader from '../util/config';
  * The base class for the Pterodactyl client API.
  * This operates using a Pterodactyl client API key which can be found
  * at <your.domain.name/account/api>.
- * 
+ *
  * **Warning:** Keep your API key private at all times. Exposing this can lead
  * to your accond and servers being corrupted, exposed and/or deleted.
  */
@@ -47,15 +47,15 @@ export class PteroClient {
     constructor(
         domain: string,
         auth: string,
-        options: Record<string, OptionSpec> = {}
+        options: Record<string, OptionSpec> = {},
     ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new ValidationError(
                 "Domain URL must start with 'http://' or 'https://' and " +
-                'must be bound to a port if using localhost.'
+                    'must be bound to a port if using localhost.',
             );
 
-        if (domain.endsWith("/")) domain = domain.slice(0, -1);
+        if (domain.endsWith('/')) domain = domain.slice(0, -1);
         this.domain = domain;
         this.auth = auth;
         this.options = loader.clientConfig({ client: options });
@@ -102,7 +102,7 @@ export class PteroClient {
     addSocketServer(...ids: string[]): Shard[];
     addSocketServer(...args: any[]): any {
         if (args.length === 1) return this.ws.createShard(args[0]);
-        return args.map(i => this.ws.createShard(i));
+        return args.map((i) => this.ws.createShard(i));
     }
 
     /**

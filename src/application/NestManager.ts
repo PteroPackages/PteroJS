@@ -14,7 +14,9 @@ export class NestManager extends BaseManager {
     public eggs: NestEggsManager;
 
     /** Allowed filter arguments for nests (none). */
-    get FILTERS() { return Object.freeze([]); }
+    get FILTERS() {
+        return Object.freeze([]);
+    }
 
     /**
      * Allowed include arguments for nests:
@@ -26,7 +28,9 @@ export class NestManager extends BaseManager {
     }
 
     /** Allowed sort arguments for nests (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroApp) {
         super();
@@ -38,7 +42,7 @@ export class NestManager extends BaseManager {
             total: 0,
             count: 0,
             perPage: 0,
-            totalPages: 0
+            totalPages: 0,
         };
     }
 
@@ -49,7 +53,9 @@ export class NestManager extends BaseManager {
      */
     _patch(data: any): any {
         if (data?.meta?.pagination) {
-            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta = caseConv.toCamelCase(data.meta.pagination, {
+                ignore: ['current_page'],
+            });
             this.meta.current = data.meta.pagination.current_page;
         }
 
@@ -109,13 +115,14 @@ export class NestManager extends BaseManager {
         if (typeof op === 'number') {
             path = endpoints.nests.get(op);
         } else {
-            include.push(...op || []);
+            include.push(...(op || []));
         }
 
         const data = await this.client.requests.get(
             path,
             { include } as Include<FetchOptions>,
-            null, this
+            null,
+            this,
         );
         return this._patch(data);
     }

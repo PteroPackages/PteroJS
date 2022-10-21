@@ -12,7 +12,7 @@ import {
     Include,
     PaginationMeta,
     Resolvable,
-    Sort
+    Sort,
 } from '../common';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -37,7 +37,9 @@ export class UserManager extends BaseManager {
      * Allowed include arguments for users:
      * * servers
      */
-    get INCLUDES() { return Object.freeze(['servers']); }
+    get INCLUDES() {
+        return Object.freeze(['servers']);
+    }
 
     /**
      * Allowed sort arguments for users:
@@ -59,7 +61,7 @@ export class UserManager extends BaseManager {
             total: 0,
             count: 0,
             perPage: 0,
-            totalPages: 0
+            totalPages: 0,
         };
     }
 
@@ -70,7 +72,9 @@ export class UserManager extends BaseManager {
      */
     _patch(data: any): any {
         if (data?.meta?.pagination) {
-            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta = caseConv.toCamelCase(data.meta.pagination, {
+                ignore: ['current_page'],
+            });
             this.meta.current = data.meta.pagination.current_page;
         }
 
@@ -80,7 +84,8 @@ export class UserManager extends BaseManager {
                 const s = new User(this.client, o.attributes);
                 res.set(s.id, s);
             }
-            if (this.client.options.servers.cache) this.cache = this.cache.join(res);
+            if (this.client.options.servers.cache)
+                this.cache = this.cache.join(res);
             return res;
         }
 
@@ -94,16 +99,20 @@ export class UserManager extends BaseManager {
      * * a string
      * * a number
      * * an object
-     * 
+     *
      * @param obj The object to resolve from.
      * @returns The resolved user or undefined if not found.
      */
     resolve(obj: Resolvable<User>): User | undefined {
         if (obj instanceof User) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
-        if (typeof obj === 'string') return this.cache.find(
-            s => (s.username === obj) || (s.firstname === obj) || (s.lastname === obj)
-        );
+        if (typeof obj === 'string')
+            return this.cache.find(
+                (s) =>
+                    s.username === obj ||
+                    s.firstname === obj ||
+                    s.lastname === obj,
+            );
         if (obj.relationships?.user)
             return this._patch(obj.relationships.user) as User;
 
@@ -158,20 +167,19 @@ export class UserManager extends BaseManager {
     async fetch(options?: Include<FetchOptions>): Promise<Dict<number, User>>;
     async fetch(
         op?: number | string | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        ops: Include<FetchOptions> = {},
     ): Promise<any> {
         let path: string;
         switch (typeof op) {
-            case 'number':{
-                if (!ops.force && this.cache.has(op))
-                    return this.cache.get(op);
+            case 'number': {
+                if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
                 path = endpoints.users.get(op);
                 break;
             }
-            case 'string':{
+            case 'string': {
                 if (!ops.force) {
-                    const u = this.cache.find(u => u.externalId === op);
+                    const u = this.cache.find((u) => u.externalId === op);
                     if (u) return u;
                 }
 
@@ -179,14 +187,14 @@ export class UserManager extends BaseManager {
                 break;
             }
             case 'undefined':
-            case 'object':{
+            case 'object': {
                 path = endpoints.users.main;
                 if (op) ops = op;
                 break;
             }
             default:
                 throw new ValidationError(
-                    `expected user id, external id or fetch options; got ${typeof op}`
+                    `expected user id, external id or fetch options; got ${typeof op}`,
                 );
         }
 
@@ -195,26 +203,29 @@ export class UserManager extends BaseManager {
     }
 
     /** @deprecated Use {@link UserManager.fetch}. */
-    async fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
+    async fetchExternal(
+        id: string,
+        options: Include<FetchOptions>,
+    ): Promise<User> {
         return this.fetch(id, options);
     }
 
     /**
      * Queries the API for users that match the specified query filters. This fetches from the
      * API directly and does not check the cache. Use cache methods for filtering and sorting.
-     * 
+     *
      * Available query filters:
      * * email
      * * uuid
      * * username
      * * externalId
-     * 
+     *
      * Available sort options:
      * * id
      * * -id
      * * uuid
      * * -uuid
-     * 
+     *
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried users.
@@ -227,11 +238,10 @@ export class UserManager extends BaseManager {
      */
     async query(
         entity: string,
-        options: Filter<Sort<{}>>
+        options: Filter<Sort<{}>>,
     ): Promise<Dict<number, User>> {
-        if (!options.sort && !options.filter) throw new ValidationError(
-            'Sort or filter is required.'
-        );
+        if (!options.sort && !options.filter)
+            throw new ValidationError('Sort or filter is required.');
         if (options.filter === 'externalId') options.filter = 'external_id';
 
         const payload: FilterArray<Sort<{}>> = {};
@@ -241,7 +251,8 @@ export class UserManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.users.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            null, this
+            null,
+            this,
         );
         return this._patch(data);
     }
@@ -265,19 +276,17 @@ export class UserManager extends BaseManager {
      * ```
      */
     async create(options: CreateUserOptions): Promise<User> {
-        const payload = caseConv.toSnakeCase<object>(
-            options,
-            {
-                map:{
-                    firstname: 'first_name',
-                    lastname: 'last_name',
-                    isAdmin: 'root_admin'
-                }
-            }
-        );
+        const payload = caseConv.toSnakeCase<object>(options, {
+            map: {
+                firstname: 'first_name',
+                lastname: 'last_name',
+                isAdmin: 'root_admin',
+            },
+        });
 
         const data = await this.client.requests.post(
-            endpoints.users.main, payload
+            endpoints.users.main,
+            payload,
         );
         return this._patch(data);
     }
@@ -295,7 +304,10 @@ export class UserManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async update(id: number, options: Partial<UpdateUserOptions>): Promise<User> {
+    async update(
+        id: number,
+        options: Partial<UpdateUserOptions>,
+    ): Promise<User> {
         if (!Object.keys(options).length)
             throw new Error('Too few options to update user.');
 
@@ -307,19 +319,17 @@ export class UserManager extends BaseManager {
         options.isAdmin ??= user.isAdmin;
         if (!('externalId' in options)) options.externalId = user.externalId;
 
-        const payload = caseConv.toSnakeCase<object>(
-            options,
-            {
-                map:{
-                    firstname: 'first_name',
-                    lastname: 'last_name',
-                    isAdmin: 'root_admin'
-                }
-            }
-        );
+        const payload = caseConv.toSnakeCase<object>(options, {
+            map: {
+                firstname: 'first_name',
+                lastname: 'last_name',
+                isAdmin: 'root_admin',
+            },
+        });
 
         const data = await this.client.requests.patch(
-            endpoints.users.get(id), payload
+            endpoints.users.get(id),
+            payload,
         );
         return this._patch(data);
     }

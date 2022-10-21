@@ -23,10 +23,14 @@ describe('Application: Servers', () => {
 
     it('fetches a server', async () => {
         expect(app.servers.fetch(0)).rejects.toThrowError(PteroAPIError);
-        expect(app.servers.fetch(4 /** to be replaced with id var */)).resolves.toBeInstanceOf(ApplicationServer);
+        expect(
+            app.servers.fetch(4 /** to be replaced with id var */),
+        ).resolves.toBeInstanceOf(ApplicationServer);
         // TODO: related to create test
         // expect(app.servers.fetch('jester')).resolves.toBeInstanceOf(ApplicationServer);
-        expect(app.servers.query('jester', { filter: 'name' })).resolves.toBeInstanceOf(Dict);
+        expect(
+            app.servers.query('jester', { filter: 'name' }),
+        ).resolves.toBeInstanceOf(Dict);
     });
 
     // TODO: related to create test
