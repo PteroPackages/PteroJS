@@ -71,7 +71,7 @@ export class RequestManager extends EventEmitter {
     }
 
     private debug(...data: string[]): void {
-        data.map((d) => `[HTTP] ${d}`).forEach((d) => super.emit('debug', d));
+        data.map(d => `[HTTP] ${d}`).forEach(d => super.emit('debug', d));
     }
 
     async _make(method: Method, path: string, body?: any) {
@@ -97,8 +97,8 @@ export class RequestManager extends EventEmitter {
                 headers,
                 data: body,
             })
-            .then((r) => this.handleResponse(r))
-            .catch((e) => this.handleError(e));
+            .then(r => this.handleResponse(r))
+            .catch(e => this.handleError(e));
     }
 
     async raw(method: Method, url: string, body?: any) {
@@ -124,8 +124,8 @@ export class RequestManager extends EventEmitter {
                 headers,
                 data: body,
             })
-            .then((r) => this.handleResponse(r))
-            .catch((e) => this.handleError(e));
+            .then(r => this.handleResponse(r))
+            .catch(e => this.handleError(e));
     }
 
     private handleResponse(res: AxiosResponse): any {

@@ -1,12 +1,12 @@
 import type { Shard } from './ws/Shard';
 import { Account } from '../structures/User';
 import { ClientServerManager } from './ClientServerManager';
-import { RequestManager } from '../http/RequestManager';
-import { ScheduleManager } from './ScheduleManager';
-import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
 import { PermissionDescriptor } from '../common/client';
+import { RequestManager } from '../http/RequestManager';
+import { ScheduleManager } from './ScheduleManager';
 import { ValidationError } from '../structures/Errors';
+import { WebSocketManager } from './ws/WebSocketManager';
 import endpoints from './endpoints';
 import loader from '../util/config';
 
@@ -102,7 +102,7 @@ export class PteroClient {
     addSocketServer(...ids: string[]): Shard[];
     addSocketServer(...args: any[]): any {
         if (args.length === 1) return this.ws.createShard(args[0]);
-        return args.map((i) => this.ws.createShard(i));
+        return args.map(i => this.ws.createShard(i));
     }
 
     /**

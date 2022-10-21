@@ -2,7 +2,6 @@ import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { Node } from '../structures/Node';
-import { ValidationError } from '../structures/Errors';
 import {
     CreateNodeOptions,
     NodeConfiguration,
@@ -17,6 +16,7 @@ import {
     Resolvable,
     Sort,
 } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -113,7 +113,8 @@ export class NodeManager extends BaseManager {
         if (obj instanceof Node) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string')
-            return this.cache.find((n) => n.name === obj);
+            return this.cache.find(n => n.name === obj);
+
         if (obj.relationships?.node)
             return this._patch(obj.relationships.node) as Node;
 

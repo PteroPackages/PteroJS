@@ -163,9 +163,11 @@ export class ApplicationServerManager extends BaseManager {
         if (obj instanceof ApplicationServer) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string')
-            return this.cache.find((s) => s.name === obj);
+            return this.cache.find(s => s.name === obj);
+
         if (obj.relationships?.servers)
             return this._patch(obj.relationships.servers);
+
         return undefined;
     }
 
@@ -245,7 +247,7 @@ export class ApplicationServerManager extends BaseManager {
             }
             case 'string': {
                 if (!ops.force) {
-                    const u = this.cache.find((u) => u.externalId === op);
+                    const u = this.cache.find(u => u.externalId === op);
                     if (u) return u;
                 }
 

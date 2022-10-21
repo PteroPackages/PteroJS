@@ -77,6 +77,7 @@ export class UserBuilder extends Builder {
         if (!this.email) throw new ValidationError('an email is required');
         if (!this.firstname)
             throw new ValidationError('a first name is required');
+
         if (!this.lastname)
             throw new ValidationError('a last name is required');
 

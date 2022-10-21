@@ -63,7 +63,7 @@ export class Dict<K, V> extends Map<K, V> {
      * @param keys The keys to check for.
      */
     hasAny(...keys: K[]): boolean {
-        return keys.some((k) => super.has(k));
+        return keys.some(k => super.has(k));
     }
 
     /**
@@ -71,7 +71,7 @@ export class Dict<K, V> extends Map<K, V> {
      * @param keys The keys to check for.
      */
     hasAll(...keys: K[]): boolean {
-        return keys.every((k) => super.has(k));
+        return keys.every(k => super.has(k));
     }
 
     /**

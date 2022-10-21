@@ -1,13 +1,13 @@
 import type { PteroClient } from '../client';
 import { BackupManager } from '../client/BackupManager';
 import { ClientDatabaseManager } from '../client/ClientDatabaseManager';
+import { ClientResources, EggVariable, StartupData } from '../common/client';
+import { FeatureLimits, Limits } from '../common';
 import { FileManager } from '../client/FileManager';
 import { NetworkManager } from '../client/NetworkManager';
 import { SubUserManager } from '../client/SubUserManager';
-import { FeatureLimits, Limits } from '../common';
-import { ClientResources, EggVariable, StartupData } from '../common/client';
-import endpoints from '../client/endpoints';
 import caseConv from '../util/caseConv';
+import endpoints from '../client/endpoints';
 
 export class ClientServer {
     public client: PteroClient;
@@ -90,6 +90,7 @@ export class ClientServer {
         if ('name' in data) this.name = data.name;
         if ('description' in data)
             this.description = data.description || undefined;
+
         if ('is_owner' in data) this.isOwner = data.is_owner;
         if ('node' in data) this.node = data.node;
         if ('sftp_details' in data) this.sftpDetails = data.sftp_details;
@@ -97,6 +98,7 @@ export class ClientServer {
         if ('feature_limits' in data) this.featureLimits = data.feature_limits;
         if ('egg_features' in data)
             this.eggFeatures = data.egg_features || undefined;
+
         if ('invocation' in data) this.invocation = data.invocation;
         if ('docker_image' in data) this.dockerImage = data.docker_image;
         if ('status' in data) this.status = data.status || undefined;

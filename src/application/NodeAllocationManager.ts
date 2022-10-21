@@ -1,8 +1,8 @@
 import type { PteroApp } from '.';
+import { Allocation } from '../common/app';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include, PaginationMeta } from '../common';
-import { Allocation } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -133,8 +133,8 @@ export class NodeAllocationManager extends BaseManager {
     async fetchAvailable(node: number, single: boolean): Promise<any> {
         const all = await this.fetch(node);
         return single
-            ? all.filter((a) => !a.assigned).first()
-            : all.filter((a) => !a.assigned);
+            ? all.filter(a => !a.assigned).first()
+            : all.filter(a => !a.assigned);
     }
 
     /**
@@ -151,7 +151,7 @@ export class NodeAllocationManager extends BaseManager {
      * ```
      */
     async create(node: number, ip: string, ports: string[]): Promise<void> {
-        if (!ports.every((p) => typeof p === 'string'))
+        if (!ports.every(p => typeof p === 'string'))
             throw new TypeError(
                 'Allocation ports must be a string integer or string range.',
             );
@@ -164,6 +164,7 @@ export class NodeAllocationManager extends BaseManager {
 
             if (start > stop)
                 throw new RangeError('Start cannot be greater than stop.');
+
             if (start <= 1024 || stop > 65535)
                 throw new RangeError(
                     'Port range must be between 1024 and 65535.',

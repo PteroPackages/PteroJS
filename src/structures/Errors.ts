@@ -15,12 +15,12 @@ export class PteroAPIError extends Error {
 
     constructor(data: APIErrorResponse) {
         const fmt = data.errors
-            .map((e) => `- ${e.status}: ${e.detail || 'No details provided'}`)
+            .map(e => `- ${e.status}: ${e.detail || 'No details provided'}`)
             .join('\n');
 
         super('\n' + fmt);
-        this.codes = data.errors.map((e) => e.code);
-        this.meta = data.errors.map((e) => e.meta).filter(Boolean);
+        this.codes = data.errors.map(e => e.code);
+        this.meta = data.errors.map(e => e.meta).filter(Boolean);
     }
 }
 

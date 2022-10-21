@@ -1,16 +1,16 @@
 import type { PteroClient } from '.';
+import type { WebSocketManager } from './ws/WebSocketManager';
 import { BaseManager } from '../structures/BaseManager';
 import { ClientServer } from '../structures/ClientServer';
-import { Dict } from '../structures/Dict';
-import { ValidationError } from '../structures/Errors';
-import { FetchOptions, Include } from '../common';
 import {
     ClientMeta,
     ClientResources,
     EggVariable,
     StartupData,
 } from '../common/client';
-import type { WebSocketManager } from './ws/WebSocketManager';
+import { Dict } from '../structures/Dict';
+import { FetchOptions, Include } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 

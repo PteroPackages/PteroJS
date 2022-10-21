@@ -167,7 +167,7 @@ export class Permissions {
         const res: string[] = [];
         const values = Object.values<string>(Flags);
 
-        if (perms.some((p) => p === '*')) return values;
+        if (perms.some(p => p === '*')) return values;
         for (const p of perms) {
             if (p in Flags || values.includes(p)) {
                 res.push(p);
@@ -185,7 +185,7 @@ export class Permissions {
      */
     hasAny(...perms: string[]): boolean {
         const res = Permissions.resolve(...perms);
-        return res.some((p) => this.value.includes(p));
+        return res.some(p => this.value.includes(p));
     }
 
     /**
@@ -194,7 +194,7 @@ export class Permissions {
      */
     hasAll(...perms: string[]): boolean {
         const res = Permissions.resolve(...perms);
-        return res.every((p) => this.value.includes(p));
+        return res.every(p => this.value.includes(p));
     }
 
     /**
@@ -227,7 +227,7 @@ export class Permissions {
      */
     remove(...perms: string[]): this {
         const res = Permissions.resolve(...perms);
-        this.value = this.value.filter((p) => !res.includes(p));
+        this.value = this.value.filter(p => !res.includes(p));
         return this;
     }
 

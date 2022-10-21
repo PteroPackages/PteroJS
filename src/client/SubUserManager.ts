@@ -1,9 +1,9 @@
 import type { PteroClient } from '.';
 import { Dict } from '../structures/Dict';
+import { FetchOptions, Resolvable } from '../common';
 import { Permissions } from '../structures/Permissions';
 import { SubUser } from '../structures/User';
 import { ValidationError } from '../structures/Errors';
-import { FetchOptions, Resolvable } from '../common';
 import endpoints from './endpoints';
 
 export class SubUserManager {

@@ -1,10 +1,10 @@
 import type { ApplicationServer } from './ApplicationServer';
 import type { PteroApp } from '../application';
 import type { PteroClient } from '../client';
+import { Activity, APIKey, SSHKey } from '../common/client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
 import { ValidationError } from './Errors';
-import { Activity, APIKey, SSHKey } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -348,7 +348,7 @@ export class Account extends BaseUser {
      */
     async deleteKey(id: string): Promise<void> {
         await this.client.requests.delete(endpoints.account.apikeys.get(id));
-        this.apikeys = this.apikeys.filter((k) => k.identifier !== id);
+        this.apikeys = this.apikeys.filter(k => k.identifier !== id);
     }
 
     /** @returns A list of activity logs on the account. */

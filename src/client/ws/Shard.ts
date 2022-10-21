@@ -80,8 +80,8 @@ export class Shard extends EventEmitter {
         this.socket = new WebSocket(auth.data.socket, origin);
 
         this.socket.on('open', () => this.onOpen(auth.data.token));
-        this.socket.on('message', (m) => this.onMessage(m.toString()));
-        this.socket.on('error', (e) => this.onError(e));
+        this.socket.on('message', m => this.onMessage(m.toString()));
+        this.socket.on('error', e => this.onError(e));
         this.socket.on('close', () => this.onClose());
     }
 
@@ -190,9 +190,7 @@ export class Shard extends EventEmitter {
         switch (event) {
             case 'auth': {
                 this.send('auth', [args]);
-                return new Promise<void>((res) =>
-                    this.once('authSuccess', res),
-                );
+                return new Promise<void>(res => this.once('authSuccess', res));
             }
             case 'sendCommand': {
                 this.send('send command', [args]);
@@ -201,15 +199,15 @@ export class Shard extends EventEmitter {
             }
             case 'sendLogs': {
                 this.send('send logs');
-                return new Promise((res) => this.once('serverOutput', res));
+                return new Promise(res => this.once('serverOutput', res));
             }
             case 'sendStats': {
                 this.send('send stats');
-                return new Promise((res) => this.once('statsUpdate', res));
+                return new Promise(res => this.once('statsUpdate', res));
             }
             case 'setState': {
                 this.send('set state', [args]);
-                return new Promise((res) => this.once('statusUpdate', res));
+                return new Promise(res => this.once('statusUpdate', res));
             }
             default:
                 throw new WebSocketError('Invalid sendable websocket event');

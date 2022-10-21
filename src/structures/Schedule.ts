@@ -1,11 +1,11 @@
 import type { PteroClient } from '../client';
-import { Dict } from './Dict';
 import {
+    CreateScheduleOptions,
     Cron,
     ScheduleTask,
     ScheduleTaskAction,
-    CreateScheduleOptions,
 } from '../common/client';
+import { Dict } from './Dict';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -62,6 +62,7 @@ export class Schedule {
         if ('is_processing' in data) this.processing = data.is_processing;
         if ('only_when_online' in data)
             this.onlyWhenOnline = data.only_when_online;
+
         if ('updated_at' in data) this.updatedAt = new Date(data.updated_at);
         if ('last_run_at' in data) this.lastRunAt = new Date(data.last_run_at);
         if ('next_run_at' in data) this.nextRunAt = new Date(data.next_run_at);

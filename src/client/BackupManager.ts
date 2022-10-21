@@ -1,10 +1,10 @@
-import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
+import { existsSync, writeFileSync } from 'fs';
 import { BaseManager } from '../structures/BaseManager';
+import { Backup, CreateBackupOptions } from '../common/client';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import { FetchOptions, Include } from '../common';
-import { Backup, CreateBackupOptions } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 

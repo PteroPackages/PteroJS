@@ -1,4 +1,4 @@
-import { FetchOptions, Include, Sort, FilterArray } from '../common';
+import { FetchOptions, FilterArray, Include, Sort } from '../common';
 import { ValidationError } from '../structures/Errors';
 export interface AllowedQueryOptions {
     filters: readonly string[];

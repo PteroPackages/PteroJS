@@ -1,8 +1,8 @@
 import type { ApplicationServer } from './ApplicationServer';
 import type { Dict } from './Dict';
 import type { PteroApp } from '../application';
-import { DaemonData, NodeLocation } from '../common';
 import { CreateNodeOptions, NodeConfiguration } from '../common/app';
+import { DaemonData, NodeLocation } from '../common';
 import caseConv from '../util/caseConv';
 
 export class Node {
@@ -82,18 +82,22 @@ export class Node {
         if ('name' in data) this.name = data.name;
         if ('description' in data)
             this.description = data.description || undefined;
+
         if ('location_id' in data) this.locationId = data.location_id;
         if ('fqdn' in data) this.fqdn = data.fqdn;
         if ('scheme' in data) this.scheme = data.scheme;
         if ('behind_proxy' in data) this.behindProxy = data.behind_proxy;
         if ('maintenance_mode' in data)
             this.maintenance = data.maintenance_mode;
+
         if ('memory' in data) this.memory = data.memory;
         if ('memory_overallocate' in data)
             this.overallocatedMemory = data.memory_overallocate;
+
         if ('disk' in data) this.disk = data.disk;
         if ('disk_overallocate' in data)
             this.overallocatedDisk = data.disk_overallocate;
+
         if ('upload_size' in data) this.uploadSize = data.upload_size;
         if (!this.daemon) this.daemon = {} as DaemonData;
         if ('daemon_listen' in data) this.daemon.listening = data.daemon_listen;

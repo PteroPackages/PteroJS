@@ -1,9 +1,9 @@
 import type { PteroClient } from '.';
+import { CreateScheduleOptions } from '../common/client';
 import { Dict } from '../structures/Dict';
+import { FetchOptions } from '../common';
 import { Schedule } from '../structures/Schedule';
 import { ValidationError } from '../structures/Errors';
-import { FetchOptions } from '../common';
-import { CreateScheduleOptions } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 

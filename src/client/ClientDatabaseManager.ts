@@ -1,8 +1,8 @@
 import type { PteroClient } from '.';
 import { BaseManager } from '../structures/BaseManager';
+import { ClientDatabase } from '../common/client';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
-import { ClientDatabase } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 

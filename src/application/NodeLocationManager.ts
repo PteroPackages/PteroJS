@@ -1,7 +1,6 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { ValidationError } from '../structures/Errors';
 import {
     FetchOptions,
     Filter,
@@ -12,6 +11,7 @@ import {
     Resolvable,
     Sort,
 } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -101,7 +101,8 @@ export class NodeLocationManager extends BaseManager {
     resolve(obj: Resolvable<any>): NodeLocation | undefined {
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string')
-            return this.cache.find((o) => o.short === obj || o.long === obj);
+            return this.cache.find(o => o.short === obj || o.long === obj);
+
         if (obj.relationships?.location?.attributes)
             return this._patch(obj.relationships.location) as NodeLocation;
 

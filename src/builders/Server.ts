@@ -165,9 +165,11 @@ export class ServerBuilder extends Builder {
         if (!this.name) throw new ValidationError('A server name is required');
         if (!this.user)
             throw new ValidationError('A server owner (user) is required');
+
         if (!this.egg) throw new ValidationError('An egg is required');
         if (!this.dockerImage)
             throw new ValidationError('A docker image is required');
+
         if (!this.startup)
             throw new ValidationError('A startup command is required');
 

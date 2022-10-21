@@ -4,7 +4,6 @@ import { Dict } from '../structures/Dict';
 import { CreateUserOptions } from '../common/app';
 import { User } from '../structures/User';
 import { UpdateUserOptions } from '../common/app';
-import { ValidationError } from '../structures/Errors';
 import {
     FetchOptions,
     Filter,
@@ -14,6 +13,7 @@ import {
     Resolvable,
     Sort,
 } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -108,7 +108,7 @@ export class UserManager extends BaseManager {
         if (typeof obj === 'number') return this.cache.get(obj);
         if (typeof obj === 'string')
             return this.cache.find(
-                (s) =>
+                s =>
                     s.username === obj ||
                     s.firstname === obj ||
                     s.lastname === obj,
@@ -179,7 +179,7 @@ export class UserManager extends BaseManager {
             }
             case 'string': {
                 if (!ops.force) {
-                    const u = this.cache.find((u) => u.externalId === op);
+                    const u = this.cache.find(u => u.externalId === op);
                     if (u) return u;
                 }
 
@@ -203,7 +203,7 @@ export class UserManager extends BaseManager {
     }
 
     /** @deprecated Use {@link UserManager.fetch}. */
-    async fetchExternal(
+    fetchExternal(
         id: string,
         options: Include<FetchOptions>,
     ): Promise<User> {

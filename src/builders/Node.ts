@@ -117,25 +117,33 @@ export class NodeBuilder extends Builder {
         if (!this.name) throw new ValidationError('A node name is required');
         if (!this.locationId)
             throw new ValidationError('A location id is required');
+
         if (!this.fqdn) throw new ValidationError('An FQDN is required');
         if (!this.scheme)
             throw new ValidationError('A HTTP scheme is required');
+
         if (!this.memory)
             throw new ValidationError('A total memory limit is required');
+
         if (this.memory < 1)
             throw new ValidationError('Memory cannot be less than 1');
+
         if (this.memoryOverallocate < -1)
             throw new ValidationError(
                 'Overallocated memory cannot be less than -1',
             );
+
         if (!this.disk)
             throw new ValidationError('A total disk limit is required');
+
         if (this.disk < 1)
             throw new ValidationError('Disk cannot be less than 1');
+
         if (this.diskOverallocate < -1)
             throw new ValidationError(
                 'Overallocated disk cannot be less than -1',
             );
+
         if (this.uploadSize < 1 || this.uploadSize > 1024)
             throw new ValidationError(
                 'The upload size must be between 1 and 1024',

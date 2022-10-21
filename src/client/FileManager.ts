@@ -1,8 +1,8 @@
-import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
+import { existsSync, writeFileSync } from 'fs';
 import { Dict } from '../structures/Dict';
-import { ValidationError } from '../structures/Errors';
 import { File, FileChmodData } from '../common/client';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -234,7 +234,7 @@ export class FileManager {
      * ```
      */
     async chmod(dir: string, files: FileChmodData[]): Promise<void> {
-        files = files.map((f) => {
+        files = files.map(f => {
             if (f.file.startsWith('.')) f.file = f.file.slice(1);
             return f;
         });
@@ -278,7 +278,7 @@ export class FileManager {
      * ```
      */
     async compress(dir: string, files: string[]): Promise<Dict<string, File>> {
-        files = files.map((f) => (f.startsWith('.') ? f.slice(1) : f));
+        files = files.map(f => (f.startsWith('.') ? f.slice(1) : f));
         const data = await this.client.requests.post(
             endpoints.servers.files.compress(this.serverId),
             { root: dir, files },
@@ -316,7 +316,7 @@ export class FileManager {
      * ```
      */
     async delete(dir: string, files: string[]): Promise<void> {
-        files = files.map((f) => (f.startsWith('.') ? f.slice(1) : f));
+        files = files.map(f => (f.startsWith('.') ? f.slice(1) : f));
         await this.client.requests.post(
             endpoints.servers.files.delete(this.serverId),
             { root: dir, files },
