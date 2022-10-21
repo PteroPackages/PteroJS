@@ -15,13 +15,10 @@ npm install @devnote-dev/pterojs
 yarn add @devnote-dev/pterojs
 ```
 
-<!-- Deno isn't fully supported yet.
-
 or if you are using Deno:
 ```js
 import pterojs from 'https://cdn.skypack.dev/@devnote-dev/pterojs';
 ```
--->
 
 Please join the [support server](https://discord.com/invite/dwcfTjgn7S) if you experience any issues with installing the package.
 
@@ -88,9 +85,9 @@ Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TO
 
 ## Contributors
 
--   [Devonte](https://github.com/devnote-dev) - Owner, maintainer
--   [Chelog](https://github.com/chelog) - Code contributor
--   [Cain](https://github.com/cainthebest) - Code contributor
+- [Devonte](https://github.com/devnote-dev) - Owner, maintainer
+- [Chelog](https://github.com/chelog) - Code contributor
+- [Cain](https://github.com/cainthebest) - Code contributor
 
 This repository is managed under the MIT license.
 
