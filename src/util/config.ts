@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { FileConfig, OptionSpec } from '../common';
 
+/** @deprecated To be replaced with a better system. */
 const DEFAULT = {
     APPLICATION: {
         users: {
@@ -47,6 +48,7 @@ const DEFAULT = {
     },
 };
 
+/** @deprecated To be replaced with a better system. */
 function parseAs(
     from: Record<string, any>,
     to: Record<string, any>,
@@ -58,6 +60,7 @@ function parseAs(
     return res;
 }
 
+/** @deprecated To be replaced with a better system. */
 function appConfig(options?: FileConfig): Record<string, OptionSpec> {
     if (
         options !== undefined &&
@@ -73,6 +76,7 @@ function appConfig(options?: FileConfig): Record<string, OptionSpec> {
     }
 }
 
+/** @deprecated To be replaced with a better system. */
 function clientConfig(options?: FileConfig): Record<string, OptionSpec | any> {
     if (
         options !== undefined &&

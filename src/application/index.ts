@@ -31,6 +31,7 @@ export class PteroApp {
      */
     public auth: string;
 
+    /** @deprecated To be replaced with a better system. */
     public options: Record<string, OptionSpec>;
 
     public allocations: NodeAllocationManager;
