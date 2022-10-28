@@ -59,7 +59,7 @@ const { PteroClient } = require('@devnote-dev/pterojs');
 const client = new PteroClient('your.domain.name', 'pterodactyl_api_key');
 
 // Adding the server to listen for
-const shard = client.addSocksetServer('f7eca02e');
+const shard = client.addSocketServer('f7eca02e');
 
 // Listening to events
 shard.on('statusUpdate', (status) => {
