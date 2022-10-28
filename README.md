@@ -1,6 +1,6 @@
 <h1 align="center">PteroJS</h1>
 <h3 align="center"><strong>A verbose API library for Pterodactyl</strong></h3>
-<p align="center"><a href="https://discord.com/invite/dwcfTjgn7S" type="_blank"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"></a> <img src="https://img.shields.io/badge/version-2.1.0-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/PteroPackages/PteroJS.svg?style=for-the-badge"> <a href="https://pteropackages.github.io/PteroJS/" type="_blank"><img src="https://img.shields.io/badge/docs-typedoc-e67e22?style=for-the-badge"></a></p>
+<p align="center"><a href="https://discord.com/invite/dwcfTjgn7S" type="_blank"><img src="https://img.shields.io/badge/discord-invite-5865f2?style=for-the-badge&logo=discord&logoColor=white"></a> <img src="https://img.shields.io/badge/version-2.1.1-3572A5?style=for-the-badge"> <img src="https://img.shields.io/github/issues/PteroPackages/PteroJS.svg?style=for-the-badge"> <a href="https://pteropackages.github.io/PteroJS/" type="_blank"><img src="https://img.shields.io/badge/docs-typedoc-e67e22?style=for-the-badge"></a></p>
 
 ## About
 
