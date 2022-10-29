@@ -1,6 +1,6 @@
 {
   "name": "@devnote-dev/pterojs",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "A verbose API library for Pterodactyl",
   "author": "Devonte <https://github.com/devnote-dev>",
   "contributors": [
@@ -17,7 +17,7 @@
     "url": "git+https://github.com/PteroPackages/PteroJS.git"
   },
   "main": "./dist/src/index.js",
-  "types": "./dist/src/types/src/index.ts",
+  "types": "./dist/src/types/src/index.d.ts",
   "exports":{
     "require": "./dist/index.js",
     "import": "./dist/index.mjs",
