@@ -34,14 +34,14 @@
     "node": ">=14.16"
   },
   "scripts": {
-    "prepublish": "tsup-node",
-    "build": "tsup-node",
+    "prepublish": "tsup",
+    "build": "tsup",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
     "format": "prettier --write **/**.{js,ts}",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
-  "jest":{
+  "jest": {
     "rootDir": "./tests"
   },
   "keywords": [
@@ -67,7 +67,7 @@
     "nock": "^13.2.9",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
-    "tsup-node": "^0.1.0",
+    "tsup": "^6.3.0",
     "typedoc": "^0.22.18"
   }
 }
