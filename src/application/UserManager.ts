@@ -306,7 +306,7 @@ export class UserManager extends BaseManager {
         options: Partial<UpdateUserOptions>,
     ): Promise<User> {
         if (!Object.keys(options).length)
-            throw new Error('Too few options to update user.');
+            throw new ValidationError('Too few options to update user.');
 
         const user = await this.fetch(id);
         options.username ||= user.username;

@@ -6,6 +6,7 @@ import {
     ScheduleTaskAction,
 } from '../common/client';
 import { Dict } from './Dict';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -147,7 +148,7 @@ export class Schedule {
         },
     ): Promise<ScheduleTask> {
         if (!Object.keys(options).length)
-            throw new Error('Too few options to update schedule task.');
+            throw new ValidationError('Too few options to update schedule task.');
 
         const payload = caseConv.toSnakeCase(options, {
             map: { offset: 'time_offset' },

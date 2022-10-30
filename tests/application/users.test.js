@@ -1,6 +1,6 @@
 const axios = require('axios');
 const nock = require('nock');
-const { Dict, PteroAPIError, PteroApp, User } = require('../..');
+const { Dict, PteroAPIError, PteroApp, User, ValidationError } = require('../../dist');
 
 axios.defaults.adapter = require('axios/lib/adapters/http');
 
@@ -203,9 +203,7 @@ describe('Application: Users', () => {
     });
 
     it('updates a user', () => {
-        expect(app.users.update(1, {})).rejects.toThrow(
-            'Too few options to update user.',
-        );
+        expect(app.users.update(1, {})).rejects.toThrowError(ValidationError);
         expect(
             app.users.update(1, { externalId: 'jest' }),
         ).resolves.toBeInstanceOf(User);
