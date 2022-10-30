@@ -37,7 +37,7 @@
     "prepublish": "tsup-node",
     "build": "tsup-node",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
-    "format": "prettier --write **/**.ts",
+    "format": "prettier --write **/**.{js,ts}",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },

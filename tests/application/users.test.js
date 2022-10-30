@@ -5,14 +5,17 @@ const { Dict, PteroAPIError, PteroApp, User } = require('../..');
 axios.defaults.adapter = require('axios/lib/adapters/http');
 
 const scope = nock('https://pterodactyl.test');
-const app = new PteroApp('https://pterodactyl.test', 'ptlc_QRkkwxgiqmkybXs3wBpYvfvPsLEYvPEk3ZyJb30PV93');
+const app = new PteroApp(
+    'https://pterodactyl.test',
+    'ptlc_QRkkwxgiqmkybXs3wBpYvfvPsLEYvPEk3ZyJb30PV93',
+);
 
 scope.get('/api/application/users').reply(200, {
     object: 'list',
-    data:[
+    data: [
         {
             object: 'user',
-            attributes:{
+            attributes: {
                 id: 1,
                 username: 'jest',
                 email: 'jest@example.com',
@@ -23,12 +26,12 @@ scope.get('/api/application/users').reply(200, {
                 updated_at: '2022-02-15T02:15:29+00:00',
                 root_admin: true,
                 '2fa': false,
-                created_at: '2022-01-03T08:08:31+00:00'
-            }
+                created_at: '2022-01-03T08:08:31+00:00',
+            },
         },
         {
             object: 'user',
-            attributes:{
+            attributes: {
                 id: 2,
                 username: 'example',
                 email: 'example@example.com',
@@ -39,17 +42,17 @@ scope.get('/api/application/users').reply(200, {
                 updated_at: '2022-02-15T02:15:29+00:00',
                 root_admin: false,
                 '2fa': true,
-                created_at: '2022-01-03T08:08:31+00:00'
-            }
-        }
-    ]
+                created_at: '2022-01-03T08:08:31+00:00',
+            },
+        },
+    ],
 });
 
 scope.get('/api/application/users/1').reply(200, {
     object: 'user',
-    attributes:{
+    attributes: {
         object: 'user',
-        attributes:{
+        attributes: {
             id: 1,
             username: 'jest',
             email: 'jest@example.com',
@@ -60,100 +63,104 @@ scope.get('/api/application/users/1').reply(200, {
             updated_at: '2022-02-15T02:15:29+00:00',
             root_admin: true,
             '2fa': false,
-            created_at: '2022-01-03T08:08:31+00:00'
-        }
-    }
+            created_at: '2022-01-03T08:08:31+00:00',
+        },
+    },
 });
 
 scope.post('/api/application/users').reply(400, {
-    errors:[
+    errors: [
         {
             code: 'ValidationException',
             detail: 'The email field is required.',
-            meta:{
+            meta: {
                 rule: 'required',
-                source_field: 'email'
+                source_field: 'email',
             },
-            'status': '422'
+            status: '422',
         },
         {
             code: 'ValidationException',
             detail: 'The username field is required.',
-            meta:{
+            meta: {
                 rule: 'required',
-                source_field: 'username'
+                source_field: 'username',
             },
-            'status': '422'
+            status: '422',
         },
         {
             code: 'ValidationException',
             detail: 'The first name field is required.',
-            meta:{
+            meta: {
                 rule: 'required',
-                source_field: 'first_name'
+                source_field: 'first_name',
             },
-            'status': '422'
+            status: '422',
         },
         {
             code: 'ValidationException',
             detail: 'The last name field is required.',
-            meta:{
+            meta: {
                 rule: 'required',
-                source_field: 'last_name'
+                source_field: 'last_name',
             },
-            'status': '422'
-        }
-    ]
+            status: '422',
+        },
+    ],
 });
 
-scope.post('/api/application/users', {
-    username: 'jester',
-    email: 'jester@example.com',
-    first_name: 'jester',
-    last_name: 'jester'
-}).reply(200, {
-    object: 'user',
-    attributes:{
-        id: 1,
-        username: 'jest',
-        email: 'jest@example.com',
-        first_name: 'jest',
-        last_name: 'jest',
-        language: 'en',
-        external_id: null,
-        updated_at: '2022-02-15T02:15:29+00:00',
-        root_admin: true,
-        '2fa': false,
-        created_at: '2022-01-03T08:08:31+00:00'
-    }
-});
-
-scope.patch('/api/application/users/1', {
-    username: 'jest',
-    email: 'jest@example.com',
-    first_name: 'jest',
-    last_name: 'jest',
-    external_id: 'jest',
-    root_admin: true
-}).reply(200, {
-    object: 'user',
-    attributes:{
+scope
+    .post('/api/application/users', {
+        username: 'jester',
+        email: 'jester@example.com',
+        first_name: 'jester',
+        last_name: 'jester',
+    })
+    .reply(200, {
         object: 'user',
-        attributes:{
+        attributes: {
             id: 1,
             username: 'jest',
             email: 'jest@example.com',
             first_name: 'jest',
             last_name: 'jest',
             language: 'en',
-            external_id: 'jest',
+            external_id: null,
             updated_at: '2022-02-15T02:15:29+00:00',
             root_admin: true,
             '2fa': false,
-            created_at: '2022-01-03T08:08:31+00:00'
-        }
-    }
-});
+            created_at: '2022-01-03T08:08:31+00:00',
+        },
+    });
+
+scope
+    .patch('/api/application/users/1', {
+        username: 'jest',
+        email: 'jest@example.com',
+        first_name: 'jest',
+        last_name: 'jest',
+        external_id: 'jest',
+        root_admin: true,
+    })
+    .reply(200, {
+        object: 'user',
+        attributes: {
+            object: 'user',
+            attributes: {
+                id: 1,
+                username: 'jest',
+                email: 'jest@example.com',
+                first_name: 'jest',
+                last_name: 'jest',
+                language: 'en',
+                external_id: 'jest',
+                updated_at: '2022-02-15T02:15:29+00:00',
+                root_admin: true,
+                '2fa': false,
+                created_at: '2022-01-03T08:08:31+00:00',
+            },
+        },
+    });
 
 scope.delete('/api/application/users/1').reply(204);
 
@@ -185,17 +192,23 @@ describe('Application: Users', () => {
 
     it('creates a user', () => {
         expect(app.users.create({})).rejects.toThrowError(PteroAPIError);
-        expect(app.users.create({
-            username: 'jester',
-            email: 'jester@example.com',
-            firstname: 'jester',
-            lastname: 'jester'
-        })).resolves.toBeInstanceOf(User);
+        expect(
+            app.users.create({
+                username: 'jester',
+                email: 'jester@example.com',
+                firstname: 'jester',
+                lastname: 'jester',
+            }),
+        ).resolves.toBeInstanceOf(User);
     });
 
     it('updates a user', () => {
-        expect(app.users.update(1, {})).rejects.toThrow('Too few options to update user.');
-        expect(app.users.update(1, { externalId: 'jest' })).resolves.toBeInstanceOf(User);
+        expect(app.users.update(1, {})).rejects.toThrow(
+            'Too few options to update user.',
+        );
+        expect(
+            app.users.update(1, { externalId: 'jest' }),
+        ).resolves.toBeInstanceOf(User);
     });
 
     it('deletes a user', () => {

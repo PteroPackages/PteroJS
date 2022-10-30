@@ -203,10 +203,7 @@ export class UserManager extends BaseManager {
     }
 
     /** @deprecated Use {@link UserManager.fetch}. */
-    fetchExternal(
-        id: string,
-        options: Include<FetchOptions>,
-    ): Promise<User> {
+    fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
         return this.fetch(id, options);
     }
 
