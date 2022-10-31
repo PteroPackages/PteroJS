@@ -1,11 +1,11 @@
 import type { PteroApp } from '.';
-import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include, PaginationMeta } from '../common';
 import { Nest } from '../common/app';
 import { NestEggsManager } from './NestEggsManager';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
+import { BaseManager } from '../structures/BaseManager';
 
 export class NestManager extends BaseManager {
     public client: PteroApp;

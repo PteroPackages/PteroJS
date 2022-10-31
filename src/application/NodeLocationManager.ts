@@ -1,5 +1,4 @@
 import type { PteroApp } from '.';
-import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import {
     FetchOptions,
@@ -14,8 +13,9 @@ import {
 import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
+import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class NodeLocationManager extends BaseManager {
+export class NodeLocationManager extends BaseManagerFetchAll<[options?: Include<FetchOptions>], number, NodeLocation> {
     public client: PteroApp;
     public cache: Dict<number, NodeLocation>;
     public meta: PaginationMeta;

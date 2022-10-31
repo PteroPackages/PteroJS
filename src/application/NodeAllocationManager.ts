@@ -1,12 +1,14 @@
 import type { PteroApp } from '.';
 import { Allocation } from '../common/app';
-import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include, PaginationMeta } from '../common';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
+import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class NodeAllocationManager extends BaseManager {
+export class NodeAllocationManager extends
+    BaseManagerFetchAll<[node: number, options: Include<FetchOptions>], number, Dict<number, Allocation>> {
+
     public client: PteroApp;
     public cache: Dict<number, Dict<number, Allocation>>;
     public meta: PaginationMeta;

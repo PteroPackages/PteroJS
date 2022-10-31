@@ -3,6 +3,8 @@ export abstract class BaseManager {
     abstract get SORTS(): readonly string[];
     abstract get INCLUDES(): readonly string[];
 
+    abstract fetch(...args: unknown[]): Promise<unknown>
+
     /**
      * Gets the allowed query options from the inherited manager.
      * @returns The query options.

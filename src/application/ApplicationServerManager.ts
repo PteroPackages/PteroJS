@@ -1,6 +1,5 @@
 import type { PteroApp } from '.';
 import { ApplicationServer } from '../structures/ApplicationServer';
-import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import {
@@ -22,8 +21,9 @@ import {
 } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
+import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class ApplicationServerManager extends BaseManager {
+export class ApplicationServerManager extends BaseManagerFetchAll<[options?: Include<FetchOptions>], number, ApplicationServer> {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
     public meta: PaginationMeta;
