@@ -17,10 +17,9 @@ import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class UserManager extends BaseManagerFetchAll<[options?: Include<FetchOptions>], number, User>  {
+export class UserManager extends BaseManagerFetchAll {
     public client: PteroApp;
     public cache: Dict<number, User>;
-    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for users:
@@ -205,6 +204,21 @@ export class UserManager extends BaseManagerFetchAll<[options?: Include<FetchOpt
     /** @deprecated Use {@link UserManager.fetch}. */
     fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
         return this.fetch(id, options);
+    }
+
+    /**
+     * Fetches all users from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched users.
+     * @example
+     * ```
+     * app.users.fetchAll({ perPage: 20 }).then(console.log).catch(console.error);
+     * ```
+     */
+    async fetchAll(options?: Include<FetchOptions>): Promise<Dict<number, User>> {
+        return this.getFetchAll(options);
     }
 
     /**

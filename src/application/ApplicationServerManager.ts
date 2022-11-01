@@ -9,7 +9,6 @@ import {
     FilterArray,
     Include,
     Limits,
-    PaginationMeta,
     Resolvable,
     Sort,
 } from '../common';
@@ -23,10 +22,9 @@ import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class ApplicationServerManager extends BaseManagerFetchAll<[options?: Include<FetchOptions>], number, ApplicationServer> {
+export class ApplicationServerManager extends BaseManagerFetchAll {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
-    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for servers:
@@ -268,6 +266,24 @@ export class ApplicationServerManager extends BaseManagerFetchAll<[options?: Inc
 
         const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
+    }
+
+    /**
+     * Fetches all servers from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched servers.
+     * @example
+     * ```
+     * app.servers.fetchAll().then(console.log).catch(console.error);
+     * ```
+     */
+
+    async fetchAll(
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, ApplicationServer>> {
+        return this.getFetchAll(options);
     }
 
     /**

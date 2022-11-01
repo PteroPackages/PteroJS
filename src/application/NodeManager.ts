@@ -20,10 +20,9 @@ import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class NodeManager extends BaseManagerFetchAll<[options?: Include<FetchOptions>], number, Node>  {
+export class NodeManager extends BaseManagerFetchAll {
     public client: PteroApp;
     public cache: Dict<number, Node>;
-    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for nodes:
@@ -171,6 +170,23 @@ export class NodeManager extends BaseManagerFetchAll<[options?: Include<FetchOpt
 
         const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
+    }
+
+    /**
+     * Fetches all nodes from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched nodes.
+     * @example
+     * ```
+     * app.nodes.fetchAll({ include:['servers'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+    async fetchAll(options?: Include<Omit<FetchOptions, 'page'>>): Promise<Dict<number, Node>> {
+        return this.getFetchAll(options);
     }
 
     /**

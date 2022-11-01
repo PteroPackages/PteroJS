@@ -2,11 +2,13 @@ import { FetchOptions, PaginationMeta } from "../common";
 import { BaseManager } from "./BaseManager";
 import { Dict } from "./Dict";
 
-export abstract class BaseManagerFetchAll<T extends unknown[], K, E> extends BaseManager {
-    abstract meta: PaginationMeta;
+export abstract class BaseManagerFetchAll extends BaseManager {
+    declare meta: PaginationMeta;
 
-    async fetchAll(...options: T): Promise<Dict<K, E>> {
-        type Data = Dict<K, E>;
+    abstract fetchAll(...args: unknown[]): Promise<unknown>
+
+    protected async getFetchAll<T, K>(...options: unknown[]): Promise<Dict<T, K>> {
+        type Data = Dict<T, K>;
         // Last option should be FetchOptions
         if (typeof options[options.length - 1] != 'object') {
             options.push({ page: 1 })

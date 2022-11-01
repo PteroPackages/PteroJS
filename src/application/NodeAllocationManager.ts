@@ -1,17 +1,14 @@
 import type { PteroApp } from '.';
 import { Allocation } from '../common/app';
 import { Dict } from '../structures/Dict';
-import { FetchOptions, Include, PaginationMeta } from '../common';
+import { FetchOptions, Include } from '../common';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class NodeAllocationManager extends
-    BaseManagerFetchAll<[node: number, options: Include<FetchOptions>], number, Dict<number, Allocation>> {
-
+export class NodeAllocationManager extends BaseManagerFetchAll {
     public client: PteroApp;
     public cache: Dict<number, Dict<number, Allocation>>;
-    public meta: PaginationMeta;
 
     /** Allowed filter arguments for allocations. */
     get FILTERS() {
@@ -73,6 +70,7 @@ export class NodeAllocationManager extends
      * (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.
      *
+     * @param [node] Node id
      * @param [options] Additional fetch options.
      * @returns The fetched allocations.
      * @example
@@ -98,6 +96,26 @@ export class NodeAllocationManager extends
             this,
         );
         return this._patch(node, data);
+    }
+
+    /**
+     * Fetches all allocations on a specific node from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [node] Node id
+     * @param [options] Additional fetch options.
+     * @returns The fetched allocations.
+     * @example
+     * ```
+     * app.allocations.fetchAll().then(console.log).catch(console.error);
+     * ```
+     */
+
+    async fetchAll(
+        node: number,
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, Allocation>> {
+        return this.getFetchAll(node, options);
     }
 
     /**
