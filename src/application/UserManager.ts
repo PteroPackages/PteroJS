@@ -1,4 +1,5 @@
 import type { PteroApp } from '.';
+import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { CreateUserOptions } from '../common/app';
 import { User } from '../structures/User';
@@ -15,11 +16,11 @@ import {
 import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
-import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class UserManager extends BaseManagerFetchAll {
+export class UserManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, User>;
+    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for users:

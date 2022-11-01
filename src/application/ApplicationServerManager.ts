@@ -1,4 +1,5 @@
 import type { PteroApp } from '.';
+import { BaseManager } from '../structures/BaseManager';
 import { ApplicationServer } from '../structures/ApplicationServer';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
@@ -9,6 +10,7 @@ import {
     FilterArray,
     Include,
     Limits,
+    PaginationMeta,
     Resolvable,
     Sort,
 } from '../common';
@@ -20,11 +22,11 @@ import {
 } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
-import { BaseManagerFetchAll } from '../structures/BaseManagerFetchAll';
 
-export class ApplicationServerManager extends BaseManagerFetchAll {
+export class ApplicationServerManager extends BaseManager {
     public client: PteroApp;
     public cache: Dict<number, ApplicationServer>;
+    public meta: PaginationMeta;
 
     /**
      * Allowed filter arguments for servers:
