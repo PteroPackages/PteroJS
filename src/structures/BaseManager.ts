@@ -8,7 +8,7 @@ function isMetadata(meta: PaginationMeta | ClientMeta): meta is PaginationMeta {
 }
 
 export abstract class BaseManager {
-    declare meta: PaginationMeta | ClientMeta | undefined;
+    public meta?: PaginationMeta | ClientMeta;
 
     abstract get FILTERS(): readonly string[];
     abstract get SORTS(): readonly string[];
@@ -40,20 +40,18 @@ export abstract class BaseManager {
         if (!this.meta || !isMetadata(this.meta)) throw new ValidationError('No page metadata');
 
         // Last option should be FetchOptions
-        if (typeof options[options.length - 1] != 'object') {
+        if (typeof options.at(-1) != 'object') {
             options.push({ page: 1 })
         }
 
-        const setPage = (page: number) => {
-            (options[options.length - 1] as FetchOptions).page = page;
-        }
+        const lastOption = options.at(-1) as FetchOptions;
 
         let data = await this.fetch(...options) as Data;
         if (this.meta.totalPages > 1) {
             for (let i = 2; i <= this.meta.totalPages; i++) {
-                setPage(i);
+                lastOption.page = i
                 const page = await this.fetch(...options) as Data;
-                data = data.join(page);
+                data.update(page);
             }
         }
         return data;
