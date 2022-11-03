@@ -171,7 +171,7 @@ export class FileManager {
     async write(path: string, content: any): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.files.write(this.serverId, this.clean(path)),
-            { raw: content },
+            content,
         );
     }
 
