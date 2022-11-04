@@ -35,8 +35,6 @@ export abstract class BaseManager {
      * @internal
      */
     protected async getFetchAll<T, K>(...options: unknown[]): Promise<Dict<T, K>> {
-        type Data = Dict<T, K>;
-
         if (!this.meta || !isMetadata(this.meta)) throw new ValidationError('No page metadata');
 
         // Last option should be FetchOptions
@@ -46,11 +44,11 @@ export abstract class BaseManager {
 
         const lastOption = options.at(-1) as FetchOptions;
 
-        let data = await this.fetch(...options) as Data;
+        let data = await this.fetch(...options) as Dict<T, K>;
         if (this.meta.totalPages > 1) {
             for (let i = 2; i <= this.meta.totalPages; i++) {
                 lastOption.page = i
-                const page = await this.fetch(...options) as Data;
+                const page = await this.fetch(...options) as Dict<T, K>;
                 data.update(page);
             }
         }
