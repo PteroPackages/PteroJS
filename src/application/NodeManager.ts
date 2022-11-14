@@ -174,6 +174,23 @@ export class NodeManager extends BaseManager {
     }
 
     /**
+     * Fetches all nodes from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched nodes.
+     * @example
+     * ```
+     * app.nodes.fetchAll({ include:['servers'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+    async fetchAll(options?: Include<Omit<FetchOptions, 'page'>>): Promise<Dict<number, Node>> {
+        return this.getFetchAll(options);
+    }
+
+    /**
      * Fetches the deployable nodes from the API following the specified deployable
      * node options. Note that memory and disk are required for deployment options.
      * @see {@link NodeDeploymentOptions}.

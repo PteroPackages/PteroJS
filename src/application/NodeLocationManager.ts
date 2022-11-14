@@ -174,6 +174,26 @@ export class NodeLocationManager extends BaseManager {
     }
 
     /**
+     * Fetches all locations from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched locations.
+     * @example
+     * ```
+     * app.locations.fetchAll({ include:['nodes'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+
+    async fetchAll(
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, NodeLocation>> {
+        return this.getFetchAll(options);
+    }
+
+    /**
      * Queries the API for locations that match the specified query filters. This fetches from the
      * API directly and does not check the cache. Use cache methods for filtering and sorting.
      *

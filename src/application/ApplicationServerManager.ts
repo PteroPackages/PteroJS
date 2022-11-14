@@ -1,6 +1,6 @@
 import type { PteroApp } from '.';
-import { ApplicationServer } from '../structures/ApplicationServer';
 import { BaseManager } from '../structures/BaseManager';
+import { ApplicationServer } from '../structures/ApplicationServer';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import {
@@ -268,6 +268,24 @@ export class ApplicationServerManager extends BaseManager {
 
         const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
+    }
+
+    /**
+     * Fetches all servers from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched servers.
+     * @example
+     * ```
+     * app.servers.fetchAll().then(console.log).catch(console.error);
+     * ```
+     */
+
+    async fetchAll(
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, ApplicationServer>> {
+        return this.getFetchAll(options);
     }
 
     /**

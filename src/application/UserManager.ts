@@ -208,6 +208,21 @@ export class UserManager extends BaseManager {
     }
 
     /**
+     * Fetches all users from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched users.
+     * @example
+     * ```
+     * app.users.fetchAll({ perPage: 20 }).then(console.log).catch(console.error);
+     * ```
+     */
+    async fetchAll(options?: Include<FetchOptions>): Promise<Dict<number, User>> {
+        return this.getFetchAll(options);
+    }
+
+    /**
      * Queries the API for users that match the specified query filters. This fetches from the
      * API directly and does not check the cache. Use cache methods for filtering and sorting.
      *
