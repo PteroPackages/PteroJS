@@ -47,7 +47,7 @@ const { PteroApp } = require('@devnote-dev/pterojs');
 const app = new PteroApp('your.domain.name', 'pterodactyl_api_key');
 
 // Accessing information
-app.servers.fetch('f7eca02e').then(console.log);
+app.servers.fetch(4).then(console.log);
 ```
 
 ### Using the client API
@@ -76,7 +76,7 @@ Checkout the new [migrations guide](./migrations/v2-0-1.md) to PteroJS v2!
 
 ## Contributing
 
-Please see the [todo list](https://github.com/PteroPackages/PteroJS/blob/main/TODO.md) or [issues](https://github.com/PteroPackages/PteroJS/issues) section for contributing ideas. New ideas/features are also welcome.
+Please see the [issues](https://github.com/PteroPackages/PteroJS/issues) section for contributing ideas. New ideas/features are also welcome.
 
 1. [Fork this repo](https://github.com/PteroPackages/PteroJS/fork)!
 2. Make a branch from `main` (`git branch -b <new-feature>`)
