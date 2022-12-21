@@ -1,6 +1,12 @@
 const axios = require('axios');
 const nock = require('nock');
-const { Dict, PteroAPIError, PteroApp, User, ValidationError } = require('../../dist');
+const {
+    Dict,
+    PteroAPIError,
+    PteroApp,
+    User,
+    ValidationError,
+} = require('../../dist');
 
 axios.defaults.adapter = require('axios/lib/adapters/http');
 

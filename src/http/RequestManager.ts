@@ -159,7 +159,7 @@ export class RequestManager extends EventEmitter {
         if (err.response!.status >= 500)
             throw new RequestError(
                 `Received an unexpected response from the API ` +
-                `(code ${err.response.status})`,
+                    `(code ${err.response.status})`,
             );
 
         throw new PteroAPIError(err.response.data as APIErrorResponse);

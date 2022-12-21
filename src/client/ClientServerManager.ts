@@ -2,11 +2,7 @@ import type { PteroClient } from '.';
 import type { WebSocketManager } from './ws/WebSocketManager';
 import { BaseManager } from '../structures/BaseManager';
 import { ClientServer } from '../structures/ClientServer';
-import {
-    ClientResources,
-    EggVariable,
-    StartupData,
-} from '../common/client';
+import { ClientResources, EggVariable, StartupData } from '../common/client';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
 import { ValidationError } from '../structures/Errors';

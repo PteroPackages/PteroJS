@@ -148,7 +148,9 @@ export class Schedule {
         },
     ): Promise<ScheduleTask> {
         if (!Object.keys(options).length)
-            throw new ValidationError('Too few options to update schedule task.');
+            throw new ValidationError(
+                'Too few options to update schedule task.',
+            );
 
         const payload = caseConv.toSnakeCase(options, {
             map: { offset: 'time_offset' },
