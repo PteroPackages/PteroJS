@@ -282,7 +282,7 @@ export class ApplicationServerManager extends BaseManager {
      * ```
      */
 
-    async fetchAll(
+    fetchAll(
         options?: Include<Omit<FetchOptions, 'page'>>,
     ): Promise<Dict<number, ApplicationServer>> {
         return this.getFetchAll(options);

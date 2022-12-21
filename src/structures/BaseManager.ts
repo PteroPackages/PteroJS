@@ -1,14 +1,14 @@
 import { FetchOptions, PaginationMeta } from "../common";
-import { ClientMeta } from "../common/client";
 import { Dict } from "./Dict";
-import { ValidationError } from "./Errors";
-
-function isMetadata(meta: PaginationMeta | ClientMeta): meta is PaginationMeta {
-    return (meta as PaginationMeta).totalPages !== undefined;
-}
 
 export abstract class BaseManager {
-    public meta?: PaginationMeta | ClientMeta;
+    public meta: PaginationMeta = {
+        current: 0,
+        total: 0,
+        count: 0,
+        perPage: 0,
+        totalPages: 0,
+    };
 
     abstract get FILTERS(): readonly string[];
     abstract get SORTS(): readonly string[];
@@ -35,20 +35,14 @@ export abstract class BaseManager {
      * @internal
      */
     protected async getFetchAll<T, K>(...options: unknown[]): Promise<Dict<T, K>> {
-        if (!this.meta || !isMetadata(this.meta)) throw new ValidationError('No page metadata');
-
         // Last option should be FetchOptions
-        if (typeof options.at(-1) != 'object') {
-            options.push({ page: 1 })
-        }
-
-        const lastOption = options.at(-1) as FetchOptions;
+        const opts = (options[options.length-1] || { page: 1 }) as FetchOptions;
 
         let data = await this.fetch(...options) as Dict<T, K>;
         if (this.meta.totalPages > 1) {
             for (let i = 2; i <= this.meta.totalPages; i++) {
-                lastOption.page = i
-                const page = await this.fetch(...options) as Dict<T, K>;
+                opts.page = i;
+                let page = await this.fetch(opts) as Dict<T, K>;
                 data.update(page);
             }
         }

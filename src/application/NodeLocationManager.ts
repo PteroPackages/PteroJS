@@ -187,7 +187,7 @@ export class NodeLocationManager extends BaseManager {
      * ```
      */
 
-    async fetchAll(
+    fetchAll(
         options?: Include<Omit<FetchOptions, 'page'>>,
     ): Promise<Dict<number, NodeLocation>> {
         return this.getFetchAll(options);

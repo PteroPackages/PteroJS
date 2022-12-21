@@ -277,13 +277,18 @@ export class FileManager {
      *  .catch(console.error);
      * ```
      */
-    async compress(dir: string, files: string[]): Promise<Dict<string, File>> {
+    async compress(dir: string, files: string[]): Promise<File> {
         files = files.map(f => (f.startsWith('.') ? f.slice(1) : f));
         const data = await this.client.requests.post(
             endpoints.servers.files.compress(this.serverId),
             { root: dir, files },
         );
-        return this._patch(dir, data);
+
+        let f = caseConv.toCamelCase<File>(data.attributes);
+        f.modeBits = BigInt(f.modeBits);
+        f.createdAt = new Date(f.createdAt);
+        f.modifiedAt &&= new Date(f.modifiedAt);
+        return f;
     }
 
     /**

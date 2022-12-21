@@ -56,13 +56,6 @@ export class UserManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
-        this.meta = {
-            current: 0,
-            total: 0,
-            count: 0,
-            perPage: 0,
-            totalPages: 0,
-        };
     }
 
     /**
@@ -202,6 +195,7 @@ export class UserManager extends BaseManager {
         return this._patch(data);
     }
 
+    // TODO: remove in next major
     /** @deprecated Use {@link UserManager.fetch}. */
     fetchExternal(id: string, options: Include<FetchOptions>): Promise<User> {
         return this.fetch(id, options);
@@ -218,7 +212,7 @@ export class UserManager extends BaseManager {
      * app.users.fetchAll({ perPage: 20 }).then(console.log).catch(console.error);
      * ```
      */
-    async fetchAll(options?: Include<FetchOptions>): Promise<Dict<number, User>> {
+    fetchAll(options?: Include<FetchOptions>): Promise<Dict<number, User>> {
         return this.getFetchAll(options);
     }
 

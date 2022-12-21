@@ -112,7 +112,7 @@ export class NodeAllocationManager extends BaseManager {
      * ```
      */
 
-    async fetchAll(
+    fetchAll(
         node: number,
         options?: Include<Omit<FetchOptions, 'page'>>,
     ): Promise<Dict<number, Allocation>> {

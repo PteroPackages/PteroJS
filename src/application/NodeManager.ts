@@ -186,7 +186,7 @@ export class NodeManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetchAll(options?: Include<Omit<FetchOptions, 'page'>>): Promise<Dict<number, Node>> {
+    fetchAll(options?: Include<Omit<FetchOptions, 'page'>>): Promise<Dict<number, Node>> {
         return this.getFetchAll(options);
     }
 

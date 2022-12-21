@@ -3,7 +3,6 @@ import type { WebSocketManager } from './ws/WebSocketManager';
 import { BaseManager } from '../structures/BaseManager';
 import { ClientServer } from '../structures/ClientServer';
 import {
-    ClientMeta,
     ClientResources,
     EggVariable,
     StartupData,
@@ -17,12 +16,6 @@ import endpoints from './endpoints';
 export class ClientServerManager extends BaseManager {
     public client: PteroClient;
     public cache: Dict<string, ClientServer>;
-
-    /**
-     * Pagination metadata that is received from the API.
-     * This is not returned by normal methods but is parsed separately.
-     */
-    public meta: ClientMeta | undefined;
 
     /** Allowed filter arguments for servers (none). */
     get FILTERS() {
@@ -47,7 +40,6 @@ export class ClientServerManager extends BaseManager {
         super();
         this.client = client;
         this.cache = new Dict();
-        this.meta = undefined;
     }
 
     /**
@@ -56,7 +48,7 @@ export class ClientServerManager extends BaseManager {
      * @returns The resolved server object(s).
      */
     _patch(data: any): any {
-        if (data.meta) this.meta = caseConv.toCamelCase<ClientMeta>(data.meta);
+        if (data.meta) this.meta = caseConv.toCamelCase(data.meta);
 
         if (data?.data) {
             const res = new Dict<string, ClientServer>();
@@ -98,7 +90,7 @@ export class ClientServerManager extends BaseManager {
     async fetch(
         id: string,
         options?: Include<FetchOptions>,
-    ): Promise<ClientServer>;
+    ): Promise<ClientServer>; // TODO: support &type=
     /**
      * Fetches a list of servers from the API with the given options (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.

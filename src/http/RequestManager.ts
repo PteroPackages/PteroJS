@@ -139,7 +139,6 @@ export class RequestManager extends EventEmitter {
         super.emit('postRequest', res.data);
 
         if (res.data.object && res.data.object === 'null_resource')
-            // TODO: retry request instead of throwing an error
             throw new RequestError('Request returned a null resource object');
 
         return res.data;
