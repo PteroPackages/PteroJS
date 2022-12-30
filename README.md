@@ -91,4 +91,4 @@ Please see the [issues](https://github.com/PteroPackages/PteroJS/issues) section
 
 This repository is managed under the MIT license.
 
-© 2021-2022 PteroPackages
+© 2021-present PteroPackages
