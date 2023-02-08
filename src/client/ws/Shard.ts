@@ -4,11 +4,9 @@ import { WebSocket } from 'ws';
 import { WebSocketError } from '../../structures/Errors';
 import {
     ShardStatus,
-    WebSocketAuth,
     WebSocketEvents,
     WebSocketPayload,
 } from '../../common/client';
-import endpoints from '../endpoints';
 import handle from './packetHandler';
 
 export class Shard extends EventEmitter {
@@ -73,9 +71,7 @@ export class Shard extends EventEmitter {
         if (![0, 1].includes(this.status)) return;
 
         this.status = ShardStatus.CONNECTING;
-        const auth = (await this.client.requests.get(
-            endpoints.servers.ws(this.id),
-        )) as WebSocketAuth;
+        const auth = await this.client.ws.getAuth(this.id);
         const origin = this.origin ? { origin: this.client.domain } : undefined;
         this.socket = new WebSocket(auth.data.socket, origin);
 
@@ -89,9 +85,7 @@ export class Shard extends EventEmitter {
         if (this.status !== ShardStatus.CONNECTED)
             throw new Error('Shard is not connected.');
 
-        const auth = (await this.client.requests.get(
-            endpoints.servers.ws(this.id),
-        )) as WebSocketAuth;
+        const auth = await this.client.ws.getAuth(this.id);
         this.send('auth', [auth.data.token]);
     }
 
