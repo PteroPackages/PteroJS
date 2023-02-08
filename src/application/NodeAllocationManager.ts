@@ -152,7 +152,7 @@ export class NodeAllocationManager extends BaseManager {
         single: false,
     ): Promise<Dict<number, Allocation>>;
     async fetchAvailable(node: number, single: boolean): Promise<any> {
-        const all = await this.fetchAll(node);
+        const all = await this.fetchAll(node, { force: true });
         return single
             ? all.filter(a => !a.assigned).first()
             : all.filter(a => !a.assigned);
