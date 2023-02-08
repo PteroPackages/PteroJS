@@ -2,6 +2,18 @@
 
 Tracking changes for PteroJS and extensions from v2 onwards (using [SemVer 2](http://semver.org/)).
 
+## [2.2.0] - 08-02-2023
+
+### Added
+
+- `WebSocketManager#getAuth()` method for getting websocket auth data
+- `type` query parameter for `ClientServerManager#fetch()` (takes "admin", "admin-all", or "owner")
+
+### Fixed
+
+- Switch `Shard` class to use `WebSocketManager#getAuth()`
+- Fix & ensure `NodeAllocationManager#fetchAvailable()` fetches all allocations
+
 ## [2.1.0] - 08-10-2022
 
 A lot of bug fixes and some new useful QOL features for the library and developers.
