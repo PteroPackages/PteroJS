@@ -75,7 +75,8 @@ export class ClientServerManager extends BaseManager {
      * force option is specified.
      *
      * @param id The identifier of the server.
-     * @param [options] Additional fetch options.
+     * @param [options] Additional fetch options, including the `type` scope of the servers to
+     * return (can be 'admin', 'admin-all', or 'owner').
      * @returns The fetched server.
      * @example
      * ```
@@ -94,7 +95,8 @@ export class ClientServerManager extends BaseManager {
      * Fetches a list of servers from the API with the given options (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.
      *
-     * @param [options] Additional fetch options.
+     * @param [options] Additional fetch options, including the `type` scope of the servers to
+     * return (can be 'admin', 'admin-all', or 'owner').
      * @returns The fetched servers.
      * @example
      * ```
