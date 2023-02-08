@@ -7,6 +7,7 @@ import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
 import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
+import { buildQuery } from '../util/query';
 import endpoints from './endpoints';
 
 export class ClientServerManager extends BaseManager {
@@ -85,7 +86,9 @@ export class ClientServerManager extends BaseManager {
      */
     async fetch(
         id: string,
-        options?: Include<FetchOptions>,
+        options?: Include<FetchOptions> & {
+            type?: 'admin' | 'admin-all' | 'owner';
+        },
     ): Promise<ClientServer>; // TODO: support &type=
     /**
      * Fetches a list of servers from the API with the given options (default is undefined).
@@ -101,11 +104,19 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async fetch(
-        options?: Include<FetchOptions>,
+        options?: Include<FetchOptions> & {
+            type?: 'admin' | 'admin-all' | 'owner';
+        },
     ): Promise<Dict<number, ClientServer>>;
     async fetch(
-        op?: string | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {},
+        op?:
+            | string
+            | (Include<FetchOptions> & {
+                  type?: 'admin' | 'admin-all' | 'owner';
+              }),
+        ops: Include<FetchOptions> & {
+            type?: 'admin' | 'admin-all' | 'owner';
+        } = {},
     ): Promise<any> {
         let path = endpoints.servers.main;
         if (typeof op === 'string') {
@@ -116,7 +127,10 @@ export class ClientServerManager extends BaseManager {
             if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(path, ops, null, this);
+        path += buildQuery(ops, this.getQueryOptions());
+        if (ops.type)
+            path += (path.includes('?') ? '&' : '?') + `type=${ops.type}`;
+        const data = await this.client.requests.get(path);
         return this._patch(data);
     }
 
