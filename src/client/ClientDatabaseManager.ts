@@ -1,8 +1,8 @@
 import type { PteroClient } from '.';
 import { BaseManager } from '../structures/BaseManager';
+import { ClientDatabase } from '../common/client';
 import { Dict } from '../structures/Dict';
 import { FetchOptions, Include } from '../common';
-import { ClientDatabase } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -12,7 +12,9 @@ export class ClientDatabaseManager extends BaseManager {
     public serverId: string;
 
     /** Allowed filter arguments for databases (none). */
-    get FILTERS() { return Object.freeze([]); }
+    get FILTERS() {
+        return Object.freeze([]);
+    }
 
     /**
      * Allowed include arguments for databases:
@@ -23,7 +25,9 @@ export class ClientDatabaseManager extends BaseManager {
     }
 
     /** Allowed sort arguments for databases (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroClient, serverId: string) {
         super();
@@ -55,7 +59,7 @@ export class ClientDatabaseManager extends BaseManager {
 
     /**
      * Fetches a list of databases from the API with the given options (default is undefined).
-     * 
+     *
      * @param [options] Additional fetch options.
      * @returns The fetched databases.
      * @example
@@ -67,11 +71,13 @@ export class ClientDatabaseManager extends BaseManager {
      * ```
      */
     async fetch(
-        options: Include<FetchOptions> = {}
+        options: Include<FetchOptions> = {},
     ): Promise<Dict<number, ClientDatabase>> {
         const data = await this.client.requests.get(
             endpoints.servers.databases.main(this.serverId),
-            options, null, this
+            options,
+            null,
+            this,
         );
         return this._patch(data);
     }
@@ -85,7 +91,7 @@ export class ClientDatabaseManager extends BaseManager {
     async create(database: string, remote: string): Promise<ClientDatabase> {
         const data = await this.client.requests.post(
             endpoints.servers.databases.main(this.serverId),
-            { database, remote }
+            { database, remote },
         );
         return this._patch(data);
     }
@@ -104,7 +110,7 @@ export class ClientDatabaseManager extends BaseManager {
      */
     async rotate(id: number): Promise<ClientDatabase> {
         const data = await this.client.requests.post(
-            endpoints.servers.databases.rotate(this.serverId, id)
+            endpoints.servers.databases.rotate(this.serverId, id),
         );
         return this._patch(data);
     }
@@ -120,7 +126,7 @@ export class ClientDatabaseManager extends BaseManager {
      */
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.databases.get(this.serverId, id)
+            endpoints.servers.databases.get(this.serverId, id),
         );
         this.cache.delete(id);
     }

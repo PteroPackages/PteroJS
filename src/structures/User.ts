@@ -1,10 +1,10 @@
 import type { ApplicationServer } from './ApplicationServer';
 import type { PteroApp } from '../application';
 import type { PteroClient } from '../client';
+import { Activity, APIKey, SSHKey } from '../common/client';
 import { Dict } from './Dict';
 import { Permissions } from './Permissions';
 import { ValidationError } from './Errors';
-import { Activity, APIKey, SSHKey } from '../common/client';
 import caseConv from '../util/caseConv';
 import endpoints from '../client/endpoints';
 
@@ -50,18 +50,15 @@ export abstract class BaseUser {
      * @returns The JSON object.
      */
     toJSON(): object {
-        return caseConv.toSnakeCase(
-            this,
-            {
-                ignore:['client'],
-                map:{ firstname: 'first_name', lastname: 'last_name' }
-            }
-        );
+        return caseConv.toSnakeCase(this, {
+            ignore: ['client'],
+            map: { firstname: 'first_name', lastname: 'last_name' },
+        });
     }
 
     /** @returns The string representation of the user. */
     toString(): string {
-        return this.firstname +' '+ this.lastname;
+        return this.firstname + ' ' + this.lastname;
     }
 }
 
@@ -96,9 +93,13 @@ export class User extends BaseUser {
         this.createdTimestamp = this.createdAt.getTime();
 
         if ('relationships' in data) {
-            this.servers = 'servers' in data.relationships
-                ? this.client.servers.resolve(data) as Dict<number, ApplicationServer>
-                : undefined;
+            this.servers =
+                'servers' in data.relationships
+                    ? (this.client.servers.resolve(data) as Dict<
+                          number,
+                          ApplicationServer
+                      >)
+                    : undefined;
         }
     }
 
@@ -106,7 +107,9 @@ export class User extends BaseUser {
         super._patch(data);
 
         this.externalId = data.external_id || undefined;
-        this.updatedAt = data.updated_at ? new Date(data.updated_at) : undefined;
+        this.updatedAt = data.updated_at
+            ? new Date(data.updated_at)
+            : undefined;
         this.updatedTimestamp = this.updatedAt?.getTime() || undefined;
 
         if ('root_admin' in data) this.isAdmin = data.root_admin;
@@ -163,7 +166,7 @@ export class SubUser {
         if ('image' in data) this.image = data.image;
         if ('2fa_enabled' in data) this.enabled = data['2fa_enabled'];
         if ('permissions' in data)
-            this.permissions = new Permissions(...data.permissions ?? []);
+            this.permissions = new Permissions(...(data.permissions ?? []));
     }
 
     /**
@@ -181,13 +184,14 @@ export class SubUser {
      */
     async setPermissions(...permissions: string[]): Promise<this> {
         const perms = Permissions.resolve(...permissions);
-        if (!perms.length) throw new ValidationError(
-            'No permissions specified for the subuser.'
-        );
+        if (!perms.length)
+            throw new ValidationError(
+                'No permissions specified for the subuser.',
+            );
 
         const data = await this.client.requests.post(
             endpoints.servers.users.get(this.serverId, this.uuid),
-            { permissions: perms }
+            { permissions: perms },
         );
         this._patch(data);
         return this;
@@ -244,9 +248,10 @@ export class Account extends BaseUser {
      */
     async updateEmail(email: string, password: string): Promise<this> {
         if (this.email === email) return Promise.resolve(this);
-        await this.client.requests.put(
-            endpoints.account.email, { email, password }
-        );
+        await this.client.requests.put(endpoints.account.email, {
+            email,
+            password,
+        });
         this.email = email;
         return this;
     }
@@ -260,13 +265,11 @@ export class Account extends BaseUser {
      */
     async updatePassword(oldPass: string, newPass: string): Promise<this> {
         if (oldPass === newPass) return Promise.resolve(this);
-        await this.client.requests.put(
-            endpoints.account.password, {
-                current_password: oldPass,
-                password: newPass,
-                password_confirmation: newPass
-            }
-        );
+        await this.client.requests.put(endpoints.account.password, {
+            current_password: oldPass,
+            password: newPass,
+            password_confirmation: newPass,
+        });
         return this;
     }
 
@@ -285,9 +288,9 @@ export class Account extends BaseUser {
      * @returns A list of 2FA codes.
      */
     async enable2FA(code: string): Promise<string[]> {
-        const data = await this.client.requests.post(
-            endpoints.account.tfa, { code }
-        );
+        const data = await this.client.requests.post(endpoints.account.tfa, {
+            code,
+        });
         this.tokens.push(...data.attributes.tokens);
         return this.tokens;
     }
@@ -297,16 +300,14 @@ export class Account extends BaseUser {
      * @param password The account password.
      */
     async disable2FA(password: string): Promise<void> {
-        await this.client.requests.delete(
-            endpoints.account.tfa, { password }
-        );
+        await this.client.requests.delete(endpoints.account.tfa, { password });
         this.tokens = [];
     }
 
     /** @returns A list of API keys associated with the account. */
     async fetchKeys(): Promise<APIKey[]> {
         const data = await this.client.requests.get(
-            endpoints.account.apikeys.main
+            endpoints.account.apikeys.main,
         );
         this.apikeys = data.data.map((o: any) => {
             let k = caseConv.toCamelCase<APIKey>(o.attributes);
@@ -325,11 +326,11 @@ export class Account extends BaseUser {
      */
     async createKey(
         description: string,
-        allowedIps: string[] = []
+        allowedIps: string[] = [],
     ): Promise<APIKey> {
         const data = await this.client.requests.post(
             endpoints.account.apikeys.main,
-            { description, allowed_ips: allowedIps }
+            { description, allowed_ips: allowedIps },
         );
 
         const key = caseConv.toCamelCase<APIKey>(data.attributes);
@@ -363,7 +364,9 @@ export class Account extends BaseUser {
 
     /** @returns A list of SSH keys associated with the account. */
     async fetchSSHKeys(): Promise<SSHKey[]> {
-        const data = await this.client.requests.get(endpoints.account.sshkeys.main);
+        const data = await this.client.requests.get(
+            endpoints.account.sshkeys.main,
+        );
         const keys = data.data.map((o: any) => {
             const k = caseConv.toCamelCase<SSHKey>(o.attributes);
             k.createdAt = new Date(k.createdAt);
@@ -381,7 +384,7 @@ export class Account extends BaseUser {
     async createSSHKey(name: string, publicKey: string): Promise<SSHKey> {
         const data = await this.client.requests.post(
             endpoints.account.sshkeys.main,
-            { name, public_key: publicKey }
+            { name, public_key: publicKey },
         );
         const key = caseConv.toCamelCase<SSHKey>(data.attributes);
         key.createdAt = new Date(key.createdAt);
@@ -393,9 +396,8 @@ export class Account extends BaseUser {
      * @param fingerprint The fingerprint of the SSH key.
      */
     async removeSSHKey(fingerprint: string): Promise<void> {
-        await this.client.requests.post(
-            endpoints.account.sshkeys.remove,
-            { fingerprint }
-        );
+        await this.client.requests.post(endpoints.account.sshkeys.remove, {
+            fingerprint,
+        });
     }
 }

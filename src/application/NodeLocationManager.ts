@@ -1,7 +1,6 @@
 import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
-import { ValidationError } from '../structures/Errors';
 import {
     FetchOptions,
     Filter,
@@ -10,8 +9,9 @@ import {
     NodeLocation,
     PaginationMeta,
     Resolvable,
-    Sort
+    Sort,
 } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -39,7 +39,9 @@ export class NodeLocationManager extends BaseManager {
     }
 
     /** Allowed sort arguments for locations (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroApp) {
         super();
@@ -50,7 +52,7 @@ export class NodeLocationManager extends BaseManager {
             total: 0,
             count: 0,
             perPage: 0,
-            totalPages: 0
+            totalPages: 0,
         };
     }
 
@@ -61,7 +63,9 @@ export class NodeLocationManager extends BaseManager {
      */
     _patch(data: any): any {
         if (data?.meta?.pagination) {
-            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta = caseConv.toCamelCase(data.meta.pagination, {
+                ignore: ['current_page'],
+            });
             this.meta.current = data.meta.pagination.current_page;
         }
 
@@ -90,15 +94,15 @@ export class NodeLocationManager extends BaseManager {
      * * a string
      * * a number
      * * an object
-     * 
+     *
      * @param obj The object to resolve from.
      * @returns The resolved location or undefined if not found.
      */
     resolve(obj: Resolvable<any>): NodeLocation | undefined {
         if (typeof obj === 'number') return this.cache.get(obj);
-        if (typeof obj === 'string') return this.cache.find(
-            o => (o.short === obj) || (o.long === obj)
-        );
+        if (typeof obj === 'string')
+            return this.cache.find(o => o.short === obj || o.long === obj);
+
         if (obj.relationships?.location?.attributes)
             return this._patch(obj.relationships.location) as NodeLocation;
 
@@ -132,7 +136,10 @@ export class NodeLocationManager extends BaseManager {
      * app.locations.fetch(8).then(console.log).catch(console.error);
      * ```
      */
-    async fetch(id: number, options?: Include<FetchOptions>): Promise<NodeLocation>;
+    async fetch(
+        id: number,
+        options?: Include<FetchOptions>,
+    ): Promise<NodeLocation>;
     /**
      * Fetches a list of locations from the API with the given options (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.
@@ -146,15 +153,16 @@ export class NodeLocationManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, NodeLocation>>;
+    async fetch(
+        options?: Include<FetchOptions>,
+    ): Promise<Dict<number, NodeLocation>>;
     async fetch(
         op?: number | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        ops: Include<FetchOptions> = {},
     ): Promise<any> {
         let path = endpoints.locations.main;
         if (typeof op === 'number') {
-            if (!ops.force && this.cache.has(op))
-                return this.cache.get(op);
+            if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
             path = endpoints.locations.get(op);
         } else {
@@ -166,13 +174,33 @@ export class NodeLocationManager extends BaseManager {
     }
 
     /**
+     * Fetches all locations from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched locations.
+     * @example
+     * ```
+     * app.locations.fetchAll({ include:['nodes'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+
+    fetchAll(
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, NodeLocation>> {
+        return this.getFetchAll(options);
+    }
+
+    /**
      * Queries the API for locations that match the specified query filters. This fetches from the
      * API directly and does not check the cache. Use cache methods for filtering and sorting.
-     * 
+     *
      * Available query filters:
      * * short
      * * long
-     * 
+     *
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried locations.
@@ -185,11 +213,10 @@ export class NodeLocationManager extends BaseManager {
      */
     async query(
         entity: string,
-        options: Filter<Sort<{}>> // might remove sort in future
+        options: Filter<Sort<{}>>, // might remove sort in future
     ): Promise<Dict<number, NodeLocation>> {
-        if (!options.sort && !options.filter) throw new ValidationError(
-            'Sort or filter is required.'
-        );
+        if (!options.sort && !options.filter)
+            throw new ValidationError('Sort or filter is required.');
 
         const payload: FilterArray<Sort<{}>> = {};
         if (options.filter) payload.filter = [options.filter, entity];
@@ -198,7 +225,8 @@ export class NodeLocationManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.locations.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            null, this
+            null,
+            this,
         );
         return this._patch(data);
     }
@@ -216,9 +244,10 @@ export class NodeLocationManager extends BaseManager {
      * ```
      */
     async create(short: string, long: string): Promise<NodeLocation> {
-        const data = await this.client.requests.post(
-            endpoints.locations.main, { short, long }
-        );
+        const data = await this.client.requests.post(endpoints.locations.main, {
+            short,
+            long,
+        });
         return this._patch(data);
     }
 
@@ -236,15 +265,16 @@ export class NodeLocationManager extends BaseManager {
      */
     async update(
         id: number,
-        options:{ short?: string; long?: string }
+        options: { short?: string; long?: string },
     ): Promise<NodeLocation> {
         if (!options.short && !options.long)
             throw new ValidationError(
-                'Either short or long is required to update the location'
+                'Either short or long is required to update the location',
             );
 
         const data = await this.client.requests.patch(
-            endpoints.locations.get(id), options
+            endpoints.locations.get(id),
+            options,
         );
         return this._patch(data);
     }

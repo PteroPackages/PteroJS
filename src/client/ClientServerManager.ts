@@ -1,31 +1,23 @@
 import type { PteroClient } from '.';
+import type { WebSocketManager } from './ws/WebSocketManager';
 import { BaseManager } from '../structures/BaseManager';
 import { ClientServer } from '../structures/ClientServer';
+import { ClientResources, EggVariable, StartupData } from '../common/client';
 import { Dict } from '../structures/Dict';
-import { ValidationError } from '../structures/Errors';
 import { FetchOptions, Include } from '../common';
-import {
-    ClientMeta,
-    ClientResources,
-    EggVariable,
-    StartupData
-} from '../common/client';
-import type { WebSocketManager } from './ws/WebSocketManager';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
+import { buildQuery } from '../util/query';
 import endpoints from './endpoints';
 
 export class ClientServerManager extends BaseManager {
     public client: PteroClient;
     public cache: Dict<string, ClientServer>;
 
-    /**
-     * Pagination metadata that is received from the API.
-     * This is not returned by normal methods but is parsed separately.
-     */
-    public meta: ClientMeta | undefined;
-
     /** Allowed filter arguments for servers (none). */
-    get FILTERS() { return Object.freeze([]); }
+    get FILTERS() {
+        return Object.freeze([]);
+    }
 
     /**
      * Allowed include arguments for servers:
@@ -37,13 +29,14 @@ export class ClientServerManager extends BaseManager {
     }
 
     /** Allowed sort arguments for servers (none). */
-    get SORTS() { return Object.freeze([]); }
+    get SORTS() {
+        return Object.freeze([]);
+    }
 
     constructor(client: PteroClient) {
         super();
         this.client = client;
         this.cache = new Dict();
-        this.meta = undefined;
     }
 
     /**
@@ -52,7 +45,7 @@ export class ClientServerManager extends BaseManager {
      * @returns The resolved server object(s).
      */
     _patch(data: any): any {
-        if (data.meta) this.meta = caseConv.toCamelCase<ClientMeta>(data.meta);
+        if (data.meta) this.meta = caseConv.toCamelCase(data.meta);
 
         if (data?.data) {
             const res = new Dict<string, ClientServer>();
@@ -80,9 +73,10 @@ export class ClientServerManager extends BaseManager {
     /**
      * Fetches a server from the API by its identifier. This will check the cache first unless the
      * force option is specified.
-     * 
+     *
      * @param id The identifier of the server.
-     * @param [options] Additional fetch options.
+     * @param [options] Additional fetch options, including the `type` scope of the servers to
+     * return (can be 'admin', 'admin-all', or 'owner').
      * @returns The fetched server.
      * @example
      * ```
@@ -91,12 +85,18 @@ export class ClientServerManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(id: string, options?: Include<FetchOptions>): Promise<ClientServer>;
+    async fetch(
+        id: string,
+        options?: Include<FetchOptions> & {
+            type?: 'admin' | 'admin-all' | 'owner';
+        },
+    ): Promise<ClientServer>; // TODO: support &type=
     /**
      * Fetches a list of servers from the API with the given options (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.
-     * 
-     * @param [options] Additional fetch options.
+     *
+     * @param [options] Additional fetch options, including the `type` scope of the servers to
+     * return (can be 'admin', 'admin-all', or 'owner').
      * @returns The fetched servers.
      * @example
      * ```
@@ -105,22 +105,34 @@ export class ClientServerManager extends BaseManager {
      *  .catch(console.error);
      * ```
      */
-    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ClientServer>>;
     async fetch(
-        op?: string | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        options?: Include<FetchOptions> & {
+            type?: 'admin' | 'admin-all' | 'owner';
+        },
+    ): Promise<Dict<number, ClientServer>>;
+    async fetch(
+        op?:
+            | string
+            | (Include<FetchOptions> & {
+                  type?: 'admin' | 'admin-all' | 'owner';
+              }),
+        ops: Include<FetchOptions> & {
+            type?: 'admin' | 'admin-all' | 'owner';
+        } = {},
     ): Promise<any> {
         let path = endpoints.servers.main;
         if (typeof op === 'string') {
-            if (!ops.force && this.cache.has(op))
-                return this.cache.get(op);
+            if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
             path = endpoints.servers.get(op);
         } else {
             if (op) ops = op;
         }
 
-        const data = await this.client.requests.get(path, ops, null, this);
+        path += buildQuery(ops, this.getQueryOptions());
+        if (ops.type)
+            path += (path.includes('?') ? '&' : '?') + `type=${ops.type}`;
+        const data = await this.client.requests.get(path);
         return this._patch(data);
     }
 
@@ -137,7 +149,7 @@ export class ClientServerManager extends BaseManager {
      */
     async fetchResources(id: string): Promise<ClientResources> {
         const data: any = await this.client.requests.get(
-            endpoints.servers.resources(id)
+            endpoints.servers.resources(id),
         );
         return caseConv.toCamelCase(data.attributes);
     }
@@ -145,7 +157,7 @@ export class ClientServerManager extends BaseManager {
     /**
      * Fetches the server startup and egg variables data.
      * @see {@link StartupData}.
-     * 
+     *
      * @param id The identifier of the server.
      * @returns The startup and egg variable data.
      * @example
@@ -157,12 +169,12 @@ export class ClientServerManager extends BaseManager {
      */
     async fetchStartup(id: string): Promise<StartupData> {
         const data = await this.client.requests.get(
-            endpoints.servers.startup.get(id)
+            endpoints.servers.startup.get(id),
         );
 
         const parsed = caseConv.toCamelCase<StartupData>(data.meta);
-        parsed.variables = data.data.map(
-            (v: any) => caseConv.toCamelCase(v.attributes)
+        parsed.variables = data.data.map((v: any) =>
+            caseConv.toCamelCase(v.attributes),
         );
         return parsed;
     }
@@ -179,9 +191,9 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async sendCommand(id: string, command: string): Promise<void> {
-        await this.client.requests.post(
-            endpoints.servers.command(id), { command }
-        );
+        await this.client.requests.post(endpoints.servers.command(id), {
+            command,
+        });
     }
 
     /**
@@ -196,16 +208,16 @@ export class ClientServerManager extends BaseManager {
      */
     async setPowerState(
         id: string,
-        state: 'start' | 'stop' | 'restart' | 'kill'
+        state: 'start' | 'stop' | 'restart' | 'kill',
     ): Promise<void> {
         if (!['start', 'stop', 'restart', 'kill'].includes(state))
             throw new ValidationError(
-                'Invalid power state, must be: start, stop, restart, or kill.'
+                'Invalid power state, must be: start, stop, restart, or kill.',
             );
 
-        await this.client.requests.post(
-            endpoints.servers.power(id), { signal: state }
-        );
+        await this.client.requests.post(endpoints.servers.power(id), {
+            signal: state,
+        });
     }
 
     /**
@@ -222,9 +234,9 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async setDockerImage(id: string, image: string): Promise<void> {
-        await this.client.requests.put(
-            endpoints.servers.settings.image(id), { docker_image: image }
-        );
+        await this.client.requests.put(endpoints.servers.settings.image(id), {
+            docker_image: image,
+        });
     }
 
     /**
@@ -245,18 +257,16 @@ export class ClientServerManager extends BaseManager {
     async setVariable(
         id: string,
         key: string,
-        value: string
+        value: string,
     ): Promise<EggVariable> {
-        if (typeof key !== 'string') throw new ValidationError(
-            'variable key', 'string', typeof key
-        );
-        if (typeof value !== 'string') throw new ValidationError(
-            'variable value', 'string', typeof value
-        );
+        if (typeof key !== 'string')
+            throw new ValidationError('variable key', 'string', typeof key);
+        if (typeof value !== 'string')
+            throw new ValidationError('variable value', 'string', typeof value);
 
         const data = await this.client.requests.put(
             endpoints.servers.startup.var(id),
-            { key, value }
+            { key, value },
         );
         return caseConv.toCamelCase(data.attributes);
     }
@@ -272,9 +282,9 @@ export class ClientServerManager extends BaseManager {
      * ```
      */
     async rename(id: string, name: string): Promise<void> {
-        await this.client.requests.post(
-            endpoints.servers.settings.rename(id), { name }
-        );
+        await this.client.requests.post(endpoints.servers.settings.rename(id), {
+            name,
+        });
         if (this.cache.has(id)) {
             const s = this.cache.get(id)!;
             s.name = name;
@@ -292,7 +302,7 @@ export class ClientServerManager extends BaseManager {
      */
     async reinstall(id: string): Promise<void> {
         await this.client.requests.post(
-            endpoints.servers.settings.reinstall(id)
+            endpoints.servers.settings.reinstall(id),
         );
     }
 }

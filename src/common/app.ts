@@ -2,112 +2,112 @@ import { FeatureLimits, Limits } from '../common';
 
 /** Represents an allocation object. */
 export interface Allocation {
-    id:         number;
-    ip:         string;
-    alias:      string | undefined;
-    port:       number;
-    notes:      string | undefined;
-    assigned:   boolean;
+    id: number;
+    ip: string;
+    alias: string | undefined;
+    port: number;
+    notes: string | undefined;
+    assigned: boolean;
 }
 
 export interface ApplicationDatabase {
-    id:             number;
-    serverId:       number;
-    hostId:         number;
-    database:       unknown;
-    username:       string;
-    remote:         string;
+    id: number;
+    serverId: number;
+    hostId: number;
+    database: unknown;
+    username: string;
+    remote: string;
     maxConnections: number;
-    createdAt:      Date;
-    updatedAt:      Date | undefined;
+    createdAt: Date;
+    updatedAt: Date | undefined;
 }
 
 /** Options for creating a node. */
 export interface CreateNodeOptions {
-    name:                   string;
-    description:            string | undefined;
+    name: string;
+    description: string | undefined;
     /** @deprecated Broken, use `locationId`. */
-    location:               string;
-    locationId:             number;
-    public:                 boolean;
-    fqdn:                   string;
-    scheme:                 string;
-    behindProxy:            boolean;
-    memory:                 number;
-    memoryOverallocate?:    number;
-    disk:                   number;
-    diskOverallocate?:      number;
+    location: string;
+    locationId: number;
+    public: boolean;
+    fqdn: string;
+    scheme: string;
+    behindProxy: boolean;
+    memory: number;
+    memoryOverallocate?: number;
+    disk: number;
+    diskOverallocate?: number;
     /** @deprecated Use `daemonPort` and `daemonListen` instead. */
-    sftp:{
-        port:               number;
-        listener:           number;
-    }
-    daemonBase:             string;
-    daemonSftp:             number;
-    daemonListen:           number;
-    maintenanceMode:        boolean;
-    uploadSize?:            number;
+    sftp: {
+        port: number;
+        listener: number;
+    };
+    daemonBase: string;
+    daemonSftp: number;
+    daemonListen: number;
+    maintenanceMode: boolean;
+    uploadSize?: number;
 }
 
 /** Options for creating a user account. */
 export interface CreateUserOptions {
-    externalId?:    string;
-    email:          string;
-    username:       string;
-    firstname:      string;
-    lastname:       string;
-    password?:      string;
-    isAdmin?:       boolean;
+    externalId?: string;
+    email: string;
+    username: string;
+    firstname: string;
+    lastname: string;
+    password?: string;
+    isAdmin?: boolean;
 }
 
 /** Options for creating a server. */
 export interface CreateServerOptions {
     /** The external identifier of the server. */
-    externalId?:        string;
+    externalId?: string;
     /** The name of the server. */
-    name:               string;
+    name: string;
     /**
      * A description of the server.
      * @default undefined
      */
-    description?:       string;
+    description?: string;
     /** The ID of the user that will own the server. */
-    user:               number;
+    user: number;
     /** The egg to use for the server. */
-    egg:                number;
+    egg: number;
     /** The default docker image for the server. */
-    dockerImage:        string;
+    dockerImage: string;
     /** The server startup command. */
-    startup:            string;
+    startup: string;
     /** An environment variables object. */
-    environment:        Record<string, string | number | boolean>;
+    environment: Record<string, string | number | boolean>;
     /**
      * Whether to skip the egg installation script.
      * @default false
      */
-    skipScripts?:       boolean;
+    skipScripts?: boolean;
     /** Doesn't work, don't use this. */
-    oomDisabled?:       boolean;
+    oomDisabled?: boolean;
     /** The server limits. */
-    limits?:            Partial<Limits>;
+    limits?: Partial<Limits>;
     /** The server's feature limits. */
-    featureLimits?:     Partial<FeatureLimits>;
+    featureLimits?: Partial<FeatureLimits>;
     /** The server allocation details. */
-    allocation:{
+    allocation: {
         /** The default server allocation. */
-        default:        number;
+        default: number;
         /** Additional allocations for the server. */
-        additional?:    number[];
-    }
+        additional?: number[];
+    };
     /**
      * Node deployment options. This is for more control over where the
      * server is deployed within the location and port ranges specified.
      */
-    deploy?:{
-        locations:      number[];
-        dedicatedIp:    boolean;
-        portRange:      string[];
-    }
+    deploy?: {
+        locations: number[];
+        dedicatedIp: boolean;
+        portRange: string[];
+    };
     /**
      * Whether to start the server after the installation process is complete.
      * @default false
@@ -117,80 +117,80 @@ export interface CreateServerOptions {
 
 /** Represents a nest egg object. */
 export interface Egg {
-    id:                 number;
-    uuid:               string;
-    nest:               number;
-    name:               string;
-    description:        string;
-    author:             string;
+    id: number;
+    uuid: string;
+    nest: number;
+    name: string;
+    description: string;
+    author: string;
     /**
      * @deprecated Will be removed in Pterodactyl v2 in favour of
      * {@link dockerImages}.
      */
-    dockerImage:        string;
-    dockerImages:       string[];
-    config:{
-        files:          Record<string, any>;
-        startup:        Record<string, any>;
-        stop:           string;
-        logs:           string[];
-        fileDenylist:   string[];
-        extends:        string | null;
-    }
-    startup:            string;
-    script:{
-        privileged:     boolean;
-        install:        string;
-        entry:          string;
-        container:      string;
-        extends:        string | null;
-    }
-    createdAt:          Date;
-    updatedAt:          Date | undefined;
+    dockerImage: string;
+    dockerImages: string[];
+    config: {
+        files: Record<string, any>;
+        startup: Record<string, any>;
+        stop: string;
+        logs: string[];
+        fileDenylist: string[];
+        extends: string | null;
+    };
+    startup: string;
+    script: {
+        privileged: boolean;
+        install: string;
+        entry: string;
+        container: string;
+        extends: string | null;
+    };
+    createdAt: Date;
+    updatedAt: Date | undefined;
 }
 
 /** Represents a nest object. */
 export interface Nest {
-    id:             number;
-    uuid:           string;
-    author:         string;
-    name:           string;
-    description:    string;
-    createdAt:      Date;
-    updatedAt:      Date | undefined;
+    id: number;
+    uuid: string;
+    author: string;
+    name: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date | undefined;
 }
 
 /** Represents a node configuration object (from Wings). */
 export interface NodeConfiguration {
-    uuid:               string;
-    tokenId:            string;
-    token:              string;
-    debug:              boolean;
-    api:{
-        host:           string;
-        port:           number;
-        ssl:{
-            enabled:    boolean;
-            cert:       string;
-            key:        string;
-        }
-        uploadLimit:    number;
+    uuid: string;
+    tokenId: string;
+    token: string;
+    debug: boolean;
+    api: {
+        host: string;
+        port: number;
+        ssl: {
+            enabled: boolean;
+            cert: string;
+            key: string;
+        };
+        uploadLimit: number;
     };
-    system:{
-        data:           string;
-        sftp:{
-            bindPort:   number;
-        }
-    }
-    allowedMounts:      string[];
-    remote:             string;
+    system: {
+        data: string;
+        sftp: {
+            bindPort: number;
+        };
+    };
+    allowedMounts: string[];
+    remote: string;
 }
 
 /** Query options for fetching deployable nodes. */
 export interface NodeDeploymentOptions {
-    memory:         number;
-    disk:           number;
-    locationIds?:   number[];
+    memory: number;
+    disk: number;
+    locationIds?: number[];
 }
 
 /** Represents a server status. If the server has no status, `NONE` is used. */
@@ -199,33 +199,34 @@ export enum ServerStatus {
     INSTALL_FAILED = 'install_failed',
     SUSPENDED = 'suspended',
     RESTORING = 'restoring_backup',
-    NONE = ''
+    NONE = '',
 }
 
 export interface UpdateBuildOptions {
-    limits?:            Partial<Limits>;
-    featureLimits?:     Partial<FeatureLimits>;
-    allocation?:        number;
-    oomDisabled?:       boolean;
-    addAllocations?:    number[];
+    limits?: Partial<Limits>;
+    featureLimits?: Partial<FeatureLimits>;
+    allocation?: number;
+    oomDisabled?: boolean;
+    addAllocations?: number[];
     removeAllocations?: number[];
 }
 
 export interface UpdateDetailsOptions {
-    name?:          string;
-    owner?:         number;
-    externalId?:    string;
-    description?:   string;
+    name?: string;
+    owner?: number;
+    externalId?: string;
+    description?: string;
 }
 
 export interface UpdateStartupOptions {
-    startup?:       string;
-    environment?:   Record<string, string | number | boolean>;
-    egg?:           number;
-    image?:         string;
-    skipScripts?:   boolean;
+    startup?: string;
+    environment?: Record<string, string | number | boolean>;
+    egg?: number;
+    image?: string;
+    skipScripts?: boolean;
 }
 
-export interface UpdateUserOptions extends Omit<CreateUserOptions, 'externalId'> {
+export interface UpdateUserOptions
+    extends Omit<CreateUserOptions, 'externalId'> {
     externalId?: string | null;
 }

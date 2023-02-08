@@ -51,7 +51,7 @@ export enum Flags {
 
     ADMIN_WEBSOCKET_ERRORS = 'admin.websocket.errors',
     ADMIN_WEBSOCKET_INSTALL = 'admin.websocket.install',
-    ADMIN_WEBSOCKET_TRANSFER = 'admin.websocket.transfer'
+    ADMIN_WEBSOCKET_TRANSFER = 'admin.websocket.transfer',
 }
 
 export class Permissions {
@@ -61,7 +61,7 @@ export class Permissions {
             Flags.CONTROL_CONSOLE,
             Flags.CONTROL_START,
             Flags.CONTROL_STOP,
-            Flags.CONTROL_RESTART
+            Flags.CONTROL_RESTART,
         ]);
     }
 
@@ -71,7 +71,7 @@ export class Permissions {
             Flags.USER_CREATE,
             Flags.USER_READ,
             Flags.USER_UPDATE,
-            Flags.USER_DELETE
+            Flags.USER_DELETE,
         ]);
     }
 
@@ -84,7 +84,7 @@ export class Permissions {
             Flags.FILE_UPDATE,
             Flags.FILE_DELETE,
             Flags.FILE_ARCHIVE,
-            Flags.FILE_SFTP
+            Flags.FILE_SFTP,
         ]);
     }
 
@@ -94,7 +94,7 @@ export class Permissions {
             Flags.BACKUP_CREATE,
             Flags.BACKUP_READ,
             Flags.BACKUP_UPDATE,
-            Flags.BACKUP_DELETE
+            Flags.BACKUP_DELETE,
         ]);
     }
 
@@ -104,16 +104,13 @@ export class Permissions {
             Flags.ALLOCATION_READ,
             Flags.ALLOCATION_CREATE,
             Flags.ALLOCATION_UPDATE,
-            Flags.ALLOCATION_DELETE
+            Flags.ALLOCATION_DELETE,
         ]);
     }
 
     /** @returns All the server startup permissions. */
     static get STARTUPS(): readonly Flags[] {
-        return Object.freeze([
-            Flags.STARTUP_READ,
-            Flags.STARTUP_UPDATE
-        ]);
+        return Object.freeze([Flags.STARTUP_READ, Flags.STARTUP_UPDATE]);
     }
 
     /** @returns All the server database permissions. */
@@ -123,7 +120,7 @@ export class Permissions {
             Flags.DATABASE_READ,
             Flags.DATABASE_UPDATE,
             Flags.DATABASE_DELETE,
-            Flags.DATABASE_VIEW_PASSWORD
+            Flags.DATABASE_VIEW_PASSWORD,
         ]);
     }
 
@@ -133,16 +130,13 @@ export class Permissions {
             Flags.SCHEDULE_CREATE,
             Flags.SCHEDULE_READ,
             Flags.SCHEDULE_UPDATE,
-            Flags.SCHEDULE_DELETE
+            Flags.SCHEDULE_DELETE,
         ]);
     }
 
     /** @returns All the server settings permissions. */
     static get SETTINGS(): readonly Flags[] {
-        return Object.freeze([
-            Flags.SETTINGS_RENAME,
-            Flags.SETTINGS_REINSTALL
-        ]);
+        return Object.freeze([Flags.SETTINGS_RENAME, Flags.SETTINGS_REINSTALL]);
     }
 
     /** @returns The admin permissions. */
@@ -150,7 +144,7 @@ export class Permissions {
         return Object.freeze([
             Flags.ADMIN_WEBSOCKET_ERRORS,
             Flags.ADMIN_WEBSOCKET_INSTALL,
-            Flags.ADMIN_WEBSOCKET_TRANSFER
+            Flags.ADMIN_WEBSOCKET_TRANSFER,
         ]);
     }
 
@@ -207,11 +201,13 @@ export class Permissions {
      * @returns True if the current value includes administrative permissions.
      */
     isAdmin(): boolean {
-        return this.value.some((p: Flags) => [
-            Flags.ADMIN_WEBSOCKET_ERRORS,
-            Flags.ADMIN_WEBSOCKET_INSTALL,
-            Flags.ADMIN_WEBSOCKET_TRANSFER
-        ].includes(p));
+        return this.value.some((p: Flags) =>
+            [
+                Flags.ADMIN_WEBSOCKET_ERRORS,
+                Flags.ADMIN_WEBSOCKET_INSTALL,
+                Flags.ADMIN_WEBSOCKET_TRANSFER,
+            ].includes(p),
+        );
     }
 
     /**

@@ -2,11 +2,10 @@ import type { PteroApp } from '.';
 import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { Node } from '../structures/Node';
-import { ValidationError } from '../structures/Errors';
 import {
     CreateNodeOptions,
     NodeConfiguration,
-    NodeDeploymentOptions
+    NodeDeploymentOptions,
 } from '../common/app';
 import {
     FetchOptions,
@@ -15,8 +14,9 @@ import {
     Include,
     PaginationMeta,
     Resolvable,
-    Sort
+    Sort,
 } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -41,7 +41,7 @@ export class NodeManager extends BaseManager {
      * * allocations
      * * location
      * * servers
-     * 
+     *
      * Note: not all of these include options have been implemented yet.
      */
     get INCLUDES() {
@@ -68,7 +68,7 @@ export class NodeManager extends BaseManager {
             total: 0,
             count: 0,
             perPage: 0,
-            totalPages: 0
+            totalPages: 0,
         };
     }
 
@@ -79,7 +79,9 @@ export class NodeManager extends BaseManager {
      */
     _patch(data: any): any {
         if (data?.meta?.pagination) {
-            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta = caseConv.toCamelCase(data.meta.pagination, {
+                ignore: ['current_page'],
+            });
             this.meta.current = data.meta.pagination.current_page;
         }
 
@@ -103,16 +105,16 @@ export class NodeManager extends BaseManager {
      * * a string
      * * a number
      * * an object
-     * 
+     *
      * @param obj The object to resolve from.
      * @returns The resolved node or undefined if not found.
      */
     resolve(obj: Resolvable<Node>): Node | undefined {
         if (obj instanceof Node) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
-        if (typeof obj === 'string') return this.cache.find(
-            n => n.name === obj
-        );
+        if (typeof obj === 'string')
+            return this.cache.find(n => n.name === obj);
+
         if (obj.relationships?.node)
             return this._patch(obj.relationships.node) as Node;
 
@@ -156,12 +158,11 @@ export class NodeManager extends BaseManager {
     async fetch(options?: Include<FetchOptions>): Promise<Dict<number, Node>>;
     async fetch(
         op?: number | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        ops: Include<FetchOptions> = {},
     ): Promise<any> {
         let path = endpoints.nodes.main;
         if (typeof op === 'number') {
-            if (!ops.force && this.cache.has(op))
-                return this.cache.get(op);
+            if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
             path = endpoints.nodes.get(op);
         } else {
@@ -170,6 +171,25 @@ export class NodeManager extends BaseManager {
 
         const data = await this.client.requests.get(path, ops, null, this);
         return this._patch(data);
+    }
+
+    /**
+     * Fetches all nodes from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched nodes.
+     * @example
+     * ```
+     * app.nodes.fetchAll({ include:['servers'] })
+     *  .then(console.log)
+     *  .catch(console.error);
+     * ```
+     */
+    fetchAll(
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, Node>> {
+        return this.getFetchAll(options);
     }
 
     /**
@@ -186,10 +206,12 @@ export class NodeManager extends BaseManager {
      * ```
      */
     async fetchDeployable(
-        options: NodeDeploymentOptions
+        options: NodeDeploymentOptions,
     ): Promise<Dict<number, Node>> {
         const data = await this.client.requests.get(
-            endpoints.nodes.deploy, undefined, options
+            endpoints.nodes.deploy,
+            undefined,
+            options,
         );
         return this._patch(data);
     }
@@ -197,19 +219,19 @@ export class NodeManager extends BaseManager {
     /**
      * Queries the API for nodes that match the specified query filters. This fetches from the
      * API directly and does not check the cache. Use cache methods for filtering and sorting.
-     * 
+     *
      * Available query filters:
      * * uuid
      * * name
      * * fqdn
      * * daemonTokenId
-     * 
+     *
      * Available sort options:
      * * id
      * * uuid
      * * memory
      * * disk
-     * 
+     *
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried nodes.
@@ -222,12 +244,12 @@ export class NodeManager extends BaseManager {
      */
     async query(
         entity: string,
-        options: Filter<Sort<{}>>
+        options: Filter<Sort<{}>>,
     ): Promise<Dict<number, Node>> {
-        if (!options.sort && !options.filter) throw new ValidationError(
-            'Sort or filter is required.'
-        );
-        if (options.filter === 'daemonTokenId') options.filter = 'daemon_token_id';
+        if (!options.sort && !options.filter)
+            throw new ValidationError('Sort or filter is required.');
+        if (options.filter === 'daemonTokenId')
+            options.filter = 'daemon_token_id';
 
         const payload: FilterArray<Sort<{}>> = {};
         if (options.filter) payload.filter = [options.filter, entity];
@@ -236,7 +258,8 @@ export class NodeManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.nodes.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            null, this
+            null,
+            this,
         );
         return this._patch(data);
     }
@@ -251,9 +274,7 @@ export class NodeManager extends BaseManager {
      * ```
      */
     async getConfig(id: number): Promise<NodeConfiguration> {
-        const data = await this.client.requests.get(
-            endpoints.nodes.config(id)
-        );
+        const data = await this.client.requests.get(endpoints.nodes.config(id));
         return caseConv.toCamelCase(data);
     }
 
@@ -284,7 +305,8 @@ export class NodeManager extends BaseManager {
     async create(options: CreateNodeOptions): Promise<Node> {
         const payload = caseConv.toSnakeCase<object>(options);
         const data = await this.client.requests.post(
-            endpoints.nodes.main, payload
+            endpoints.nodes.main,
+            payload,
         );
         return this._patch(data);
     }
@@ -304,7 +326,7 @@ export class NodeManager extends BaseManager {
      */
     async update(
         id: number,
-        options: Partial<CreateNodeOptions>
+        options: Partial<CreateNodeOptions>,
     ): Promise<Node> {
         if (!Object.keys(options).length)
             throw new ValidationError('Too few options to update the node.');
@@ -314,7 +336,8 @@ export class NodeManager extends BaseManager {
         const payload = caseConv.toSnakeCase<object>(options);
 
         const data = await this.client.requests.patch(
-            endpoints.nodes.get(id), payload
+            endpoints.nodes.get(id),
+            payload,
         );
         return this._patch(data);
     }

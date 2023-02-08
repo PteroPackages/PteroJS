@@ -1,5 +1,7 @@
 import type { PteroClient } from '..';
+import { WebSocketAuth } from '../../common/client';
 import { Shard } from './Shard';
+import endpoints from '../endpoints';
 
 export class WebSocketManager {
     public client: PteroClient;
@@ -45,6 +47,15 @@ export class WebSocketManager {
         let sum = 0;
         for (let s of this.shards.values()) sum += s.ping;
         return sum / this.shards.size;
+    }
+
+    /**
+     * Fetches the websocket authentication data for a specified server.
+     * @param id The identifier of the server.
+     * @returns The websocket authentication data.
+     */
+    getAuth(id: string): Promise<WebSocketAuth> {
+        return this.client.requests.get(endpoints.servers.ws(id));
     }
 
     /**

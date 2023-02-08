@@ -1,9 +1,9 @@
 import type { PteroClient } from '.';
 import { Dict } from '../structures/Dict';
+import { FetchOptions, Resolvable } from '../common';
 import { Permissions } from '../structures/Permissions';
 import { SubUser } from '../structures/User';
 import { ValidationError } from '../structures/Errors';
-import { FetchOptions, Resolvable } from '../common';
 import endpoints from './endpoints';
 
 export class SubUserManager {
@@ -39,7 +39,7 @@ export class SubUserManager {
      * * a string
      * * a number
      * * an object
-     * 
+     *
      * @param obj The object to resolve from.
      * @returns The resolved user or undefined if not found.
      */
@@ -48,7 +48,8 @@ export class SubUserManager {
         // needed for typing resolution
         if (typeof obj === 'number') return undefined;
         if (typeof obj === 'string') return this.cache.get(obj);
-        if (obj.relationships?.users) return this._patch(obj.relationships.users);
+        if (obj.relationships?.users)
+            return this._patch(obj.relationships.users);
         return undefined;
     }
 
@@ -63,7 +64,7 @@ export class SubUserManager {
     /**
      * Fetches a subuser from the API by its UUID. This will check the cache first unless the
      * force option is specified.
-     * 
+     *
      * @param uuid The UUID of the subuser.
      * @param [options] Additional fetch options.
      * @returns The fetched subuser.
@@ -78,7 +79,7 @@ export class SubUserManager {
     async fetch(uuid: string, options?: FetchOptions): Promise<SubUser>;
     /**
      * Fetches a list of subusers from the API with the given options (default is undefined).
-     * 
+     *
      * @param [options] Additional fetch options.
      * @returns The fetched subusers.
      * @example
@@ -90,11 +91,13 @@ export class SubUserManager {
      * ```
      */
     async fetch(options?: FetchOptions): Promise<Dict<number, SubUser>>;
-    async fetch(op?: string | FetchOptions, ops: FetchOptions = {}): Promise<any> {
+    async fetch(
+        op?: string | FetchOptions,
+        ops: FetchOptions = {},
+    ): Promise<any> {
         let path = endpoints.servers.users.main(this.serverId);
         if (typeof op === 'string') {
-            if (!ops.force && this.cache.has(op))
-                return this.cache.get(op);
+            if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
             path = endpoints.servers.users.get(this.serverId, op);
         } else {
@@ -121,16 +124,17 @@ export class SubUserManager {
      */
     async add(
         email: string,
-        permissions: string[] // TODO: change to permissions
+        permissions: string[], // TODO: change to permissions
     ): Promise<SubUser> {
         const perms = Permissions.resolve(...permissions);
-        if (!perms.length) throw new ValidationError(
-            'Need at least 1 permission for the subuser.'
-        );
+        if (!perms.length)
+            throw new ValidationError(
+                'Need at least 1 permission for the subuser.',
+            );
 
         const data = await this.client.requests.post(
             endpoints.servers.users.main(this.serverId),
-            { email, permissions: perms }
+            { email, permissions: perms },
         );
         return this._patch(data);
     }
@@ -152,18 +156,16 @@ export class SubUserManager {
      *  .catch(console.error);
      * ```
      */
-    async setPermissions(
-        id: string,
-        permissions: string[]
-    ): Promise<SubUser> {
+    async setPermissions(id: string, permissions: string[]): Promise<SubUser> {
         const perms = Permissions.resolve(...permissions);
-        if (!perms.length) throw new ValidationError(
-            'No permissions specified for the subuser.'
-        );
+        if (!perms.length)
+            throw new ValidationError(
+                'No permissions specified for the subuser.',
+            );
 
         const data = await this.client.requests.post(
             endpoints.servers.users.get(this.serverId, id),
-            { permissions: perms }
+            { permissions: perms },
         );
         return this._patch(data);
     }
@@ -180,7 +182,7 @@ export class SubUserManager {
      */
     async remove(id: string): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.users.get(this.serverId, id)
+            endpoints.servers.users.get(this.serverId, id),
         );
         this.cache.delete(id);
     }

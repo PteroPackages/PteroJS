@@ -1,12 +1,12 @@
 import type { Shard } from './ws/Shard';
 import { Account } from '../structures/User';
 import { ClientServerManager } from './ClientServerManager';
-import { RequestManager } from '../http/RequestManager';
-import { ScheduleManager } from './ScheduleManager';
-import { WebSocketManager } from './ws/WebSocketManager';
 import { OptionSpec } from '../common';
 import { PermissionDescriptor } from '../common/client';
+import { RequestManager } from '../http/RequestManager';
+import { ScheduleManager } from './ScheduleManager';
 import { ValidationError } from '../structures/Errors';
+import { WebSocketManager } from './ws/WebSocketManager';
 import endpoints from './endpoints';
 import loader from '../util/config';
 
@@ -14,7 +14,7 @@ import loader from '../util/config';
  * The base class for the Pterodactyl client API.
  * This operates using a Pterodactyl client API key which can be found
  * at <your.domain.name/account/api>.
- * 
+ *
  * **Warning:** Keep your API key private at all times. Exposing this can lead
  * to your accond and servers being corrupted, exposed and/or deleted.
  */
@@ -31,6 +31,7 @@ export class PteroClient {
      */
     public auth: string;
 
+    /** @deprecated To be replaced with a better system. */
     public options: Record<string, OptionSpec>;
 
     /**
@@ -47,15 +48,15 @@ export class PteroClient {
     constructor(
         domain: string,
         auth: string,
-        options: Record<string, OptionSpec> = {}
+        options: Record<string, OptionSpec> = {},
     ) {
         if (!/https?\:\/\/(?:localhost\:\d{4}|[\w\.\-]{3,256})/gi.test(domain))
             throw new ValidationError(
                 "Domain URL must start with 'http://' or 'https://' and " +
-                'must be bound to a port if using localhost.'
+                    'must be bound to a port if using localhost.',
             );
 
-        if (domain.endsWith("/")) domain = domain.slice(0, -1);
+        if (domain.endsWith('/')) domain = domain.slice(0, -1);
         this.domain = domain;
         this.auth = auth;
         this.options = loader.clientConfig({ client: options });

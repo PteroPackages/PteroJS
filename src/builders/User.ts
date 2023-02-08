@@ -75,8 +75,11 @@ export class UserBuilder extends Builder {
     build(): CreateUserOptions {
         if (!this.username) throw new ValidationError('a username is required');
         if (!this.email) throw new ValidationError('an email is required');
-        if (!this.firstname) throw new ValidationError('a first name is required');
-        if (!this.lastname) throw new ValidationError('a last name is required');
+        if (!this.firstname)
+            throw new ValidationError('a first name is required');
+
+        if (!this.lastname)
+            throw new ValidationError('a last name is required');
 
         return super.build();
     }

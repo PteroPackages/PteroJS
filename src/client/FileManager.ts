@@ -1,8 +1,8 @@
-import { existsSync, writeFileSync } from 'fs';
 import type { PteroClient } from '.';
+import { existsSync, writeFileSync } from 'fs';
 import { Dict } from '../structures/Dict';
-import { ValidationError } from '../structures/Errors';
 import { File, FileChmodData } from '../common/client';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
 
@@ -60,7 +60,7 @@ export class FileManager {
     async fetch(dir: string = '/'): Promise<Dict<string, File>> {
         const data = await this.client.requests.get(
             endpoints.servers.files.main(this.serverId) +
-            `?directory=${this.clean(dir)}`
+                `?directory=${this.clean(dir)}`,
         );
         return this._patch(dir, data);
     }
@@ -80,7 +80,7 @@ export class FileManager {
      */
     async getContents(path: string): Promise<string> {
         const data = await this.client.requests.get(
-            endpoints.servers.files.contents(this.serverId, this.clean(path))
+            endpoints.servers.files.contents(this.serverId, this.clean(path)),
         );
         return data.toString();
     }
@@ -99,7 +99,7 @@ export class FileManager {
      */
     async getDownloadURL(path: string): Promise<string> {
         const data = await this.client.requests.get(
-            endpoints.servers.files.download(this.serverId, this.clean(path))
+            endpoints.servers.files.download(this.serverId, this.clean(path)),
         );
         return data.attributes.url;
     }
@@ -116,9 +116,10 @@ export class FileManager {
      * ```
      */
     async download(path: string, dest: string): Promise<void> {
-        if (existsSync(dest)) throw new ValidationError(
-            'A file or directory exists at this path.'
-        );
+        if (existsSync(dest))
+            throw new ValidationError(
+                'A file or directory exists at this path.',
+            );
 
         const url = await this.getDownloadURL(path);
         const data = await this.client.requests.raw('GET', url);
@@ -140,7 +141,7 @@ export class FileManager {
     async getUploadURL(dir: string = '/'): Promise<string> {
         const data = await this.client.requests.get(
             endpoints.servers.files.upload(this.serverId) +
-            `?directory=${this.clean(dir)}`
+                `?directory=${this.clean(dir)}`,
         );
         return data.attributes.url;
     }
@@ -170,7 +171,7 @@ export class FileManager {
     async write(path: string, content: any): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.files.write(this.serverId, this.clean(path)),
-            { raw: content }
+            content,
         );
     }
 
@@ -187,7 +188,7 @@ export class FileManager {
     async createFolder(path: string, name: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.files.create(this.serverId),
-            { root: path, name }
+            { root: path, name },
         );
     }
 
@@ -208,10 +209,13 @@ export class FileManager {
      *  .catch(console.error);
      * ```
      */
-    async rename(path: string, files:{ from: string; to: string }[]): Promise<void> {
+    async rename(
+        path: string,
+        files: { from: string; to: string }[],
+    ): Promise<void> {
         await this.client.requests.put(
             endpoints.servers.files.rename(this.serverId),
-            { root: path, files }
+            { root: path, files },
         );
     }
 
@@ -237,7 +241,7 @@ export class FileManager {
 
         await this.client.requests.post(
             endpoints.servers.files.chmod(this.serverId),
-            { root: dir, files }
+            { root: dir, files },
         );
     }
 
@@ -253,7 +257,7 @@ export class FileManager {
     async copy(path: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.files.copy(this.serverId),
-            { location: path }
+            { location: path },
         );
     }
 
@@ -273,13 +277,18 @@ export class FileManager {
      *  .catch(console.error);
      * ```
      */
-    async compress(dir: string, files: string[]): Promise<Dict<string, File>> {
-        files = files.map(f => f.startsWith('.') ? f.slice(1) : f);
+    async compress(dir: string, files: string[]): Promise<File> {
+        files = files.map(f => (f.startsWith('.') ? f.slice(1) : f));
         const data = await this.client.requests.post(
             endpoints.servers.files.compress(this.serverId),
-            { root: dir, files }
+            { root: dir, files },
         );
-        return this._patch(dir, data);
+
+        let f = caseConv.toCamelCase<File>(data.attributes);
+        f.modeBits = BigInt(f.modeBits);
+        f.createdAt = new Date(f.createdAt);
+        f.modifiedAt &&= new Date(f.modifiedAt);
+        return f;
     }
 
     /**
@@ -296,7 +305,7 @@ export class FileManager {
     async decompress(dir: string, file: string): Promise<void> {
         await this.client.requests.post(
             endpoints.servers.files.decompress(this.serverId),
-            { root: dir, file }
+            { root: dir, file },
         );
     }
 
@@ -312,10 +321,10 @@ export class FileManager {
      * ```
      */
     async delete(dir: string, files: string[]): Promise<void> {
-        files = files.map(f => f.startsWith('.') ? f.slice(1) : f);
+        files = files.map(f => (f.startsWith('.') ? f.slice(1) : f));
         await this.client.requests.post(
             endpoints.servers.files.delete(this.serverId),
-            { root: dir, files }
+            { root: dir, files },
         );
     }
 }

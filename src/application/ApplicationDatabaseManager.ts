@@ -3,9 +3,9 @@ import { BaseManager } from '../structures/BaseManager';
 import { Dict } from '../structures/Dict';
 import { ApplicationDatabase } from '../common/app';
 import { FetchOptions, Include } from '../common';
+import { ValidationError } from '../structures/Errors';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
-import { ValidationError } from '../structures/Errors';
 
 export class ApplicationDatabaseManager extends BaseManager {
     public client: PteroApp;
@@ -38,7 +38,9 @@ export class ApplicationDatabaseManager extends BaseManager {
         if (data.data) {
             const res = new Dict<number, ApplicationDatabase>();
             for (let o of data.data) {
-                const d = caseConv.toCamelCase<ApplicationDatabase>(o.attributes);
+                const d = caseConv.toCamelCase<ApplicationDatabase>(
+                    o.attributes,
+                );
             }
             this.cache.update(res);
             return res;
@@ -49,27 +51,34 @@ export class ApplicationDatabaseManager extends BaseManager {
         return d;
     }
 
-    async fetch(id: number, options?: Include<FetchOptions>): Promise<ApplicationDatabase>;
-    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ApplicationDatabase>>;
-    async fetch(op?: number | Include<FetchOptions>, ops: Include<FetchOptions> = {}): Promise<any> {
+    async fetch(
+        id: number,
+        options?: Include<FetchOptions>,
+    ): Promise<ApplicationDatabase>;
+    async fetch(
+        options?: Include<FetchOptions>,
+    ): Promise<Dict<number, ApplicationDatabase>>;
+    async fetch(
+        op?: number | Include<FetchOptions>,
+        ops: Include<FetchOptions> = {},
+    ): Promise<any> {
         let path: string;
         switch (typeof op) {
-            case 'number':{
-                if (!ops.force && this.cache.has(op))
-                    return this.cache.get(op);
+            case 'number': {
+                if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
                 path = endpoints.servers.databases.get(this.serverId, op);
                 break;
             }
             case 'undefined':
-            case 'object':{
+            case 'object': {
                 path = endpoints.servers.databases.main(this.serverId);
                 if (op) ops = op;
                 break;
             }
             default:
                 throw new ValidationError(
-                    `expected database id or fetch options; got ${typeof op}`
+                    `expected database id or fetch options; got ${typeof op}`,
                 );
         }
 
@@ -80,28 +89,29 @@ export class ApplicationDatabaseManager extends BaseManager {
     async create(
         database: string,
         remote: string,
-        host: number
+        host: number,
     ): Promise<ApplicationDatabase> {
-        if (!/^[0-9%.]{1,15}$/.test(remote)) throw new ValidationError(
-            'remote did not pass the required validation: /^[0-9%.]{1,15}$/'
-        );
+        if (!/^[0-9%.]{1,15}$/.test(remote))
+            throw new ValidationError(
+                'remote did not pass the required validation: /^[0-9%.]{1,15}$/',
+            );
 
         const data = await this.client.requests.post(
             endpoints.servers.databases.main(this.serverId),
-            { database, remote, host }
+            { database, remote, host },
         );
         return this._patch(data);
     }
 
     async resetPasword(id: number): Promise<void> {
         await this.client.requests.post(
-            endpoints.servers.databases.reset(this.serverId, id)
+            endpoints.servers.databases.reset(this.serverId, id),
         );
     }
 
     async delete(id: number): Promise<void> {
         await this.client.requests.delete(
-            endpoints.servers.databases.get(this.serverId, id)
+            endpoints.servers.databases.get(this.serverId, id),
         );
         this.cache.delete(id);
     }

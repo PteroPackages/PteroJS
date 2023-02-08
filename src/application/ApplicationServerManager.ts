@@ -1,6 +1,6 @@
 import type { PteroApp } from '.';
-import { ApplicationServer } from '../structures/ApplicationServer';
 import { BaseManager } from '../structures/BaseManager';
+import { ApplicationServer } from '../structures/ApplicationServer';
 import { Dict } from '../structures/Dict';
 import { ValidationError } from '../structures/Errors';
 import {
@@ -12,13 +12,13 @@ import {
     Limits,
     PaginationMeta,
     Resolvable,
-    Sort
+    Sort,
 } from '../common';
 import {
     CreateServerOptions,
     UpdateBuildOptions,
     UpdateDetailsOptions,
-    UpdateStartupOptions
+    UpdateStartupOptions,
 } from '../common/app';
 import caseConv from '../util/caseConv';
 import endpoints from './endpoints';
@@ -39,8 +39,11 @@ export class ApplicationServerManager extends BaseManager {
      */
     get FILTERS() {
         return Object.freeze([
-            'name', 'uuid', 'uuidShort',
-            'externalId', 'image'
+            'name',
+            'uuid',
+            'uuidShort',
+            'externalId',
+            'image',
         ]);
     }
 
@@ -55,14 +58,20 @@ export class ApplicationServerManager extends BaseManager {
      * * location
      * * node
      * * databases
-     * 
+     *
      * Note: not all of these include options have been implemented yet.
      */
     get INCLUDES() {
         return Object.freeze([
-            'allocations', 'user', 'subusers',
-            'nest', 'egg', 'variables',
-            'location', 'node', 'databases'
+            'allocations',
+            'user',
+            'subusers',
+            'nest',
+            'egg',
+            'variables',
+            'location',
+            'node',
+            'databases',
         ]);
     }
 
@@ -72,7 +81,7 @@ export class ApplicationServerManager extends BaseManager {
      * * -id
      * * uuid
      * * -uuid
-     * 
+     *
      * Negative arguments reverse the sorted results.
      */
     get SORTS() {
@@ -88,7 +97,7 @@ export class ApplicationServerManager extends BaseManager {
             total: 0,
             count: 0,
             perPage: 0,
-            totalPages: 0
+            totalPages: 0,
         };
     }
 
@@ -99,16 +108,16 @@ export class ApplicationServerManager extends BaseManager {
             disk: 512,
             io: 500,
             cpu: 100,
-            threads: null
-        }
+            threads: null,
+        };
     }
 
     get defaultFeatureLimits(): FeatureLimits {
         return {
             allocations: 1,
             databases: 1,
-            backups: 1
-        }
+            backups: 1,
+        };
     }
 
     /**
@@ -118,7 +127,9 @@ export class ApplicationServerManager extends BaseManager {
      */
     _patch(data: any): any {
         if (data?.meta?.pagination) {
-            this.meta = caseConv.toCamelCase(data.meta.pagination, { ignore:['current_page'] });
+            this.meta = caseConv.toCamelCase(data.meta.pagination, {
+                ignore: ['current_page'],
+            });
             this.meta.current = data.meta.pagination.current_page;
         }
 
@@ -142,15 +153,21 @@ export class ApplicationServerManager extends BaseManager {
      * * a string
      * * a number
      * * an object
-     * 
+     *
      * @param obj The object to resolve from.
      * @returns The resolved server or undefined if not found.
      */
-    resolve(obj: Resolvable<ApplicationServer>): ApplicationServer | Dict<number, ApplicationServer> | undefined {
+    resolve(
+        obj: Resolvable<ApplicationServer>,
+    ): ApplicationServer | Dict<number, ApplicationServer> | undefined {
         if (obj instanceof ApplicationServer) return obj;
         if (typeof obj === 'number') return this.cache.get(obj);
-        if (typeof obj === 'string') return this.cache.find(s => s.name === obj);
-        if (obj.relationships?.servers) return this._patch(obj.relationships.servers);
+        if (typeof obj === 'string')
+            return this.cache.find(s => s.name === obj);
+
+        if (obj.relationships?.servers)
+            return this._patch(obj.relationships.servers);
+
         return undefined;
     }
 
@@ -182,7 +199,10 @@ export class ApplicationServerManager extends BaseManager {
      * app.servers.fetch(12).then(console.log).catch(console.error);
      * ```
      */
-    async fetch(id: number, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    async fetch(
+        id: number,
+        options?: Include<FetchOptions>,
+    ): Promise<ApplicationServer>;
     /**
      * Fetches a server from the API by its external ID. This will check the cache first unless the
      * force option is specified.
@@ -195,7 +215,10 @@ export class ApplicationServerManager extends BaseManager {
      * app.servers.fetch('minecraft').then(console.log).catch(console.error);
      * ```
      */
-    async fetch(id: string, options?: Include<FetchOptions>): Promise<ApplicationServer>;
+    async fetch(
+        id: string,
+        options?: Include<FetchOptions>,
+    ): Promise<ApplicationServer>;
     /**
      * Fetches a list of servers from the API with the given options (default is undefined).
      * @see {@link Include} and {@link FetchOptions}.
@@ -207,21 +230,22 @@ export class ApplicationServerManager extends BaseManager {
      * app.servers.fetch({ page: 2 }).then(console.log).catch(console.error);
      * ```
      */
-    async fetch(options?: Include<FetchOptions>): Promise<Dict<number, ApplicationServer>>;
+    async fetch(
+        options?: Include<FetchOptions>,
+    ): Promise<Dict<number, ApplicationServer>>;
     async fetch(
         op?: number | string | Include<FetchOptions>,
-        ops: Include<FetchOptions> = {}
+        ops: Include<FetchOptions> = {},
     ): Promise<any> {
         let path: string;
         switch (typeof op) {
-            case 'number':{
-                if (!ops.force && this.cache.has(op))
-                    return this.cache.get(op);
+            case 'number': {
+                if (!ops.force && this.cache.has(op)) return this.cache.get(op);
 
                 path = endpoints.servers.get(op);
                 break;
             }
-            case 'string':{
+            case 'string': {
                 if (!ops.force) {
                     const u = this.cache.find(u => u.externalId === op);
                     if (u) return u;
@@ -231,14 +255,14 @@ export class ApplicationServerManager extends BaseManager {
                 break;
             }
             case 'undefined':
-            case 'object':{
+            case 'object': {
                 path = endpoints.servers.main;
                 if (op) ops = op;
                 break;
             }
             default:
                 throw new ValidationError(
-                    `expected server id, external id or fetch options; got ${typeof op}`
+                    `expected server id, external id or fetch options; got ${typeof op}`,
                 );
         }
 
@@ -247,9 +271,27 @@ export class ApplicationServerManager extends BaseManager {
     }
 
     /**
+     * Fetches all servers from the API with the given options (default is undefined).
+     * @see {@link Include} and {@link FetchOptions}.
+     *
+     * @param [options] Additional fetch options.
+     * @returns The fetched servers.
+     * @example
+     * ```
+     * app.servers.fetchAll().then(console.log).catch(console.error);
+     * ```
+     */
+
+    fetchAll(
+        options?: Include<Omit<FetchOptions, 'page'>>,
+    ): Promise<Dict<number, ApplicationServer>> {
+        return this.getFetchAll(options);
+    }
+
+    /**
      * Queries the API for servers that match the specified query filters. This fetches from the
      * API directly and does not check the cache. Use cache methods for filtering and sorting.
-     * 
+     *
      * Available query filters:
      * * name
      * * uuid
@@ -257,13 +299,13 @@ export class ApplicationServerManager extends BaseManager {
      * * identifier (alias for uuidShort)
      * * externalId
      * * image
-     * 
+     *
      * Available sort options:
      * * id
      * * -id
      * * uuid
      * * -uuid
-     * 
+     *
      * @param entity The entity to query.
      * @param options The query options to filter by.
      * @returns The queried servers.
@@ -276,7 +318,7 @@ export class ApplicationServerManager extends BaseManager {
      */
     async query(
         entity: string,
-        options: Filter<Sort<{}>>
+        options: Filter<Sort<{}>>,
     ): Promise<Dict<number, ApplicationServer>> {
         if (!options.sort && !options.filter)
             throw new ValidationError('Sort or filter is required.');
@@ -291,7 +333,8 @@ export class ApplicationServerManager extends BaseManager {
         const data = await this.client.requests.get(
             endpoints.servers.main,
             payload as FilterArray<Sort<FetchOptions>>,
-            null, this
+            null,
+            this,
         );
         return this._patch(data);
     }
@@ -327,20 +370,21 @@ export class ApplicationServerManager extends BaseManager {
     async create(options: CreateServerOptions): Promise<ApplicationServer> {
         options.limits = Object.assign(
             this.defaultLimits,
-            options.limits || {}
+            options.limits || {},
         );
         options.featureLimits = Object.assign(
             this.defaultFeatureLimits,
-            options.featureLimits || {}
+            options.featureLimits || {},
         );
 
-        const payload = caseConv.toSnakeCase<any>(
-            options, { ignore:['environment'] }
-        );
+        const payload = caseConv.toSnakeCase<any>(options, {
+            ignore: ['environment'],
+        });
         payload.environment = options.environment;
 
         const data = await this.client.requests.post(
-            endpoints.servers.main, payload
+            endpoints.servers.main,
+            payload,
         );
         return this._patch(data);
     }
@@ -360,7 +404,7 @@ export class ApplicationServerManager extends BaseManager {
      */
     async updateDetails(
         id: number,
-        options: UpdateDetailsOptions
+        options: UpdateDetailsOptions,
     ): Promise<ApplicationServer> {
         if (!Object.keys(options).length)
             throw new ValidationError('Too few options to update the server.');
@@ -371,9 +415,12 @@ export class ApplicationServerManager extends BaseManager {
         options.externalId ||= server.externalId;
         options.description ||= server.description;
 
-        const payload = caseConv.toSnakeCase<object>(options, { map:{ owner: 'user' }});
+        const payload = caseConv.toSnakeCase<object>(options, {
+            map: { owner: 'user' },
+        });
         const data = await this.client.requests.patch(
-            endpoints.servers.details(id), payload
+            endpoints.servers.details(id),
+            payload,
         );
         return this._patch(data);
     }
@@ -398,19 +445,22 @@ export class ApplicationServerManager extends BaseManager {
      */
     async updateBuild(
         id: number,
-        options: UpdateBuildOptions
+        options: UpdateBuildOptions,
     ): Promise<ApplicationServer> {
         if (!Object.keys(options).length)
             throw new ValidationError('Too few options to update the server.');
 
         const server = await this.fetch(id, { force: true });
         options.limits = Object.assign(server.limits, options.limits);
-        options.featureLimits = Object.assign(server.featureLimits, options.featureLimits);
+        options.featureLimits = Object.assign(
+            server.featureLimits,
+            options.featureLimits,
+        );
         options.allocation ??= server.allocation;
 
         const data = await this.client.requests.patch(
             endpoints.servers.build(id),
-            caseConv.toSnakeCase(options)
+            caseConv.toSnakeCase(options),
         );
         return this._patch(data);
     }
@@ -433,7 +483,7 @@ export class ApplicationServerManager extends BaseManager {
      */
     async updateStartup(
         id: number,
-        options: UpdateStartupOptions
+        options: UpdateStartupOptions,
     ): Promise<ApplicationServer> {
         if (!Object.keys(options).length)
             throw new ValidationError('Too few options to update the server.');
@@ -445,12 +495,14 @@ export class ApplicationServerManager extends BaseManager {
         options.skipScripts ??= false;
         options.startup ||= server.container.startupCommand;
 
-        const payload = caseConv.toSnakeCase<any>(options, { ignore:['environment'] });
+        const payload = caseConv.toSnakeCase<any>(options, {
+            ignore: ['environment'],
+        });
         payload.environment = options.environment;
 
         const data = await this.client.requests.patch(
             endpoints.servers.startup(id),
-            payload
+            payload,
         );
         return this._patch(data);
     }
@@ -501,7 +553,9 @@ export class ApplicationServerManager extends BaseManager {
      * ```
      */
     async delete(id: number, force: boolean = false): Promise<void> {
-        await this.client.requests.delete(endpoints.servers.get(id) + (force ? '/force' : ''));
+        await this.client.requests.delete(
+            endpoints.servers.get(id) + (force ? '/force' : ''),
+        );
         this.cache.delete(id);
     }
 }
