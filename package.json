@@ -35,8 +35,8 @@
   },
   "scripts": {
     "prepublishOnly": "tsup",
-    "prepublish": "tsup",
-    "postinstall": "tsup",
+    "prepublish": "npm run build",
+    "postinstall": "npm run build",
     "build": "tsup",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
     "format": "prettier --write **/**.{js,ts}",
