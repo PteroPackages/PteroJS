@@ -28,6 +28,7 @@
     "CHANGELOG.md",
     "LICENSE",
     "pterojs.json",
+    "tsup.config.ts",
     "README.md"
   ],
   "engines": {
