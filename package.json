@@ -28,7 +28,6 @@
     "CHANGELOG.md",
     "LICENSE",
     "pterojs.json",
-    "tsup.config.ts",
     "README.md"
   ],
   "engines": {
@@ -37,7 +36,6 @@
   "scripts": {
     "prepublishOnly": "tsup",
     "prepublish": "npm run build",
-    "postinstall": "npm run build",
     "build": "tsup",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
     "format": "prettier --write **/**.{js,ts}",
@@ -60,7 +58,6 @@
   "dependencies": {
     "axios": "^0.27.2",
     "form-data": "^4.0.0",
-    "tsup": "^6.3.0",
     "ws": "^8.8.1"
   },
   "devDependencies": {
@@ -71,6 +68,7 @@
     "nock": "^13.2.9",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
+    "tsup": "^6.3.0",
     "typedoc": "^0.22.18"
   }
 }
