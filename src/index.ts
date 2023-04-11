@@ -1,4 +1,6 @@
-export { version } from '../package.json';
+import { version as v } from '../package.json';
+
+export const version = v;
 
 // Application API
 export { PteroApp } from './application';
