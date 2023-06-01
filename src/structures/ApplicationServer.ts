@@ -10,13 +10,6 @@ import {
 } from '../common/app';
 import caseConv from '../util/caseConv';
 
-export type ApplicationServerStatus =
-    | 'installing'
-    | 'install_failed'
-    | 'reinstall_failed'
-    | 'suspended'
-    | 'restoring_backup';
-
 export class ApplicationServer {
     public client: PteroApp;
     public databases: ApplicationDatabaseManager;
@@ -44,7 +37,7 @@ export class ApplicationServer {
     public description: string | undefined;
 
     /** The current processing status of the server. */
-    public status: ApplicationServerStatus | null;
+    public status: string | null;
 
     /** Whether the server is suspended from action. */
     public suspended: boolean;
