@@ -1,5 +1,7 @@
 const axios = require('axios');
 const nock = require('nock');
+require('dotenv').config();
+
 const {
     Dict,
     PteroAPIError,
@@ -10,11 +12,8 @@ const {
 
 axios.defaults.adapter = require('axios/lib/adapters/http');
 
-const scope = nock('https://pterodactyl.test');
-const app = new PteroApp(
-    'https://pterodactyl.test',
-    'ptlc_QRkkwxgiqmkybXs3wBpYvfvPsLEYvPEk3ZyJb30PV93',
-);
+const scope = nock(process.env.APP_URL);
+const app = new PteroApp(process.env.APP_URL, process.env.APP_KEY);
 
 scope.get('/api/application/users').reply(200, {
     object: 'list',
