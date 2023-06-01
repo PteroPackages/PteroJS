@@ -11,3 +11,4 @@ package-lock.json
 /src/remote
 *.cmd
 *.sh
+.env
