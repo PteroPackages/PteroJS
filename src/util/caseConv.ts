@@ -55,43 +55,49 @@ function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
     return parsed as T;
 }
 
-function toSnakeCase<T>(
-    obj: any,
-    options: ConvertOptions = {},
-    visited: Set<any> = new Set<any>(),
-): T {
-    if (typeof obj !== 'object' || obj === null || visited.has(obj)) {
-        return obj;
-    }
+function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
+    if (typeof obj !== 'object' || obj === null) return obj;
 
-    visited.add(obj);
-
+    const stack = [{ obj, currentKey: '' }];
     const parsed: Record<string, any> = {};
 
-    if (Array.isArray(obj)) {
-        return obj.map(i => toSnakeCase(i, options, visited)) as any;
-    }
+    while (stack.length > 0) {
+        const { obj: currentObj, currentKey } =
+            stack.pop() as (typeof stack)[0];
 
-    for (let [k, v] of Object.entries(obj)) {
-        if (options.ignore?.includes(k)) continue;
-        if (options.map?.[k]) k = options.map[k];
-        if (options.cast?.[k]) {
-            try {
-                const cls = options.cast[k];
-                v = new cls(v);
-            } catch {
-                v = String(v);
+        if (Array.isArray(currentObj)) {
+            parsed[currentKey] = currentObj.map(i => toSnakeCase(i));
+            continue;
+        }
+
+        if (typeof currentObj === 'object' && currentObj !== null) {
+            const keys = Object.keys(currentObj);
+            for (let i = keys.length - 1; i >= 0; i--) {
+                const key = keys[i];
+                let value = currentObj[key];
+                const newKey = options.map?.[key] || snakeCase(key);
+
+                if (options.ignore?.includes(key)) continue;
+
+                if (options.cast?.[key]) {
+                    try {
+                        const cls = options.cast[key];
+                        value = new cls(value);
+                    } catch {
+                        value = String(value);
+                    }
+                }
+
+                parsed[newKey] = value;
+
+                if (typeof value === 'object' && value !== null) {
+                    stack.push({ obj: value, currentKey: newKey });
+                }
             }
+        } else {
+            parsed[currentKey] = currentObj;
         }
-        if (Array.isArray(v)) {
-            v = v.map(i => toSnakeCase(i, options, visited));
-        } else if (typeof v === 'object' && v !== null) {
-            v = toSnakeCase(v, options, visited);
-        }
-        parsed[snakeCase(k)] = v;
     }
-
-    visited.delete(obj);
 
     return parsed as T;
 }
