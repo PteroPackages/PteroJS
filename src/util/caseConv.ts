@@ -1,3 +1,5 @@
+import { snakeCase } from 'snake-case';
+
 export interface ConvertOptions {
     ignore?: string[];
     map?: Record<string, string>;
@@ -53,25 +55,21 @@ function toCamelCase<T>(obj: any, options: ConvertOptions = {}): T {
     return parsed as T;
 }
 
-function snakeCase(str: string): string {
-    let res = '';
-    const isUpper = (c: string) =>
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').includes(c);
+function toSnakeCase<T>(
+    obj: any,
+    options: ConvertOptions = {},
+    visited: Set<any> = new Set<any>(),
+): T {
+    if (typeof obj !== 'object' || obj === null || visited.has(obj)) {
+        return obj;
+    }
 
-    str.split('').forEach(c => {
-        if (isUpper(c)) res += '_';
-        res += c.toLowerCase();
-    });
+    visited.add(obj);
 
-    return res;
-}
-
-function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
-    if (typeof obj !== 'object') return obj;
     const parsed: Record<string, any> = {};
 
     if (Array.isArray(obj)) {
-        return <any>obj.map(i => toSnakeCase(i));
+        return obj.map(i => toSnakeCase(i, options, visited)) as any;
     }
 
     for (let [k, v] of Object.entries(obj)) {
@@ -80,19 +78,20 @@ function toSnakeCase<T>(obj: any, options: ConvertOptions = {}): T {
         if (options.cast?.[k]) {
             try {
                 const cls = options.cast[k];
-                // @ts-ignore
                 v = new cls(v);
             } catch {
                 v = String(v);
             }
         }
         if (Array.isArray(v)) {
-            v = v.map(i => toSnakeCase(i));
-        } else if (typeof v === 'object' && !!v) {
-            v = toSnakeCase(v);
+            v = v.map(i => toSnakeCase(i, options, visited));
+        } else if (typeof v === 'object' && v !== null) {
+            v = toSnakeCase(v, options, visited);
         }
         parsed[snakeCase(k)] = v;
     }
+
+    visited.delete(obj);
 
     return parsed as T;
 }
