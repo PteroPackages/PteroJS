@@ -60,8 +60,12 @@ export interface CreateUserOptions {
     isAdmin?: boolean;
 }
 
+export type CreateServerOptions =
+    | CreateServerWithAllocation
+    | CreateServerWithDeploy;
+
 /** Options for creating a server. */
-export interface CreateServerOptions {
+export interface CreateServerOptionsBase {
     /** The external identifier of the server. */
     externalId?: string;
     /** The name of the server. */
@@ -92,6 +96,14 @@ export interface CreateServerOptions {
     limits?: Partial<Limits>;
     /** The server's feature limits. */
     featureLimits?: Partial<FeatureLimits>;
+    /**
+     * Whether to start the server after the installation process is complete.
+     * @default false
+     */
+    startOnCompletion?: boolean;
+}
+
+export interface CreateServerWithAllocation extends CreateServerOptionsBase {
     /** The server allocation details. */
     allocation: {
         /** The default server allocation. */
@@ -99,20 +111,18 @@ export interface CreateServerOptions {
         /** Additional allocations for the server. */
         additional?: number[];
     };
+}
+
+export interface CreateServerWithDeploy extends CreateServerOptionsBase {
     /**
      * Node deployment options. This is for more control over where the
      * server is deployed within the location and port ranges specified.
      */
-    deploy?: {
+    deploy: {
         locations: number[];
         dedicatedIp: boolean;
         portRange: string[];
     };
-    /**
-     * Whether to start the server after the installation process is complete.
-     * @default false
-     */
-    startOnCompletion?: boolean;
 }
 
 /** Represents a nest egg object. */
