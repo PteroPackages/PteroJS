@@ -1,4 +1,5 @@
-import { FeatureLimits, Limits } from '../common';
+import { FeatureLimits, Limits } from './index';
+import type { EggVariable } from './client';
 
 /** Represents an allocation object. */
 export interface Allocation {
@@ -147,6 +148,77 @@ export interface Egg {
     };
     createdAt: Date;
     updatedAt: Date | undefined;
+    relationships?: {
+        /**
+         * Information about the nest that owns the egg.
+         * Returned when `nest` is included via the `FetchOptions`.
+         * */
+        nest?: EggIncludedNest;
+        /**
+         * List of servers using the egg.
+         * Returned when `servers` are included via the `FetchOptions`.
+         */
+        servers?: EggIncludedServers;
+        /**
+         * List of egg variables.
+         * Returned when `variables` are included via the `FetchOptions`.
+         * */
+        variables?: EggIncludedVariables;
+    };
+}
+
+/** Information about the nest that owns the egg. */
+export interface EggIncludedNest {
+    object: 'nest';
+    attributes: Nest;
+}
+
+/** Represents a server using the egg. */
+export interface EggIncludedServer {
+    object: 'server';
+    attributes: {
+        id: number;
+        externalId: string | undefined;
+        uuid: string;
+        identifier: string;
+        name: string;
+        description: string | undefined;
+        status: string | null;
+        suspended: boolean;
+        limits: Limits;
+        featureLimits: FeatureLimits;
+        user: number;
+        node: number;
+        allocation: number;
+        nest: number;
+        egg: number;
+        container: {
+            startupCommand: string;
+            image: string;
+            installed: boolean;
+            environment: Record<string, string | number | undefined>;
+        };
+        updatedAt: string;
+        createdAt: string;
+    };
+}
+
+/** List of servers using the egg. */
+export interface EggIncludedServers {
+    object: 'list';
+    data: EggIncludedServer[];
+}
+
+/** Represents an egg variable. */
+export interface EggIncludedVariable {
+    object: 'list';
+    attributes: EggVariable;
+}
+
+/** List of egg variables. */
+export interface EggIncludedVariables {
+    object: 'egg_variable';
+    data: EggIncludedVariable[];
 }
 
 /** Represents a nest object. */
