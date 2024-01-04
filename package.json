@@ -21,7 +21,9 @@
   "exports": {
     "require": "./dist/index.js",
     "import": "./dist/index.mjs",
-    "default": "./dist/index.mjs"
+    "default": "./dist/index.mjs",
+    "types":"./dist/index.d.ts",
+    "node": "./dist/index.js"
   },
   "files": [
     "dist",
