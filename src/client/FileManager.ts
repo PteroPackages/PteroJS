@@ -82,7 +82,7 @@ export class FileManager {
         const data = await this.client.requests.get(
             endpoints.servers.files.contents(this.serverId, this.clean(path)),
         );
-        return data.toString();
+        return data;
     }
 
     /**

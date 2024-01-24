@@ -25,6 +25,12 @@ export class RequestManager extends EventEmitter {
         super();
         this.instance = axios.create({
             baseURL: `${this._domain}/api/${this._type.toLowerCase()}`,
+            transformResponse: (data, headers) => {
+                if (headers && headers['content-type'].startsWith('text/plain'))
+                    return data;
+
+                return JSON.parse(data);
+            },
         });
         this._ping = -1;
         this._start = 0;
@@ -65,7 +71,7 @@ export class RequestManager extends EventEmitter {
         return {
             'User-Agent': `PteroJS ${this._type} v${version}`,
             'Content-Type': 'application/json',
-            Accept: 'application/json, text/plain',
+            Accept: 'application/json',
             Authorization: `Bearer ${this._auth}`,
         };
     }
