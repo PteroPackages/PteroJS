@@ -22,7 +22,7 @@
     "require": "./dist/index.js",
     "import": "./dist/index.mjs",
     "default": "./dist/index.mjs",
-    "types":"./dist/index.d.ts",
+    "types": "./dist/index.d.ts",
     "node": "./dist/index.js"
   },
   "files": [
@@ -40,12 +40,7 @@
     "prepublish": "npm run build",
     "build": "tsup",
     "docs": "typedoc --out docs --excludePrivate src/index.ts",
-    "format": "prettier --write **/**.{js,ts}",
-    "test": "jest",
-    "test:watch": "jest --watchAll"
-  },
-  "jest": {
-    "rootDir": "./tests"
+    "format": "prettier --write **/**.{js,ts}"
   },
   "keywords": [
     "api",
@@ -63,11 +58,8 @@
     "ws": "^8.8.1"
   },
   "devDependencies": {
-    "@types/jest": "^29.0.0",
     "@types/node": "^17.0.45",
     "@types/ws": "^8.5.3",
-    "jest": "^29.0.2",
-    "nock": "^13.2.9",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
     "tsup": "^6.3.0",
