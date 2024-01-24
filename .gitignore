@@ -1,4 +1,5 @@
 # General directories
+/.vscode
 /node_modules
 /dist
 
