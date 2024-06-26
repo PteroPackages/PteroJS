@@ -16,7 +16,7 @@ import loader from '../util/config';
  * at <your.domain.name/account/api>.
  *
  * **Warning:** Keep your API key private at all times. Exposing this can lead
- * to your accond and servers being corrupted, exposed and/or deleted.
+ * to your account and servers being corrupted, exposed and/or deleted.
  */
 export class PteroClient {
     /**
